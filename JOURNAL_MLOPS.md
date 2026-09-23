@@ -152,9 +152,15 @@ docker compose --profile pipeline run --rm pipeline   # dvc repro conteneurisé
 1. job `tests` : installe `requirements-dev.txt` et lance `pytest`. Aucun secret nécessaire, car
    les tests n'utilisent que des données synthétiques ;
 2. job `docker` : `dvc pull` depuis DagsHub, build de l'image API, puis test de fumée sur `/health`.
-   **Ignoré tant que les secrets `DAGSHUB_USER` / `DAGSHUB_TOKEN` ne sont pas configurés.**
+   Ignoré tant que le secret `DAGSHUB_TOKEN` n'est pas configuré.
 
-⚠️ Non testée : impossible à exécuter sans le dépôt GitHub. À vérifier au premier push (onglet Actions).
+✅ **Validée le 2026-09-23** : secret `DAGSHUB_TOKEN` ajouté (GitHub → Settings → Secrets and
+variables → Actions → New repository secret), run lancé à la main (Actions → CI → Run workflow).
+Les jobs `tests` et `docker` sont verts. Le jeton DagsHub sert à la fois d'identifiant et de mot de
+passe S3 : aucun secret « utilisateur » n'est nécessaire.
+À dire au jury : chaque push vérifie automatiquement que le code passe les tests, que les données
+et modèles versionnés sont récupérables depuis DagsHub, et que l'image de l'API démarre et répond.
+C'est le socle d'un déploiement continu (C6, C9).
 
 ### 2.8 README et commits
 - `README.md` à la racine : page d'accueil du dépôt pour le jury (résultats, structure, commandes).
@@ -258,12 +264,11 @@ dvc status -c                                      # "Cache and remote 'origin' 
    dvc push          # envoie les CSV, parquets et modèles
    ```
    `--local` écrit le jeton dans `.dvc/config.local`, qui n'est **jamais** commité.
-   ⚠️ La CI suppose que le remote s'appelle `origin` : garde ce nom.
+   La CI suppose que le remote s'appelle `origin` : garde ce nom.
 4. MLflow sur DagsHub : définis les 3 variables affichées par DagsHub (`MLFLOW_TRACKING_URI`,
    `MLFLOW_TRACKING_USERNAME`, `MLFLOW_TRACKING_PASSWORD`), puis relance l'entraînement
    (`dvc repro -f -s train_churn train_clv`). Les runs apparaissent sur DagsHub sans modifier le code.
-5. GitHub → Settings → Secrets and variables → Actions : ajoute `DAGSHUB_USER` et `DAGSHUB_TOKEN`
-   pour activer le job `docker` de la CI.
+5. ✅ Secret `DAGSHUB_TOKEN` ajouté dans GitHub, CI verte (§2.7).
 6. Reporte les liens GitHub, DagsHub et MLflow dans `README.md`, puis dans le notebook final.
 
 ### 3.3 Tâches de fond

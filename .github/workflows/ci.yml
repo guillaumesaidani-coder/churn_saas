@@ -30,13 +30,12 @@ jobs:
     needs: tests
     runs-on: ubuntu-latest
     env:
-      DAGSHUB_USER: ${{ secrets.DAGSHUB_USER }}
       DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - name: Secret DagsHub absent -- étape ignorée
         if: env.DAGSHUB_TOKEN == ''
-        run: echo "Configurer DAGSHUB_USER et DAGSHUB_TOKEN dans Settings > Secrets > Actions."
+        run: echo "Configurer le secret DAGSHUB_TOKEN dans Settings > Secrets > Actions."
       - uses: actions/setup-python@v5
         if: env.DAGSHUB_TOKEN != ''
         with:
