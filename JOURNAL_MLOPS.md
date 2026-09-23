@@ -168,11 +168,24 @@ docker compose --profile pipeline run --rm pipeline   # dvc repro conteneurisé
   6. `.gitattributes` ;
   7. ce journal.
 
+### 2.9 Push vers GitHub (2026-09-23)
+```bash
+git remote add origin https://github.com/guillaumesaidani-coder/churn_saas.git
+git push -u origin main
+```
+`-u` associe la branche locale `main` à `origin/main` : ensuite, `git push` et `git pull` suffisent.
+Le push a déclenché la CI (onglet **Actions**) ; le job `docker` reste ignoré tant que les secrets
+DagsHub ne sont pas en place.
+Le dépôt semble **privé** : pour le jury, il faudra le rendre public ou l'y inviter
+(Settings → Collaborators).
+Nom `origin` : le remote Git et le remote DVC s'appellent tous les deux `origin`, sans conflit, car
+ce sont deux outils distincts.
+
 ---
 
 ## 3. Ce qu'il te reste à faire (je ne peux pas le faire à ta place : ça demande tes comptes)
 
-### 3.1 GitHub
+### 3.1 GitHub ✅ fait (§2.9)
 1. Sur github.com : **New repository**, par exemple `churn-saas-certification`, **sans** README ni
    .gitignore (le dépôt local en a déjà). Public (lien jury) ou privé avec invitation du jury.
 2. Donne-moi l'URL, ou lance toi-même :
