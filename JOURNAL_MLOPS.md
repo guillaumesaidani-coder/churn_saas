@@ -189,8 +189,10 @@ contenait.
      ```bash
      git filter-branch --prune-empty --index-filter        'git rm -r -q --cached --ignore-unmatch Livrables questions_jury_ml_mlops_v2.md' -- main
      ```
-  4. tu as **supprimé le dépôt GitHub et en as recréé un vide**, ce qui évite de forcer un push
-     sur un historique déjà publié ;
+  4. tu as **supprimé le dépôt GitHub et en as recréé un**, ce qui évite de forcer un push sur un
+     historique déjà publié. GitHub y avait ajouté un commit « Initial commit » (README de 2
+     lignes) : il a été fusionné (`git merge --allow-unrelated-histories`) en gardant notre
+     README, plutôt qu'écrasé par un push forcé ;
   5. push de l'historique propre.
 - Vérification : 0 occurrence de `Livrables/` dans tous les commits de `main`. Le dossier est
   intact sur ton disque.
