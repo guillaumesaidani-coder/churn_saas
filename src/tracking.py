@@ -62,9 +62,12 @@ def log_training_run(
     """Loggue un run MLflow (params + métriques + tag gold_sha256 si fourni, tags et
     fichiers artefacts optionnels). Retourne le run_id créé.
 
-    `artifact_location` n'est utilisé qu'à la création de l'expérience (store local :
-    évite que MLflow écrive ses artefacts dans le répertoire courant du notebook)."""
+    `artifact_location` n'est utilisé qu'à la création de l'expérience, et seulement pour un
+    store local (évite que MLflow écrive ses artefacts dans le répertoire courant du notebook).
+    Sur un serveur distant (http/https), c'est le serveur qui choisit où stocker les artefacts."""
     mlflow.set_tracking_uri(tracking_uri)
+    if artifact_location and tracking_uri.startswith("http"):
+        artifact_location = None
     if artifact_location and mlflow.get_experiment_by_name(experiment_name) is None:
         mlflow.create_experiment(experiment_name, artifact_location=artifact_location)
     mlflow.set_experiment(experiment_name)

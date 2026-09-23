@@ -27,19 +27,19 @@
     },
     {
       "variable": "anciennete_mois",
-      "importance_moyenne": 0.015610579270136649
+      "importance_moyenne": 0.015610579270136538
     },
     {
       "variable": "sieges_souscrits",
-      "importance_moyenne": 0.0019905803336782196
+      "importance_moyenne": 0.001990580333678116
     },
     {
       "variable": "heures_usage_30j",
-      "importance_moyenne": 0.0010417746745171894
+      "importance_moyenne": 0.0010417746745170634
     },
     {
       "variable": "connexions_30j",
-      "importance_moyenne": 0.0007066087480835037
+      "importance_moyenne": 0.0007066087480834001
     }
   ]
 }

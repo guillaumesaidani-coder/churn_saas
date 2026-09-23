@@ -7,7 +7,7 @@ pour que tu puisses le défendre devant le jury (compétences C6 et C9 surtout).
 Sommaire :
 0. État de départ
 1. À quoi sert chaque outil
-2. Actions réalisées, pas à pas (§2.1 à §2.11)
+2. Actions réalisées, pas à pas (§2.1 à §2.12)
 3. Ce qu'il te reste à faire (avec les commandes)
 4. Livrable final : où on en est
 5. Points d'attention et questions probables du jury
@@ -236,6 +236,38 @@ dvc status -c                                      # "Cache and remote 'origin' 
 - ⚠️ Le jeton a été collé dans la conversation avec l'assistant : **en générer un nouveau** sur
   DagsHub, supprimer l'ancien, puis relancer les deux commandes `--local`.
 
+### 2.12 MLflow sur le serveur DagsHub (2026-09-23)
+Serveur : https://dagshub.com/guillaume.saidani/churn_saas.mlflow (source : documentation DagsHub,
+« MLflow tracking »).
+- **Correction préalable** de `src/tracking.py` : à la création d'une expérience, le code
+  imposait un dossier d'artefacts local (`file:///C:/...`). Sur un serveur distant, les artefacts
+  seraient partis vers un chemin de ton PC, inaccessible pour le jury. On laisse maintenant le
+  serveur choisir quand l'URI est en `http(s)`. Nouveau test associé, 92 tests au total.
+- Relance du pipeline avec 3 variables d'environnement, **sans modifier les notebooks** : c'était
+  le but de `resolve_tracking_uri()` (§2.3).
+  ```powershell
+  $env:MLFLOW_TRACKING_URI      = "https://dagshub.com/guillaume.saidani/churn_saas.mlflow"
+  $env:MLFLOW_TRACKING_USERNAME = "guillaume.saidani"
+  $env:MLFLOW_TRACKING_PASSWORD = "<jeton DagsHub>"   # le même que pour DVC
+  python -m dvc repro
+  ```
+  DVC n'a rejoué que `train_churn` et `train_clv`, car leur dépendance `src/tracking.py` avait
+  changé. `scoring` a été sauté : les modèles réentraînés sont **identiques octet par octet**, une
+  preuve de plus de la reproductibilité.
+- Vérifié côté serveur :
+
+  | Expérience | Métriques | Paramètres | Artefacts | Tag `gold_sha256` |
+  |---|---|---|---|---|
+  | `churn_saas_classification` | 16 | 18 | modèle, metrics.json, model card, manifeste, 2 courbes | `c3f400321b24…` |
+  | `churn_saas_regression_clv` | 13 | 22 | metrics, model card, manifeste, graphique | `c3f400321b24…` |
+
+  Le même `gold_sha256` figure dans `gold_manifest.json` et `model_manifest.json`. On remonte ainsi
+  d'un run MLflow jusqu'à la version exacte des données.
+- Le store local `data/model/mlflow.db` garde les premiers runs, ceux de §2.4. Il reste utile hors
+  ligne, mais **la référence à montrer au jury est le serveur DagsHub**.
+- Docker : le service `pipeline` de `compose.yaml` lit déjà ces 3 variables, depuis un fichier
+  `.env` (ignoré par Git).
+
 ---
 
 ## 3. Ce qu'il te reste à faire (je ne peux pas le faire à ta place : ça demande tes comptes)
@@ -265,9 +297,7 @@ dvc status -c                                      # "Cache and remote 'origin' 
    ```
    `--local` écrit le jeton dans `.dvc/config.local`, qui n'est **jamais** commité.
    La CI suppose que le remote s'appelle `origin` : garde ce nom.
-4. MLflow sur DagsHub : définis les 3 variables affichées par DagsHub (`MLFLOW_TRACKING_URI`,
-   `MLFLOW_TRACKING_USERNAME`, `MLFLOW_TRACKING_PASSWORD`), puis relance l'entraînement
-   (`dvc repro -f -s train_churn train_clv`). Les runs apparaissent sur DagsHub sans modifier le code.
+4. ✅ MLflow sur DagsHub (§2.12).
 5. ✅ Secret `DAGSHUB_TOKEN` ajouté dans GitHub, CI verte (§2.7).
 6. Reporte les liens GitHub, DagsHub et MLflow dans `README.md`, puis dans le notebook final.
 
@@ -287,11 +317,11 @@ fournir les **liens GitHub et vers le jeu de données**.
 
 | Élément | État |
 |---|---|
-| Jeu de données versionné | ✅ DVC ; lien public dès le `dvc push` vers DagsHub (§3.2) |
+| Jeu de données versionné | ✅ DVC, https://dagshub.com/guillaume.saidani/churn_saas (§2.11) |
 | Modèles sérialisés | ✅ `model.joblib`, `model_clv.joblib` (DVC) |
-| Artefacts générés | ✅ courbes, cartes modèle, manifestes, runs MLflow |
+| Artefacts générés | ✅ courbes, cartes modèle, manifestes ; runs MLflow en ligne sur DagsHub (§2.12) |
 | Notebooks exécutés | ✅ `reports/notebooks/00` à `06`, régénérés par `dvc repro` |
-| Code sur GitHub | ⏳ en attente de ton dépôt (§3.1) |
+| Code sur GitHub | ✅ https://github.com/guillaumesaidani-coder/churn_saas (CI verte) |
 | **Notebook unique au plan imposé** | ❌ **à construire** : c'est le plus gros manque |
 | Support de présentation | présent dans `Livrables/soutenance_churn_saas_C1_C9.pptx` (non vérifié ici) |
 

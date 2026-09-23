@@ -1,7 +1,7 @@
 {
   "couche": "model",
   "sous_modele": "clv_regression",
-  "processed_at_utc": "2026-09-23T08:29:42.748091+00:00",
+  "processed_at_utc": "2026-09-23T09:27:12.939015+00:00",
   "source": "data/gold/clients_churn_gold.parquet",
   "gold_version": "v1",
   "gold_sha256": "c3f400321b243989443155f1dc62a95353eb1d2dc67e9c868f80f689bcd630a6",
@@ -70,19 +70,19 @@
       },
       {
         "variable": "anciennete_mois",
-        "importance_moyenne": 0.015610579270136649
+        "importance_moyenne": 0.015610579270136538
       },
       {
         "variable": "sieges_souscrits",
-        "importance_moyenne": 0.0019905803336782196
+        "importance_moyenne": 0.001990580333678116
       },
       {
         "variable": "heures_usage_30j",
-        "importance_moyenne": 0.0010417746745171894
+        "importance_moyenne": 0.0010417746745170634
       },
       {
         "variable": "connexions_30j",
-        "importance_moyenne": 0.0007066087480835037
+        "importance_moyenne": 0.0007066087480834001
       }
     ]
   },

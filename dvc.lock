@@ -156,8 +156,8 @@ stages:
       size: 217229
     - path: src/tracking.py
       hash: md5
-      md5: 81757c9a6748aefd7639ea301c5c6a94
-      size: 4327
+      md5: 56e16825571b32ec4f3b319e9a74b418
+      size: 4542
     outs:
     - path: data/model/courbes_roc_pr.png
       hash: md5
@@ -181,12 +181,12 @@ stages:
       size: 1541
     - path: data/model/model_manifest.json
       hash: md5
-      md5: f28cfd41368be5485aa8d20fe31a935b
+      md5: b04ba2dc235d939769c5bd9c0014596a
       size: 3499
     - path: reports/notebooks/04_modelisation_churn.ipynb
       hash: md5
-      md5: 9c72719ce66c1bf52bd3812aa7f8eebe
-      size: 218697
+      md5: ffee99d03bf0758e84e0b5f560c2229b
+      size: 218861
   train_clv:
     cmd: python -m jupyter nbconvert --to notebook --execute 
       --ExecutePreprocessor.timeout=1800 
@@ -207,8 +207,8 @@ stages:
       size: 178942
     - path: src/tracking.py
       hash: md5
-      md5: 81757c9a6748aefd7639ea301c5c6a94
-      size: 4327
+      md5: 56e16825571b32ec4f3b319e9a74b418
+      size: 4542
     outs:
     - path: data/model/clv_reel_vs_predit.png
       hash: md5
@@ -216,8 +216,8 @@ stages:
       size: 143741
     - path: data/model/metrics_clv.json
       hash: md5
-      md5: a7f8c0131d2b15a01e5ed9005dbf43b2
-      size: 1134
+      md5: 7381cacdf1cb405ada8658ab36695eb8
+      size: 1133
     - path: data/model/model_card_clv.md
       hash: md5
       md5: 70faf84724ff577f48e789e8674ce3f1
@@ -228,12 +228,12 @@ stages:
       size: 62538058
     - path: data/model/model_clv_manifest.json
       hash: md5
-      md5: b0271c42335744026513c05a064b55b6
-      size: 2810
+      md5: 32a0ef21feea99f94937ac90894263bb
+      size: 2809
     - path: reports/notebooks/05_modelisation_clv.ipynb
       hash: md5
-      md5: aced5df6ffdc621f641e126d31a8aa20
-      size: 180006
+      md5: df72e66981b5ffada5ec4763bf5d444a
+      size: 180549
   scoring:
     cmd: python -m jupyter nbconvert --to notebook --execute 
       --ExecutePreprocessor.timeout=1800 

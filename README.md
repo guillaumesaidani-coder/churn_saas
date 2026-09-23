@@ -9,7 +9,7 @@ Customer Success à prioriser leurs actions de rétention.
 |---|---|
 | Code (GitHub) | https://github.com/guillaumesaidani-coder/churn_saas |
 | Jeu de données et modèles (DagsHub, DVC) | https://dagshub.com/guillaume.saidani/churn_saas |
-| Runs d'entraînement (MLflow sur DagsHub) | à venir : https://dagshub.com/guillaume.saidani/churn_saas.mlflow |
+| Runs d'entraînement (MLflow sur DagsHub) | https://dagshub.com/guillaume.saidani/churn_saas.mlflow |
 
 ## Résultats (jeu de test, 1 000 comptes, seed 42)
 
@@ -44,6 +44,9 @@ dvc pull            # récupère données et modèles depuis DagsHub
 dvc repro           # rejoue uniquement les étapes dont une dépendance a changé
 pytest              # tests unitaires
 mlflow ui --backend-store-uri sqlite:///data/model/mlflow.db   # runs tracés en local
+# Pour tracer sur le serveur MLflow de DagsHub plutôt qu'en local :
+#   MLFLOW_TRACKING_URI=https://dagshub.com/guillaume.saidani/churn_saas.mlflow
+#   MLFLOW_TRACKING_USERNAME=<user DagsHub>  MLFLOW_TRACKING_PASSWORD=<jeton DagsHub>
 ```
 
 Avec Docker :

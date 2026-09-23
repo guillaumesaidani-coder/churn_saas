@@ -133,3 +133,27 @@ class TestLogTrainingRunArtefacts:
 
         assert run.data.tags["modele_retenu"] == "RL"
         assert "model_card.md" in noms
+
+    def test_artifact_location_ignore_pour_un_serveur_distant(self, monkeypatch):
+        appels = {}
+        monkeypatch.setattr(mlflow, "set_tracking_uri", lambda uri: None)
+        monkeypatch.setattr(mlflow, "get_experiment_by_name", lambda nom: None)
+        monkeypatch.setattr(mlflow, "create_experiment", lambda *a, **k: appels.setdefault("create", k))
+        monkeypatch.setattr(mlflow, "set_experiment", lambda nom: None)
+
+        class FauxRun:
+            info = type("Info", (), {"run_id": "abc"})()
+            def __enter__(self): return self
+            def __exit__(self, *exc): return False
+
+        monkeypatch.setattr(mlflow, "start_run", lambda run_name: FauxRun())
+        monkeypatch.setattr(mlflow, "log_params", lambda p: None)
+        monkeypatch.setattr(mlflow, "log_metrics", lambda m: None)
+
+        log_training_run(
+            run_name="distant", params={}, metrics={},
+            tracking_uri="https://dagshub.com/user/repo.mlflow",
+            artifact_location="file:///C:/local/mlartifacts",
+        )
+
+        assert "create" not in appels
