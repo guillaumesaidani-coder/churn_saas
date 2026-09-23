@@ -1,0 +1,61 @@
+name: CI
+
+# À chaque push / pull request :
+#   1. tests unitaires (données synthétiques, aucun secret requis) ;
+#   2. récupération des données/modèles versionnés par DVC depuis DagsHub (`dvc pull`),
+#      build de l'image API et test de fumée /health.
+#      Étape 2 ignorée tant que le secret DAGSHUB_TOKEN n'est pas configuré.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - run: python -m pytest -q
+        env:
+          MLFLOW_DISABLE_AGENT_HINT: "1"
+
+  docker:
+    needs: tests
+    runs-on: ubuntu-latest
+    env:
+      DAGSHUB_USER: ${{ secrets.DAGSHUB_USER }}
+      DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Secret DagsHub absent -- étape ignorée
+        if: env.DAGSHUB_TOKEN == ''
+        run: echo "Configurer DAGSHUB_USER et DAGSHUB_TOKEN dans Settings > Secrets > Actions."
+      - uses: actions/setup-python@v5
+        if: env.DAGSHUB_TOKEN != ''
+        with:
+          python-version: "3.13"
+      - name: dvc pull (données + modèles depuis DagsHub)
+        if: env.DAGSHUB_TOKEN != ''
+        run: |
+          pip install "dvc[s3]==3.67.1"
+          dvc remote modify origin --local access_key_id "$DAGSHUB_TOKEN"
+          dvc remote modify origin --local secret_access_key "$DAGSHUB_TOKEN"
+          dvc pull
+      - name: Build image API + test de fumée
+        if: env.DAGSHUB_TOKEN != ''
+        run: |
+          docker build --target runtime -t churn-api:ci .
+          docker run -d --name api -p 8000:8000 -e API_KEY=ci-key -e MODEL_DIR=/app/data/model churn-api:ci
+          for i in $(seq 1 30); do
+            curl -fsS http://localhost:8000/health && exit 0
+            sleep 2
+          done
+          docker logs api
+          exit 1
