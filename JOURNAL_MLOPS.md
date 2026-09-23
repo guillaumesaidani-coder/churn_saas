@@ -347,8 +347,11 @@ pour git (« Authentication failed »). Pour git, DagsHub demande le **jeton par
 depuis ton terminal : les identifiants sont gardés par le gestionnaire d'identifiants de Windows,
 et ne figurent ni dans le projet ni dans la conversation.
 
-Visibilité vérifiée : le dépôt DagsHub est **public** (Settings → Danger Zone → Change visibility :
-« This repository is currently public »). Le jury peut ouvrir le lien sans compte.
+Visibilité : le dépôt DagsHub est **public** (Settings → Danger Zone → Change visibility :
+« This repository is currently public »). **Mais DagsHub exige une connexion pour consulter tout
+dépôt**, même public : c'est vérifié sur le dépôt officiel `DAGsHub-Official/dagshub-docs`, qui
+redirige lui aussi vers la page de connexion. Un visiteur sans compte DagsHub ne voit donc pas
+les données : il faut un lien de repli accessible sans compte (voir §3).
 
 ---
 
