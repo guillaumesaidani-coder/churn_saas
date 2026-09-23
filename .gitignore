@@ -34,3 +34,6 @@ mlruns_docker/
 
 # Variables locales (jetons DagsHub)
 .env
+
+# Livrables (docx/pptx de formation) : conservés en local, non publiés
+Livrables/
