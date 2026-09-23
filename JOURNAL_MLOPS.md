@@ -7,7 +7,7 @@ pour que tu puisses le défendre devant le jury (compétences C6 et C9 surtout).
 Sommaire :
 0. État de départ
 1. À quoi sert chaque outil
-2. Actions réalisées, pas à pas (§2.1 à §2.14)
+2. Actions réalisées, pas à pas (§2.1 à §2.15)
 3. Ce qu'il te reste à faire (avec les commandes)
 4. Livrable final : où on en est
 5. Points d'attention et questions probables du jury
@@ -354,6 +354,20 @@ dépôt**, même public : c'est vérifié sur le dépôt officiel `DAGsHub-Offic
 redirige lui aussi vers la page de connexion. Un visiteur sans compte DagsHub ne voit donc pas
 les données : il faut un lien de repli accessible sans compte (voir §3).
 
+### 2.15 Release GitHub v2.0 : lien vers les données sans compte (2026-09-23)
+DagsHub exigeant une connexion (§2.14), le lien « jeu de données » à livrer est une **release
+GitHub** : https://github.com/guillaumesaidani-coder/churn_saas/releases/tag/v2.0
+- Archive `churn_saas_donnees_modeles_v2.0.zip` (0,9 Mo) : 3 CSV bruts, Gold v2 (+ manifeste,
+  fiche), modèles churn et CLV v2 (+ manifestes, métriques), README avec les empreintes MD5
+  (identiques à DVC) et SHA-256, et un exemple de rechargement des modèles (testé).
+- Préparée par l'assistant (`dist/`, ignoré par Git), publiée par toi via l'interface GitHub.
+- Vérifié : release publiée, téléchargement anonyme OK, archive identique octet par octet à celle
+  préparée.
+- Liens ajoutés au README et à la page de garde du notebook. Seul ce texte a changé, pas le code :
+  la même modification a été appliquée au notebook source et à sa version exécutée, puis
+  enregistrée par `dvc commit certification`, sans réexécution (DagsHub était injoignable à ce
+  moment, et une réexécution n'aurait rien changé aux résultats).
+
 ---
 
 ## 3. Ce qu'il te reste à faire (je ne peux pas le faire à ta place : ça demande tes comptes)
@@ -403,7 +417,7 @@ fournir les **liens GitHub et vers le jeu de données**.
 
 | Élément | État |
 |---|---|
-| Jeu de données versionné | ✅ DVC, https://dagshub.com/guillaume.saidani/churn_saas (§2.11) |
+| Jeu de données versionné | ✅ DVC sur DagsHub (§2.11) ; **lien à livrer : release https://github.com/guillaumesaidani-coder/churn_saas/releases/tag/v2.0** (§2.15) |
 | Modèles sérialisés | ✅ `model.joblib`, `model_clv.joblib` (DVC) |
 | Artefacts générés | ✅ courbes, cartes modèle, manifestes ; runs MLflow en ligne sur DagsHub (§2.12) |
 | Notebooks exécutés | ✅ `reports/notebooks/00` à `06`, régénérés par `dvc repro` |

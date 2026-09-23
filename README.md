@@ -9,7 +9,8 @@ Customer Success à prioriser leurs actions de rétention.
 |---|---|
 | **Notebook de certification exécuté (livrable)** | [`reports/notebooks/notebook_certifiant_churn_saas.ipynb`](reports/notebooks/notebook_certifiant_churn_saas.ipynb) |
 | Code (GitHub) | https://github.com/guillaumesaidani-coder/churn_saas |
-| Jeu de données et modèles (DagsHub, DVC) | https://dagshub.com/guillaume.saidani/churn_saas |
+| **Jeu de données et modèles (téléchargement libre, release v2.0)** | https://github.com/guillaumesaidani-coder/churn_saas/releases/tag/v2.0 |
+| Versioning DVC (DagsHub, compte gratuit requis pour naviguer) | https://dagshub.com/guillaume.saidani/churn_saas |
 | Runs d'entraînement (MLflow sur DagsHub) | https://dagshub.com/guillaume.saidani/churn_saas.mlflow |
 
 ## Résultats du modèle v2 (notebook de certification, jeu de test de 1 000 comptes)
