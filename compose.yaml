@@ -1,0 +1,87 @@
+services:
+  api:
+    build:
+      context: .
+      target: runtime
+    environment:
+      API_KEY: dev-local-key
+      MODEL_DIR: /app/data/model
+    ports:
+      - "8011:8000"
+    # HEALTHCHECK déjà défini dans le Dockerfile (GET /health).
+
+  drift-exporter:
+    build:
+      context: .
+      target: runtime
+    command: ["python", "scripts/export_drift_metrics.py"]
+    # Le HEALTHCHECK du Dockerfile vise l'API (port 8000, /health) : l'exporteur n'expose
+    # que /metrics sur 9110, il lui faut sa propre sonde.
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:9110/metrics', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+    environment:
+      GOLD_DIR: /app/data/gold
+      DRIFT_EXPORTER_PORT: "9110"
+      DRIFT_REFRESH_SECONDS: "60"
+    ports:
+      - "9111:9110"
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./drift_alert_rules.yml:/etc/prometheus/drift_alert_rules.yml:ro
+      - prometheus_data:/prometheus
+    depends_on:
+      api:
+        condition: service_healthy
+      drift-exporter:
+        condition: service_started
+    ports:
+      - "9092:9090"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    ports:
+      - "3011:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/etc/grafana/dashboards:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:3000/api/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Rejoue le pipeline DVC dans un conteneur (hors stack de service) :
+  #   docker compose --profile pipeline run --rm pipeline
+  # Le store MLflow du conteneur est séparé du store Windows (chemins d'artefacts
+  # incompatibles) ; définir MLFLOW_TRACKING_URI (DagsHub) pour un store commun.
+  pipeline:
+    build:
+      context: .
+      target: pipeline
+    profiles: ["pipeline"]
+    volumes:
+      - .:/app
+    environment:
+      MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI:-sqlite:////app/mlruns_docker/mlflow.db}
+      MLFLOW_TRACKING_USERNAME: ${MLFLOW_TRACKING_USERNAME:-}
+      MLFLOW_TRACKING_PASSWORD: ${MLFLOW_TRACKING_PASSWORD:-}
+
+volumes:
+  prometheus_data:
+  grafana_data:

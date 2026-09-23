@@ -1,0 +1,22 @@
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.venv
+Livrables
+notebooks
+Examen_cas d'usage candidat
+data/bronze
+data/silver
+data/rgpd
+scratchpad
+tests
+*.html
+*.pptx
+*.docx
+mlruns_docker
+.git
+.dvc/cache
+.env
+reports
+data/model/mlflow.db
+data/model/mlartifacts

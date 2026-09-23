@@ -1,0 +1,20 @@
+# Environnement complet : pipeline DVC (notebooks), entraînement, tracking, tests.
+# L'image Docker de l'API n'installe que requirements.txt (runtime léger).
+-r requirements.txt
+
+# Notebooks exécutés par `dvc repro`
+nbconvert==7.17.1
+ipykernel==7.3.0
+matplotlib==3.11.2
+
+# Entraînement, recherche d'hyperparamètres, tracking
+optuna==5.0.0
+mlflow==3.16.1
+PyYAML==6.0.3
+
+# Versioning des données et remote DagsHub (compatible S3)
+dvc[s3]==3.67.1
+
+# Tests (httpx : requis par fastapi.testclient)
+pytest==9.1.1
+httpx==0.28.1
