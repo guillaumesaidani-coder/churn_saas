@@ -7,7 +7,7 @@ pour que tu puisses le défendre devant le jury (compétences C6 et C9 surtout).
 Sommaire :
 0. État de départ
 1. À quoi sert chaque outil
-2. Actions réalisées, pas à pas (§2.1 à §2.17)
+2. Actions réalisées, pas à pas (§2.1 à §2.18)
 3. Ce qu'il te reste à faire (avec les commandes)
 4. Livrable final : où on en est
 5. Points d'attention et questions probables du jury
@@ -387,6 +387,30 @@ et synthèse (§14). Modification de texte uniquement, appliquée au notebook so
 version exécutée, puis enregistrée par `dvc commit certification` ; cellules de code
 inchangées (vérifié).
 
+### 2.18 Support de soutenance v2 (2026-09-23)
+L'ancien support (`Livrables/soutenance_churn_saas_C1_C9.pptx`, 27 diapositives) décrivait une
+version antérieure du projet : seuil de 0,44, base PostgreSQL, `metadata.json`, API en esquisse,
+ROI de 137×. Il est conservé tel quel. Nouveau support : **`Livrables/soutenance_churn_saas_v2.pptx`**
+(22 diapositives, prévues pour 30 minutes, dans le même style visuel), qui suit la structure du
+notebook :
+- titre, besoin, **les 3 briques**, C1 (données), C2 (éthique), C3 (nettoyage, fuite et leurres) ;
+- C4 et C5 (choix du modèle, seuil hors pli, évaluation finale, explicabilité) ;
+- brique 2 (CLV), brique 3 (système de décision), C6 (API testée), C7 (architecture) ;
+- C8 (impact métier, recette D15 présentée honnêtement), C9 (dérive, ré-entraînement) ;
+- MLOps et défauts v1 corrigés, retour d'expérience et **3 arbitrages proposés au métier**,
+  carte de couverture C1 à C9, conclusion et liens.
+
+Tous les chiffres viennent du notebook exécuté ; les figures sont celles du notebook, et chaque
+diapositive a des notes pour l'oral. Généré par `Livrables/sources_soutenance_v2/generer.js`
+(pptxgenjs), validé, puis vérifié visuellement diapositive par diapositive (rendu PowerPoint).
+`Livrables/` n'est pas publié.
+
+La relecture a fait corriger une figure du notebook : les titres des matrices de confusion se
+chevauchaient et les axes étaient en anglais. **Cette correction de code impose de réexécuter
+le notebook**, ce qui a révélé un problème : le jeton DagsHub enregistré est désormais refusé
+(erreur 401) par DVC comme par MLflow. La réexécution et le `dvc push` sont en attente d'un
+jeton valide (§3).
+
 ---
 
 ## 3. Ce qu'il te reste à faire (je ne peux pas le faire à ta place : ça demande tes comptes)
@@ -419,6 +443,17 @@ inchangées (vérifié).
 4. ✅ MLflow sur DagsHub (§2.12).
 5. ✅ Secret `DAGSHUB_TOKEN` ajouté dans GitHub, CI verte (§2.7).
 6. Reporte les liens GitHub, DagsHub et MLflow dans `README.md`, puis dans le notebook final.
+
+### 3.2 bis Jeton DagsHub à renouveler (bloquant, 2026-09-23)
+Le jeton enregistré dans `.dvc/config.local` et dans le secret GitHub `DAGSHUB_TOKEN` est refusé
+(401). Utilise le **Default Access Token** (https://dagshub.com/user/settings/tokens), qui
+fonctionne pour Git, DVC et MLflow :
+```powershell
+python -m dvc remote modify origin --local access_key_id <JETON_PAR_DEFAUT>
+python -m dvc remote modify origin --local secret_access_key <JETON_PAR_DEFAUT>
+```
+puis mets à jour le secret GitHub `DAGSHUB_TOKEN` (Settings → Secrets and variables → Actions).
+Sans cela, le job `docker` de la CI échoue au `dvc pull`.
 
 ### 3.3 Tâches de fond
 - Relire `git log` et ce journal ; savoir expliquer chaque commit.
