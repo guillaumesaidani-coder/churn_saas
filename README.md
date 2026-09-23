@@ -7,11 +7,22 @@ Customer Success à prioriser leurs actions de rétention.
 
 | Ressource | Lien |
 |---|---|
+| **Notebook de certification exécuté (livrable)** | [`reports/notebooks/notebook_certifiant_churn_saas.ipynb`](reports/notebooks/notebook_certifiant_churn_saas.ipynb) |
 | Code (GitHub) | https://github.com/guillaumesaidani-coder/churn_saas |
 | Jeu de données et modèles (DagsHub, DVC) | https://dagshub.com/guillaume.saidani/churn_saas |
 | Runs d'entraînement (MLflow sur DagsHub) | https://dagshub.com/guillaume.saidani/churn_saas.mlflow |
 
-## Résultats (jeu de test, 1 000 comptes, seed 42)
+## Résultats du modèle v2 (notebook de certification, jeu de test de 1 000 comptes)
+
+| | Valeur |
+|---|---|
+| Modèle churn | Régression logistique, 20 variables (Gold v2) |
+| PR-AUC / ROC-AUC (test) | 0,761 / 0,883 (baseline métier : 0,593 / 0,791) |
+| Seuil D9 (calculé hors pli) | 0,286 : rappel 80,7 %, précision 62,4 % |
+| 150 priorités Hautes | 97 comptes réellement partis (hasard : 42), 84 % de la perte réelle captée |
+| CLV | Gradient boosting sur log(CLV) : R² log 0,89, erreur relative médiane 43 % |
+
+## Résultats v1 (notebooks 04 à 06, conservés pour comparaison)
 
 | Modèle churn | ROC-AUC | PR-AUC |
 |---|---|---|
@@ -26,9 +37,9 @@ Seuil de décision : 0,282 (rappel ≥ 80 %, décision D9), voir `data/model/sco
 
 ```
 Examen_cas d'usage candidat/*.csv.dvc   données brutes (versionnées par DVC)
-notebooks/            notebooks sources, une étape par notebook (00 à 06)
+notebooks/            notebook_certifiant_churn_saas.ipynb (livrable) + notebooks v1 par étape (00 à 06)
 reports/notebooks/    mêmes notebooks exécutés par le pipeline, avec leurs sorties
-data/{rgpd,bronze,silver,gold,model}/   sorties du pipeline, avec un manifeste par étape (hash SHA-256)
+data/{rgpd,bronze,silver,gold,model,model_v2}/   sorties du pipeline, avec un manifeste par étape (hash SHA-256)
 src/                  code réutilisable (nettoyage, gold, scoring, API, tracking MLflow, dérive)
 tests/                tests unitaires (pytest)
 dvc.yaml / dvc.lock   pipeline reproductible RGPD → Bronze → Silver → Gold → modèles → scoring
@@ -42,6 +53,7 @@ Dockerfile, compose.yaml   API de scoring, exporteur de dérive, Prometheus, Gra
 pip install -r requirements-dev.txt
 dvc pull            # récupère données et modèles depuis DagsHub
 dvc repro           # rejoue uniquement les étapes dont une dépendance a changé
+dvc repro certification   # exécute le notebook de certification
 pytest              # tests unitaires
 mlflow ui --backend-store-uri sqlite:///data/model/mlflow.db   # runs tracés en local
 # Pour tracer sur le serveur MLflow de DagsHub plutôt qu'en local :

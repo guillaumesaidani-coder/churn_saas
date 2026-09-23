@@ -1,0 +1,10 @@
+{
+  "modele_retenu": "Gradient boosting",
+  "mae_eur": 41244.5645,
+  "rmse_eur": 129884.5555,
+  "r2_eur": 0.688,
+  "r2_log": 0.8905,
+  "erreur_relative_mediane": 0.4283,
+  "baseline_mae_eur": 81808.744,
+  "baseline_r2_eur": -0.1024
+}

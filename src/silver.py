@@ -92,9 +92,16 @@ def normalize_secteur(value: str) -> str:
     return value
 
 
-def clean_silver(clients: pd.DataFrame, catalogue: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, Any]]:
+def clean_silver(
+    clients: pd.DataFrame, catalogue: pd.DataFrame, impute_medians: bool = True
+) -> tuple[pd.DataFrame, dict[str, Any]]:
     """Enchaîne NB02 §1-§6 dans l'ordre exact. Ne fait pas l'I/O (lecture/écriture parquet,
-    manifeste) : voir `notebooks/02_nettoyage_silver.ipynb` §7 pour la persistance."""
+    manifeste) : voir `notebooks/02_nettoyage_silver.ipynb` §7 pour la persistance.
+
+    `impute_medians=False` laisse les NaN des colonnes `MEDIAN_COLUMNS` : l'imputation est
+    alors faite dans le pipeline sklearn, ajustée sur le seul jeu d'entraînement (Gold v2,
+    notebook certifiant) -- une médiane calculée sur toutes les lignes utiliserait des
+    informations du jeu de test."""
     clients = clients.copy()
     catalogue = catalogue.copy()
 
@@ -135,7 +142,7 @@ def clean_silver(clients: pd.DataFrame, catalogue: pd.DataFrame) -> tuple[pd.Dat
 
     # 4) numériques restants : médiane documentée
     medianes: dict[str, float] = {}
-    for col in MEDIAN_COLUMNS:
+    for col in MEDIAN_COLUMNS if impute_medians else []:
         mediane = clients[col].median()
         medianes[col] = float(mediane)
         clients[col] = clients[col].fillna(mediane)

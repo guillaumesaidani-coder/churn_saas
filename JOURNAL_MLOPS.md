@@ -7,7 +7,7 @@ pour que tu puisses le défendre devant le jury (compétences C6 et C9 surtout).
 Sommaire :
 0. État de départ
 1. À quoi sert chaque outil
-2. Actions réalisées, pas à pas (§2.1 à §2.12)
+2. Actions réalisées, pas à pas (§2.1 à §2.13)
 3. Ce qu'il te reste à faire (avec les commandes)
 4. Livrable final : où on en est
 5. Points d'attention et questions probables du jury
@@ -268,6 +268,64 @@ Serveur : https://dagshub.com/guillaume.saidani/churn_saas.mlflow (source : docu
 - Docker : le service `pipeline` de `compose.yaml` lit déjà ces 3 variables, depuis un fichier
   `.env` (ignoré par Git).
 
+### 2.13 Notebook unique de certification (2026-09-23)
+Livrable : `notebooks/notebook_certifiant_churn_saas.ipynb` (source, sans sorties) et sa version
+**exécutée** `reports/notebooks/notebook_certifiant_churn_saas.ipynb` (158 cellules, 16 figures).
+Il suit le plan imposé §0 à §15 et intègre les recommandations de l'analyse critique.
+
+**Pédagogie** : chaque cellule de code est précédée d'une cellule « 📘 Explication » (ce qu'elle
+fait, pourquoi, ce qu'il faut retenir) et commentée ligne à ligne. Ces cellules portent le tag
+`pedagogie`. Pour produire plus tard une version sans elles :
+```bash
+jupyter nbconvert --to notebook --TagRemovePreprocessor.remove_cell_tags='["pedagogie"]' \
+  --output notebook_sans_pedagogie.ipynb reports/notebooks/notebook_certifiant_churn_saas.ipynb
+```
+
+**Changements dans le code (`src/`)** :
+- `src/silver.py` : paramètre `impute_medians` (par défaut `True`, donc rien ne change pour la
+  v1). Avec `False`, les NaN sont laissés au pipeline sklearn ;
+- `src/features.py` (nouveau) : construction des 20 features du Gold v2, la même fonction servant
+  à l'entraînement et au scoring d'un export brut ;
+- tests : `tests/test_features.py` (6 tests) et un test de plus dans `test_silver.py`, soit
+  99 tests au total, tous verts.
+
+**Défauts de la v1 corrigés** (à savoir expliquer au jury) :
+
+| Défaut v1 | Correction v2 |
+|---|---|
+| Modèle choisi sur le jeu de test | Choix en validation croisée, avec une règle fixée à l'avance |
+| Seuil D9 calibré sur le test (rappel de 80 % garanti par construction) | Seuil calculé sur des prédictions hors pli du train ; le rappel mesuré sur le test (80,7 %) est honnête |
+| Leurres gardés comme features | 5 leurres + 5 colonnes redondantes exclus (30 → 20 variables, même performance) |
+| Médianes calculées avant le découpage train/test | Imputation dans le pipeline, ajustée sur le train ; `taux_adoption_pct` recalculé |
+| Une valeur manquante faisait échouer l'API (erreur 500) | Imputation dans le pipeline, testée via l'API (code 200) |
+| Modèle CLV de 62 Mo | Gradient boosting de 1,5 Mo, à performance égale |
+
+**Ajouts** : baseline métier D8 (reformulée sans la variable de fuite), trois familles de
+modèles, étude d'ablation, calibration (Brier), analyse coût/seuil, importance par permutation,
+preuve que les leurres étaient inutiles dans le modèle v1, impact métier estimé avec analyse de
+sensibilité, recette D15, audit d'équité avec intervalles de confiance, simulation de dérive,
+test de l'API de bout en bout (`TestClient`), runs MLflow v2 publiés sur DagsHub.
+
+**Résultats honnêtes à connaître** :
+- critère D8 respecté sur le test (+0,168 de PR-AUC pour +0,15 exigé) ;
+- **recette D15 partiellement non respectée** : Spearman global de 0,29 (seuil 0,7), et 16 comptes
+  partis de grande valeur non signalés. Le notebook explique pourquoi (72 % de pertes réelles
+  nulles ; parmi les comptes partis, Spearman = 0,85 ; 84 % de la perte réelle captée) et propose
+  deux arbitrages métier, sans modifier les critères après coup ;
+- dérive simulée : 2 variables sur 4 déclenchent l'alerte PSI. La dérive de la sortie du modèle
+  (36 % → 75 % de comptes signalés) complète la détection.
+
+**Pipeline** : nouvelle étape DVC `certification` (dépendances : données brutes, `src/`, Gold et
+modèle v1 pour la comparaison). Les sorties Gold v2 et `data/model_v2/` (modèles, figures) sont
+poussées sur DagsHub (`dvc push`, 21 fichiers). `dvc metrics show` compare les métriques v1 et v2.
+Lancé avec les variables MLflow DagsHub (§2.12), le notebook publie ses runs à côté des runs v1.
+
+**Ce qui n'est pas encore fait** :
+- l'API et l'image Docker servent toujours le modèle **v1** (`data/model`). Pour passer en v2, il
+  faut pointer `MODEL_DIR` vers `data/model_v2` dans `compose.yaml` et copier ce dossier dans
+  l'image (`Dockerfile`) ;
+- le support de présentation (`Livrables/`) n'a pas été mis à jour avec les résultats v2.
+
 ---
 
 ## 3. Ce qu'il te reste à faire (je ne peux pas le faire à ta place : ça demande tes comptes)
@@ -322,14 +380,9 @@ fournir les **liens GitHub et vers le jeu de données**.
 | Artefacts générés | ✅ courbes, cartes modèle, manifestes ; runs MLflow en ligne sur DagsHub (§2.12) |
 | Notebooks exécutés | ✅ `reports/notebooks/00` à `06`, régénérés par `dvc repro` |
 | Code sur GitHub | ✅ https://github.com/guillaumesaidani-coder/churn_saas (CI verte) |
-| **Notebook unique au plan imposé** | ❌ **à construire** : c'est le plus gros manque |
-| Support de présentation | présent dans `Livrables/soutenance_churn_saas_C1_C9.pptx` (non vérifié ici) |
-
-Pour le notebook unique, je propose : `notebooks/notebook_certifiant.ipynb` qui suit le plan §0 à
-§15, **réutilise `src/`** (pas de copier-coller des notebooks 00 à 06), contient un journal de bord
-par section et un §13 qui montre DVC, MLflow, la dérive et la CI. On l'ajoute au pipeline comme
-stage `rapport` : `dvc repro` produit alors la version exécutée à livrer, avec les liens GitHub,
-DagsHub et MLflow dans la page de garde.
+| **Notebook unique au plan imposé** | ✅ `reports/notebooks/notebook_certifiant_churn_saas.ipynb`, exécuté par `dvc repro certification` (§2.13) |
+| Support de présentation | présent dans `Livrables/soutenance_churn_saas_C1_C9.pptx` (non vérifié ici), **à mettre à jour avec les résultats v2** |
+| Modèle v2 servi par l'API | ⏳ l'API et Docker servent encore la v1 (§2.13) |
 
 ---
 

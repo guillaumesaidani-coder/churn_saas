@@ -129,3 +129,48 @@ stages:
           cache: false
       - reports/notebooks/06_implementation_scoring.ipynb:
           cache: false
+
+  # Notebook unique de certification (plan imposé §0-§15) : Gold v2, modèles v2, API testée,
+  # MLflow. Sa version exécutée (reports/notebooks/) est le livrable principal.
+  certification:
+    cmd: ${nbexec} notebooks/notebook_certifiant_churn_saas.ipynb
+    deps:
+      - notebooks/notebook_certifiant_churn_saas.ipynb
+      - Examen_cas d'usage candidat/churn_saas_complet.csv
+      - Examen_cas d'usage candidat/churn_saas_echantillon.csv
+      - Examen_cas d'usage candidat/catalogue_plans.csv
+      - data/rgpd/rgpd_gate_manifest.json
+      - data/gold/clients_churn_gold.parquet
+      - data/gold/gold_manifest.json
+      - data/model/model.joblib
+      - data/model/model_manifest.json
+      - src/bronze.py
+      - src/silver.py
+      - src/gold.py
+      - src/features.py
+      - src/scoring.py
+      - src/drift.py
+      - src/tracking.py
+      - src/api.py
+      - src/versioning.py
+    outs:
+      - data/gold/clients_churn_gold_v2.parquet
+      - data/gold/gold_v2_manifest.json:
+          cache: false
+      - data/gold/gold_fiche_identite_v2.md:
+          cache: false
+      - data/model_v2/model.joblib
+      - data/model_v2/model_clv.joblib
+      - data/model_v2/scoring_exemple_cycle.parquet
+      - data/model_v2/figures
+      - data/model_v2/model_manifest.json:
+          cache: false
+      - data/model_v2/scoring_manifest.json:
+          cache: false
+      - reports/notebooks/notebook_certifiant_churn_saas.ipynb:
+          cache: false
+    metrics:
+      - data/model_v2/metrics.json:
+          cache: false
+      - data/model_v2/metrics_clv.json:
+          cache: false

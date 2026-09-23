@@ -1,0 +1,61 @@
+{
+  "couche": "gold",
+  "version": "v2",
+  "processed_at_utc": "2026-09-23T10:06:39.861602+00:00",
+  "produit_par": "notebooks/notebook_certifiant_churn_saas.ipynb",
+  "commit_git": "75bd79e",
+  "sources": {
+    "churn_saas_complet.csv": "2fc45e8c3c74d3ddcdbda162c5bb50184587201b46d877cc06742afd13063844",
+    "catalogue_plans.csv": "c94f6f52652532c578cb7a44d752b8b197ef84f5e6c6e17a58579fa195e9ad08"
+  },
+  "sha256_gold": "d443920d4245d3c6bd7e2605151402345a4d074b787a585743dcc32719001a3e",
+  "lignes": 5000,
+  "features_modele": [
+    "secteur",
+    "taille_entreprise",
+    "plan",
+    "anciennete_mois",
+    "sieges_souscrits",
+    "utilisateurs_actifs",
+    "taux_adoption_pct",
+    "connexions_30j",
+    "heures_usage_30j",
+    "fonctionnalites_total",
+    "fonctionnalites_utilisees",
+    "nb_integrations",
+    "derniere_connexion_jours",
+    "tickets_support_90j",
+    "delai_reponse_support_h",
+    "csat",
+    "retards_paiement_12m",
+    "revenu_mensuel_recurrent_eur",
+    "taux_utilisation_fonctionnalites",
+    "taux_retard_paiement_par_mois"
+  ],
+  "colonnes_exclues": {
+    "client_id": "identifiant",
+    "date_souscription": "redondante",
+    "commentaire_csm": "conformité (D7)",
+    "sante_compte_fin_periode": "fuite de données",
+    "valeur_vie_client_eur": "cible secondaire",
+    "jour_souscription": "leurre",
+    "pays": "leurre",
+    "code_datacenter": "leurre",
+    "couleur_theme_interface": "leurre",
+    "groupe_experimentation": "leurre",
+    "prix_mensuel_par_siege_eur": "redondante (catalogue)",
+    "fonctionnalites_incluses": "redondante (catalogue)",
+    "sla_reponse_h": "redondante (catalogue)",
+    "quota_stockage_go": "redondante (catalogue)",
+    "support_dedie": "redondante (catalogue)"
+  },
+  "imputation": "médiane dans le pipeline sklearn, ajustée sur le train ; taux_adoption_pct recalculé",
+  "split": {
+    "random_state": 42,
+    "test_size": 0.2,
+    "stratifie_sur": "churn",
+    "taux_churn_train": 0.28,
+    "taux_churn_test": 0.28,
+    "identique_v1": true
+  }
+}

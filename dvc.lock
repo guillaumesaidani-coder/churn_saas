@@ -273,3 +273,131 @@ stages:
       hash: md5
       md5: 24c228d94e33e1011cad3f26150f86ac
       size: 44770
+  certification:
+    cmd: python -m jupyter nbconvert --to notebook --execute 
+      --ExecutePreprocessor.timeout=1800 
+      --ExecutePreprocessor.kernel_name=python3 --output-dir reports/notebooks 
+      notebooks/notebook_certifiant_churn_saas.ipynb
+    deps:
+    - path: Examen_cas d'usage candidat/catalogue_plans.csv
+      hash: md5
+      md5: 6e1d25ff7514ef0766625891ac1dac57
+      size: 203
+    - path: Examen_cas d'usage candidat/churn_saas_complet.csv
+      hash: md5
+      md5: 2b44e1405bf6a5c13cc71652cc90cf34
+      size: 727622
+    - path: Examen_cas d'usage candidat/churn_saas_echantillon.csv
+      hash: md5
+      md5: 30c65edbe30ae1616cc930223d25678c
+      size: 7824
+    - path: data/gold/clients_churn_gold.parquet
+      hash: md5
+      md5: 2044014d174f581343bea7685121d534
+      size: 218818
+    - path: data/gold/gold_manifest.json
+      hash: md5
+      md5: 8946db3bfb2fa830950e34bb8a49e37b
+      size: 4665
+    - path: data/model/model.joblib
+      hash: md5
+      md5: 5fc8182b78c1b7b38a5c060d096f0ba3
+      size: 7889
+    - path: data/model/model_manifest.json
+      hash: md5
+      md5: b04ba2dc235d939769c5bd9c0014596a
+      size: 3499
+    - path: data/rgpd/rgpd_gate_manifest.json
+      hash: md5
+      md5: 16bf221018397868579f62c140f92756
+      size: 878
+    - path: notebooks/notebook_certifiant_churn_saas.ipynb
+      hash: md5
+      md5: 5612613c3816bd1446a51a61f4e83792
+      size: 198863
+    - path: src/api.py
+      hash: md5
+      md5: 002411dd1030ead9d09ef768b98df2fe
+      size: 8315
+    - path: src/bronze.py
+      hash: md5
+      md5: c9ee95d65a299dbb0ccb9e5cdcdc66a8
+      size: 2290
+    - path: src/drift.py
+      hash: md5
+      md5: ebb4e5c2cb4a3cdcb42279bb37a89933
+      size: 2830
+    - path: src/features.py
+      hash: md5
+      md5: 1c399a7ac34e613dc17b03c51a5aac87
+      size: 2847
+    - path: src/gold.py
+      hash: md5
+      md5: 6b92e4b21c9761c89a13b4a2ed02ccf2
+      size: 8736
+    - path: src/scoring.py
+      hash: md5
+      md5: a4736cd07d9403e7f50d9d93887db164
+      size: 4163
+    - path: src/silver.py
+      hash: md5
+      md5: eb0d5535e89ba5d58999860fd91bfafd
+      size: 8103
+    - path: src/tracking.py
+      hash: md5
+      md5: 56e16825571b32ec4f3b319e9a74b418
+      size: 4542
+    - path: src/versioning.py
+      hash: md5
+      md5: 5943ea9ac2baa95851ab942772123868
+      size: 1151
+    outs:
+    - path: data/gold/clients_churn_gold_v2.parquet
+      hash: md5
+      md5: f3c1963c441e6abee1194763df91e936
+      size: 200600
+    - path: data/gold/gold_fiche_identite_v2.md
+      hash: md5
+      md5: 13ddd18ff9ba2600a9ec9e147036a702
+      size: 1123
+    - path: data/gold/gold_v2_manifest.json
+      hash: md5
+      md5: c9c0445bfe20c97ebb76fd59e6576e4e
+      size: 2083
+    - path: data/model_v2/figures
+      hash: md5
+      md5: 778fe6b6269ef1f724b8ba5de40d5cee.dir
+      size: 838623
+      nfiles: 16
+    - path: data/model_v2/metrics.json
+      hash: md5
+      md5: f6bac67157996143182ed665fef78af6
+      size: 435
+    - path: data/model_v2/metrics_clv.json
+      hash: md5
+      md5: 3379a32bd168943bf9ff45cdac5fff25
+      size: 242
+    - path: data/model_v2/model.joblib
+      hash: md5
+      md5: c85f271b71f3ef6cd2ca050018d79149
+      size: 6058
+    - path: data/model_v2/model_clv.joblib
+      hash: md5
+      md5: 380e91cd320cac6c760299eccdafa983
+      size: 1467282
+    - path: data/model_v2/model_manifest.json
+      hash: md5
+      md5: a00679175da8ae8f9bf9c8262d0883f4
+      size: 2115
+    - path: data/model_v2/scoring_exemple_cycle.parquet
+      hash: md5
+      md5: e6e87f657b380b585eeda753fe134ee1
+      size: 21063
+    - path: data/model_v2/scoring_manifest.json
+      hash: md5
+      md5: 4c3d8a624c2843b4055eaf69b86eb64a
+      size: 840
+    - path: reports/notebooks/notebook_certifiant_churn_saas.ipynb
+      hash: md5
+      md5: 90aafc47f46c44fd6ead9c3f0971e947
+      size: 1285618

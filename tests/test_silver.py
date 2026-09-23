@@ -175,3 +175,16 @@ class TestCleanSilverIntegration:
         out, _ = clean_silver(clients, catalogue)
 
         assert out["anciennete_mois"].tolist() == [12.0, 12.0]
+
+    def test_impute_medians_false_laisse_les_nan_pour_le_pipeline(self):
+        clients = _clients_bronze_minimal()
+        clients.loc[1, "csat"] = ""
+        catalogue = _catalogue_bronze_minimal()
+
+        avec, rapport_avec = clean_silver(clients, catalogue)
+        sans, rapport_sans = clean_silver(clients, catalogue, impute_medians=False)
+
+        assert avec["csat"].isna().sum() == 0
+        assert sans["csat"].isna().sum() == 1
+        assert rapport_sans["medianes"] == {}
+        assert "csat" in rapport_avec["medianes"]

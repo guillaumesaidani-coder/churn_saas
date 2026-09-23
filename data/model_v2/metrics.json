@@ -1,0 +1,16 @@
+{
+  "roc_auc": 0.8827,
+  "pr_auc": 0.761,
+  "pr_auc_baseline_naive": 0.28,
+  "pr_auc_baseline_metier_D8": 0.5931,
+  "roc_auc_baseline_metier_D8": 0.7913,
+  "rappel_seuil_D9": 0.8071,
+  "precision_seuil_D9": 0.6243,
+  "part_signales_seuil_D9": 0.362,
+  "rappel_seuil_0_5": 0.5679,
+  "precision_seuil_0_5": 0.7162,
+  "gain_pr_auc_vs_D8": 0.1679,
+  "critere_D8_respecte": true,
+  "pr_auc_cv": 0.7916,
+  "seuil_D9": 0.2864
+}
