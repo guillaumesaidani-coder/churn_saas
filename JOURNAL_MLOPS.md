@@ -7,7 +7,7 @@ pour que tu puisses le défendre devant le jury (compétences C6 et C9 surtout).
 Sommaire :
 0. État de départ
 1. À quoi sert chaque outil
-2. Actions réalisées, pas à pas (§2.1 à §2.16)
+2. Actions réalisées, pas à pas (§2.1 à §2.17)
 3. Ce qu'il te reste à faire (avec les commandes)
 4. Livrable final : où on en est
 5. Points d'attention et questions probables du jury
@@ -376,6 +376,16 @@ GitHub** : https://github.com/guillaumesaidani-coder/churn_saas/releases/tag/v2.
 - CI : le test de fumée interroge `/ready` (modèles chargés) et plus seulement `/health`.
 - Vérifié sur la stack Docker : `/ready` OK, `/score-batch` accepte une valeur manquante
   (erreur 500 en v1), scores identiques au modèle v2 chargé localement, 4 services en bonne santé.
+
+### 2.17 Le système de décision nommé comme 3ᵉ brique dans le notebook (2026-09-23)
+La solution compte **trois briques** : (1) le modèle de churn (classification), (2) le modèle de
+CLV (régression), (3) le **système de décision**, qui applique des règles métier sans rien
+apprendre (seuil D9, perte attendue, capacité D10, priorité D14, actions D11, garde-fou D3).
+Le notebook le présente désormais explicitement : résumé exécutif, nouvelle section §2.3 bis
+(schéma et tableau « brique / nature / section »), titre de §10.2, tableau d'architecture (§11.2)
+et synthèse (§14). Modification de texte uniquement, appliquée au notebook source et à sa
+version exécutée, puis enregistrée par `dvc commit certification` ; cellules de code
+inchangées (vérifié).
 
 ---
 

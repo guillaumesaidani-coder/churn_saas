@@ -313,8 +313,8 @@ stages:
       size: 878
     - path: notebooks/notebook_certifiant_churn_saas.ipynb
       hash: md5
-      md5: fed5be8f908acb05286b4584a09ac6f9
-      size: 199036
+      md5: 810c1bf9f299b03646eb7ff4d4786b22
+      size: 202300
     - path: src/api.py
       hash: md5
       md5: 002411dd1030ead9d09ef768b98df2fe
@@ -399,5 +399,5 @@ stages:
       size: 840
     - path: reports/notebooks/notebook_certifiant_churn_saas.ipynb
       hash: md5
-      md5: 8a5531d89719958e01844b30acf55989
-      size: 1285789
+      md5: 2e508a6b96ae0e2307a2493db52b340e
+      size: 1289053
