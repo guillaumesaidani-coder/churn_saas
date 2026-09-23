@@ -38,3 +38,6 @@ mlruns_docker/
 # Livrables (docx/pptx de formation) : conservés en local, non publiés
 Livrables/
 data/model_v2/mlflow.db
+
+# Archives de release (publiées sur GitHub Releases, pas dans git)
+dist/
