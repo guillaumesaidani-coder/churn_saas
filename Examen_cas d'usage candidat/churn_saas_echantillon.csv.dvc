@@ -1,0 +1,5 @@
+outs:
+- md5: 30c65edbe30ae1616cc930223d25678c
+  size: 7824
+  hash: md5
+  path: churn_saas_echantillon.csv

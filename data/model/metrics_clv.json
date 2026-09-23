@@ -1,0 +1,45 @@
+{
+  "cible": "valeur_vie_client_eur (régression, log1p à l'entraînement)",
+  "baseline": {
+    "rmse_eur": 244135.0,
+    "mae_eur": 81809.0,
+    "r2": -0.102
+  },
+  "ridge_log_cible": {
+    "rmse_eur": 185679.0,
+    "mae_eur": 50438.0,
+    "r2": 0.362,
+    "r2_cv_log_mean": 0.804,
+    "r2_cv_log_std": 0.015
+  },
+  "foret_aleatoire_log_cible": {
+    "rmse_eur": 128038.0,
+    "mae_eur": 40615.0,
+    "r2": 0.697,
+    "r2_cv_log_mean": 0.887,
+    "r2_cv_log_std": 0.008
+  },
+  "modele_retenu": "Forêt aléatoire (log-cible)",
+  "top_5_variables_importance_permutation": [
+    {
+      "variable": "revenu_mensuel_recurrent_eur",
+      "importance_moyenne": 1.8075289270938388
+    },
+    {
+      "variable": "anciennete_mois",
+      "importance_moyenne": 0.015610579270136649
+    },
+    {
+      "variable": "sieges_souscrits",
+      "importance_moyenne": 0.0019905803336782196
+    },
+    {
+      "variable": "heures_usage_30j",
+      "importance_moyenne": 0.0010417746745171894
+    },
+    {
+      "variable": "connexions_30j",
+      "importance_moyenne": 0.0007066087480835037
+    }
+  ]
+}

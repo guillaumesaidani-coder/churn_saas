@@ -1,0 +1,123 @@
+{
+  "couche": "model",
+  "processed_at_utc": "2026-09-23T08:29:27.221249+00:00",
+  "source": "data/gold/clients_churn_gold.parquet",
+  "gold_version": "v1",
+  "gold_sha256": "c3f400321b243989443155f1dc62a95353eb1d2dc67e9c868f80f689bcd630a6",
+  "modele_retenu": "Régression logistique",
+  "random_state": 42,
+  "features": [
+    "jour_souscription",
+    "secteur",
+    "pays",
+    "taille_entreprise",
+    "plan",
+    "anciennete_mois",
+    "sieges_souscrits",
+    "utilisateurs_actifs",
+    "taux_adoption_pct",
+    "connexions_30j",
+    "heures_usage_30j",
+    "fonctionnalites_total",
+    "fonctionnalites_utilisees",
+    "nb_integrations",
+    "derniere_connexion_jours",
+    "tickets_support_90j",
+    "delai_reponse_support_h",
+    "csat",
+    "retards_paiement_12m",
+    "revenu_mensuel_recurrent_eur",
+    "couleur_theme_interface",
+    "code_datacenter",
+    "groupe_experimentation",
+    "prix_mensuel_par_siege_eur",
+    "fonctionnalites_incluses",
+    "sla_reponse_h",
+    "quota_stockage_go",
+    "support_dedie",
+    "taux_utilisation_fonctionnalites",
+    "taux_retard_paiement_par_mois"
+  ],
+  "cible": "churn",
+  "metriques": {
+    "baseline": {
+      "roc_auc": 0.534,
+      "pr_auc": 0.296
+    },
+    "regression_logistique": {
+      "roc_auc_test": 0.88,
+      "pr_auc_test": 0.759,
+      "roc_auc_cv_mean": 0.888,
+      "roc_auc_cv_std": 0.008
+    },
+    "foret_aleatoire": {
+      "roc_auc_test": 0.859,
+      "pr_auc_test": 0.713,
+      "roc_auc_cv_mean": 0.878,
+      "roc_auc_cv_std": 0.012
+    },
+    "modele_retenu": "Régression logistique",
+    "matrice_confusion_seuil_0_5": [
+      [
+        657,
+        63
+      ],
+      [
+        124,
+        156
+      ]
+    ],
+    "seuil_propose": {
+      "valeur": 0.02,
+      "statut": "PROPOSITION TECHNIQUE -- non validée par le métier (D5)",
+      "a_valider_par": "Head of Customer Success -- point de contact métier n°3",
+      "hypothese_cout_fn_eur": 6879,
+      "hypothese_cout_fp_eur_fourchette": [
+        50,
+        150
+      ],
+      "precision_au_seuil": 0.337,
+      "rappel_au_seuil": 1.0,
+      "part_comptes_flagues": 0.83,
+      "limite": "Minimisation de coût seule, sans contrainte de capacité CS -- le point de contact n°3 doit fixer à la fois le coût FP (H01) et une capacité d'action mensuelle pour rendre ce seuil opérationnalisable."
+    },
+    "top_5_variables_importance_permutation": [
+      {
+        "variable": "derniere_connexion_jours",
+        "importance_moyenne": 0.048594246031745995
+      },
+      {
+        "variable": "nb_integrations",
+        "importance_moyenne": 0.043629298941798914
+      },
+      {
+        "variable": "anciennete_mois",
+        "importance_moyenne": 0.04050165343915338
+      },
+      {
+        "variable": "tickets_support_90j",
+        "importance_moyenne": 0.027857142857142834
+      },
+      {
+        "variable": "csat",
+        "importance_moyenne": 0.021415343915343884
+      }
+    ],
+    "rang_moyen_leurres": 24.7
+  },
+  "decisions_atelier_appliquees": [
+    "D2",
+    "D3",
+    "D4",
+    "D5",
+    "D7",
+    "D9"
+  ],
+  "fichiers": {
+    "modele": "..\\data\\model\\model.joblib",
+    "metriques": "..\\data\\model\\metrics.json",
+    "model_card": "..\\data\\model\\model_card.md",
+    "courbes_roc_pr": "..\\data\\model\\courbes_roc_pr.png",
+    "courbe_cout_seuil": "..\\data\\model\\cout_seuil_sensibilite.png"
+  }
+}

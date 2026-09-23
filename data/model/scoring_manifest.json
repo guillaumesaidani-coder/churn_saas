@@ -1,0 +1,46 @@
+{
+  "couche": "model",
+  "sous_etape": "implementation_scoring",
+  "processed_at_utc": "2026-09-23T08:30:08.453819+00:00",
+  "modeles_utilises": {
+    "churn": "..\\data\\model\\model.joblib",
+    "clv": "..\\data\\model\\model_clv.joblib"
+  },
+  "regle_decision": {
+    "source": "Livrables/releve_decision_pdc3_churn_saas.docx (D9, D10, D11, D14)",
+    "seuil_D9_rappel_cible": 0.8,
+    "seuil_D9_valeur": 0.282,
+    "rappel_obtenu": 0.8,
+    "precision_obtenue": 0.627,
+    "capacite_csm_D10": 150,
+    "formule_priorite_D14": "perte_attendue = score_churn x valeur_vie_estimee_eur, sans facteur tau",
+    "catalogue_actions_D11": {
+      "Haute": "Appel personnalisé du CSM référent sous 5 jours ouvrés",
+      "Moyenne": "Email ciblé et proposition d'un point d'usage",
+      "Basse": "Surveillance passive, sans action dédiée"
+    }
+  },
+  "colonnes_export_crm": [
+    "client_id",
+    "score_churn",
+    "valeur_vie_estimee_eur",
+    "priorite",
+    "action_recommandee"
+  ],
+  "decisions_appliquees": [
+    "D3",
+    "D6",
+    "D7",
+    "D9",
+    "D10",
+    "D11",
+    "D14"
+  ],
+  "decisions_hors_perimetre": {
+    "D8": "critère d'acceptation du modèle -- concerne 04_modelisation_churn.ipynb, pas ce notebook",
+    "D12_D13": "groupe témoin et cadence de reporting -- mesure d'impact post-déploiement (C8/C9), pas encore de notebook dédié",
+    "D15": "critère de recette (corrélation de rang) -- concerne un futur notebook de recette, pas encore créé"
+  },
+  "contrat_source": "Livrables/architecture_donnees_churn_saas.pptx, slide 5",
+  "fichier_exemple": "..\\data\\model\\scoring_exemple_cycle.parquet"
+}

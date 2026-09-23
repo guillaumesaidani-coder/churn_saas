@@ -1,0 +1,22 @@
+{
+  "version": "v1",
+  "sha256_source_csv": "2fc45e8c3c74d3ddcdbda162c5bb50184587201b46d877cc06742afd13063844",
+  "controle_effectue_le": "2026-09-23T08:29:13.365156+00:00",
+  "fichier_controle": "churn_saas_complet.csv",
+  "colonnes_identifiantes_detectees": [],
+  "motifs_nominatifs_detectes": 0,
+  "format_client_id_conforme": true,
+  "criteres_cnil_reunis": 1,
+  "aipd_obligatoire": false,
+  "pseudonymisation_client_id": {
+    "appliquee_par_defaut": false,
+    "disponible": true,
+    "table_correspondance": "..\\data\\rgpd\\keymap_client_id.parquet"
+  },
+  "decision": "GO -- ingestion Bronze autorisée",
+  "reste_a_faire_cote_client": [
+    "Base légale et finalité à documenter formellement (Art. 6, 5.1.b)",
+    "Registre de traitement à rédiger (Art. 30)",
+    "Contrat de sous-traitance à vérifier si hébergement tiers (Art. 28)"
+  ]
+}

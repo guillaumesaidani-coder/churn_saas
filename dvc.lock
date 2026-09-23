@@ -1,0 +1,275 @@
+schema: '2.0'
+stages:
+  rgpd:
+    cmd: python -m jupyter nbconvert --to notebook --execute 
+      --ExecutePreprocessor.timeout=1800 
+      --ExecutePreprocessor.kernel_name=python3 --output-dir reports/notebooks 
+      notebooks/00_conformite_rgpd_anonymisation.ipynb
+    deps:
+    - path: Examen_cas d'usage candidat/churn_saas_complet.csv
+      hash: md5
+      md5: 2b44e1405bf6a5c13cc71652cc90cf34
+      size: 727622
+    - path: notebooks/00_conformite_rgpd_anonymisation.ipynb
+      hash: md5
+      md5: 96005aecde2ec21ddf0549636a5a37ca
+      size: 43107
+    outs:
+    - path: data/rgpd/keymap_client_id.parquet
+      hash: md5
+      md5: 78f86afa611248aec989dadadea2f4f4
+      size: 127354
+    - path: data/rgpd/keymap_secret.json
+      hash: md5
+      md5: 7f43f96279937d53ce9960225bc9d11d
+      size: 269
+    - path: data/rgpd/rgpd_gate_manifest.json
+      hash: md5
+      md5: 16bf221018397868579f62c140f92756
+      size: 878
+    - path: reports/notebooks/00_conformite_rgpd_anonymisation.ipynb
+      hash: md5
+      md5: 98f9a5aaec83908e9dd156234e767707
+      size: 43107
+  bronze:
+    cmd: python -m jupyter nbconvert --to notebook --execute 
+      --ExecutePreprocessor.timeout=1800 
+      --ExecutePreprocessor.kernel_name=python3 --output-dir reports/notebooks 
+      notebooks/01_ingestion_bronze.ipynb
+    deps:
+    - path: Examen_cas d'usage candidat/catalogue_plans.csv
+      hash: md5
+      md5: 6e1d25ff7514ef0766625891ac1dac57
+      size: 203
+    - path: Examen_cas d'usage candidat/churn_saas_complet.csv
+      hash: md5
+      md5: 2b44e1405bf6a5c13cc71652cc90cf34
+      size: 727622
+    - path: Examen_cas d'usage candidat/churn_saas_echantillon.csv
+      hash: md5
+      md5: 30c65edbe30ae1616cc930223d25678c
+      size: 7824
+    - path: data/rgpd/rgpd_gate_manifest.json
+      hash: md5
+      md5: 16bf221018397868579f62c140f92756
+      size: 878
+    - path: notebooks/01_ingestion_bronze.ipynb
+      hash: md5
+      md5: b906380216043c6d69bf36d95802e49f
+      size: 32830
+    outs:
+    - path: data/bronze/bronze_manifest.json
+      hash: md5
+      md5: 901e86ae7092fb6ea733abba26d45885
+      size: 3610
+    - path: data/bronze/catalogue_plans_bronze.parquet
+      hash: md5
+      md5: f0f1f1eecdc870e339c125ac6f1bda1d
+      size: 5452
+    - path: data/bronze/clients_churn_bronze.parquet
+      hash: md5
+      md5: 3f8bcf6ca41068b84836df286b215596
+      size: 244308
+    - path: data/bronze/clients_churn_echantillon_bronze.parquet
+      hash: md5
+      md5: 5975404d14778457dff3059dd2883edf
+      size: 23272
+    - path: reports/notebooks/01_ingestion_bronze.ipynb
+      hash: md5
+      md5: 01ce28183bd012eb47eaec173b126a57
+      size: 32830
+  silver:
+    cmd: python -m jupyter nbconvert --to notebook --execute 
+      --ExecutePreprocessor.timeout=1800 
+      --ExecutePreprocessor.kernel_name=python3 --output-dir reports/notebooks 
+      notebooks/02_nettoyage_silver.ipynb
+    deps:
+    - path: data/bronze/catalogue_plans_bronze.parquet
+      hash: md5
+      md5: f0f1f1eecdc870e339c125ac6f1bda1d
+      size: 5452
+    - path: data/bronze/clients_churn_bronze.parquet
+      hash: md5
+      md5: 3f8bcf6ca41068b84836df286b215596
+      size: 244308
+    - path: notebooks/02_nettoyage_silver.ipynb
+      hash: md5
+      md5: 3777529f60e00bed70f5239d7e18271f
+      size: 33069
+    outs:
+    - path: data/silver/clients_churn_silver.parquet
+      hash: md5
+      md5: e5dc53f8fc0e1a62741b60b333d1cb64
+      size: 222370
+    - path: data/silver/silver_manifest.json
+      hash: md5
+      md5: 8587dd0e3646633bc532afa5a1cdbb63
+      size: 2035
+    - path: reports/notebooks/02_nettoyage_silver.ipynb
+      hash: md5
+      md5: 02c2f83aeea24d5b95689b8c48a22349
+      size: 33069
+  gold:
+    cmd: python -m jupyter nbconvert --to notebook --execute 
+      --ExecutePreprocessor.timeout=1800 
+      --ExecutePreprocessor.kernel_name=python3 --output-dir reports/notebooks 
+      notebooks/03_preparation_gold.ipynb
+    deps:
+    - path: data/silver/clients_churn_silver.parquet
+      hash: md5
+      md5: e5dc53f8fc0e1a62741b60b333d1cb64
+      size: 222370
+    - path: notebooks/03_preparation_gold.ipynb
+      hash: md5
+      md5: d65b797456ea30d1663787e2b15b03f2
+      size: 52938
+    outs:
+    - path: data/gold/clients_churn_gold.parquet
+      hash: md5
+      md5: 2044014d174f581343bea7685121d534
+      size: 218818
+    - path: data/gold/gold_manifest.json
+      hash: md5
+      md5: 8946db3bfb2fa830950e34bb8a49e37b
+      size: 4665
+    - path: reports/notebooks/03_preparation_gold.ipynb
+      hash: md5
+      md5: 25c7b82e72b803f37be3b47fc0218040
+      size: 52834
+  train_churn:
+    cmd: python -m jupyter nbconvert --to notebook --execute 
+      --ExecutePreprocessor.timeout=1800 
+      --ExecutePreprocessor.kernel_name=python3 --output-dir reports/notebooks 
+      notebooks/04_modelisation_churn.ipynb
+    deps:
+    - path: data/gold/clients_churn_gold.parquet
+      hash: md5
+      md5: 2044014d174f581343bea7685121d534
+      size: 218818
+    - path: data/gold/gold_manifest.json
+      hash: md5
+      md5: 8946db3bfb2fa830950e34bb8a49e37b
+      size: 4665
+    - path: notebooks/04_modelisation_churn.ipynb
+      hash: md5
+      md5: ec7431a1f9b43fb88fe58cf830ecdf53
+      size: 217229
+    - path: src/tracking.py
+      hash: md5
+      md5: 81757c9a6748aefd7639ea301c5c6a94
+      size: 4327
+    outs:
+    - path: data/model/courbes_roc_pr.png
+      hash: md5
+      md5: 119f60e33a5f7beb84ff2c410b5687a6
+      size: 88815
+    - path: data/model/cout_seuil_sensibilite.png
+      hash: md5
+      md5: fdf7fd69147046a7207b810e374cdc57
+      size: 58705
+    - path: data/model/metrics.json
+      hash: md5
+      md5: 798303fefb8d9efab9a7ecebe21e32d3
+      size: 1765
+    - path: data/model/model.joblib
+      hash: md5
+      md5: 5fc8182b78c1b7b38a5c060d096f0ba3
+      size: 7889
+    - path: data/model/model_card.md
+      hash: md5
+      md5: c48c2a51f04e03599184420879352eb7
+      size: 1541
+    - path: data/model/model_manifest.json
+      hash: md5
+      md5: f28cfd41368be5485aa8d20fe31a935b
+      size: 3499
+    - path: reports/notebooks/04_modelisation_churn.ipynb
+      hash: md5
+      md5: 9c72719ce66c1bf52bd3812aa7f8eebe
+      size: 218697
+  train_clv:
+    cmd: python -m jupyter nbconvert --to notebook --execute 
+      --ExecutePreprocessor.timeout=1800 
+      --ExecutePreprocessor.kernel_name=python3 --output-dir reports/notebooks 
+      notebooks/05_modelisation_clv.ipynb
+    deps:
+    - path: data/gold/clients_churn_gold.parquet
+      hash: md5
+      md5: 2044014d174f581343bea7685121d534
+      size: 218818
+    - path: data/gold/gold_manifest.json
+      hash: md5
+      md5: 8946db3bfb2fa830950e34bb8a49e37b
+      size: 4665
+    - path: notebooks/05_modelisation_clv.ipynb
+      hash: md5
+      md5: 9518c870a7f2f9ec9fec13cbdc91210f
+      size: 178942
+    - path: src/tracking.py
+      hash: md5
+      md5: 81757c9a6748aefd7639ea301c5c6a94
+      size: 4327
+    outs:
+    - path: data/model/clv_reel_vs_predit.png
+      hash: md5
+      md5: 2e7635cc64db64923bdddda72360e2f7
+      size: 143741
+    - path: data/model/metrics_clv.json
+      hash: md5
+      md5: a7f8c0131d2b15a01e5ed9005dbf43b2
+      size: 1134
+    - path: data/model/model_card_clv.md
+      hash: md5
+      md5: 70faf84724ff577f48e789e8674ce3f1
+      size: 1167
+    - path: data/model/model_clv.joblib
+      hash: md5
+      md5: 819742b62baeb8010fb185c6749d2c41
+      size: 62538058
+    - path: data/model/model_clv_manifest.json
+      hash: md5
+      md5: b0271c42335744026513c05a064b55b6
+      size: 2810
+    - path: reports/notebooks/05_modelisation_clv.ipynb
+      hash: md5
+      md5: aced5df6ffdc621f641e126d31a8aa20
+      size: 180006
+  scoring:
+    cmd: python -m jupyter nbconvert --to notebook --execute 
+      --ExecutePreprocessor.timeout=1800 
+      --ExecutePreprocessor.kernel_name=python3 --output-dir reports/notebooks 
+      notebooks/06_implementation_scoring.ipynb
+    deps:
+    - path: data/gold/clients_churn_gold.parquet
+      hash: md5
+      md5: 2044014d174f581343bea7685121d534
+      size: 218818
+    - path: data/gold/gold_manifest.json
+      hash: md5
+      md5: 8946db3bfb2fa830950e34bb8a49e37b
+      size: 4665
+    - path: data/model/model.joblib
+      hash: md5
+      md5: 5fc8182b78c1b7b38a5c060d096f0ba3
+      size: 7889
+    - path: data/model/model_clv.joblib
+      hash: md5
+      md5: 819742b62baeb8010fb185c6749d2c41
+      size: 62538058
+    - path: notebooks/06_implementation_scoring.ipynb
+      hash: md5
+      md5: 5ad53177d363a17f40853aa7679878fd
+      size: 44770
+    outs:
+    - path: data/model/scoring_exemple_cycle.parquet
+      hash: md5
+      md5: 8d619e0956f47ef8a540c51e43776a8a
+      size: 20777
+    - path: data/model/scoring_manifest.json
+      hash: md5
+      md5: c7a911a9d7062bda882d003e16be7ea3
+      size: 1681
+    - path: reports/notebooks/06_implementation_scoring.ipynb
+      hash: md5
+      md5: 24c228d94e33e1011cad3f26150f86ac
+      size: 44770

@@ -1,0 +1,6 @@
+/model.joblib
+/courbes_roc_pr.png
+/cout_seuil_sensibilite.png
+/model_clv.joblib
+/clv_reel_vs_predit.png
+/scoring_exemple_cycle.parquet

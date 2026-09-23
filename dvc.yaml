@@ -1,0 +1,131 @@
+# Pipeline reproductible RGPD -> Bronze -> Silver -> Gold -> modèles -> scoring.
+# Chaque stage exécute un notebook (cwd = notebooks/, chemins relatifs "../data/...")
+# et écrit la version exécutée, avec ses sorties, dans reports/notebooks/ (versionnée par
+# Git : c'est la preuve d'exécution consultable sur GitHub).
+#
+# Conventions :
+#   - parquet / joblib / png  -> cache DVC (poussés sur le remote DagsHub)
+#   - manifestes, métriques, model cards (JSON/MD, petits, diffables) -> cache: false, Git
+#   - clé et table de pseudonymisation RGPD -> cache: false ET .gitignore : jamais publiées
+#
+# Lancer : `dvc repro` (ne réexécute que les stages dont une dépendance a changé).
+
+vars:
+  - nbexec: >-
+      python -m jupyter nbconvert --to notebook --execute
+      --ExecutePreprocessor.timeout=1800 --ExecutePreprocessor.kernel_name=python3
+      --output-dir reports/notebooks
+
+stages:
+  rgpd:
+    cmd: ${nbexec} notebooks/00_conformite_rgpd_anonymisation.ipynb
+    deps:
+      - notebooks/00_conformite_rgpd_anonymisation.ipynb
+      - Examen_cas d'usage candidat/churn_saas_complet.csv
+    outs:
+      - data/rgpd/rgpd_gate_manifest.json:
+          cache: false
+      - data/rgpd/keymap_client_id.parquet:
+          cache: false
+      - data/rgpd/keymap_secret.json:
+          cache: false
+      - reports/notebooks/00_conformite_rgpd_anonymisation.ipynb:
+          cache: false
+
+  bronze:
+    cmd: ${nbexec} notebooks/01_ingestion_bronze.ipynb
+    deps:
+      - notebooks/01_ingestion_bronze.ipynb
+      - data/rgpd/rgpd_gate_manifest.json
+      - Examen_cas d'usage candidat/churn_saas_complet.csv
+      - Examen_cas d'usage candidat/churn_saas_echantillon.csv
+      - Examen_cas d'usage candidat/catalogue_plans.csv
+    outs:
+      - data/bronze/clients_churn_bronze.parquet
+      - data/bronze/catalogue_plans_bronze.parquet
+      - data/bronze/clients_churn_echantillon_bronze.parquet
+      - data/bronze/bronze_manifest.json:
+          cache: false
+      - reports/notebooks/01_ingestion_bronze.ipynb:
+          cache: false
+
+  silver:
+    cmd: ${nbexec} notebooks/02_nettoyage_silver.ipynb
+    deps:
+      - notebooks/02_nettoyage_silver.ipynb
+      - data/bronze/clients_churn_bronze.parquet
+      - data/bronze/catalogue_plans_bronze.parquet
+    outs:
+      - data/silver/clients_churn_silver.parquet
+      - data/silver/silver_manifest.json:
+          cache: false
+      - reports/notebooks/02_nettoyage_silver.ipynb:
+          cache: false
+
+  gold:
+    cmd: ${nbexec} notebooks/03_preparation_gold.ipynb
+    deps:
+      - notebooks/03_preparation_gold.ipynb
+      - data/silver/clients_churn_silver.parquet
+    outs:
+      - data/gold/clients_churn_gold.parquet
+      - data/gold/gold_manifest.json:
+          cache: false
+      - reports/notebooks/03_preparation_gold.ipynb:
+          cache: false
+
+  train_churn:
+    cmd: ${nbexec} notebooks/04_modelisation_churn.ipynb
+    deps:
+      - notebooks/04_modelisation_churn.ipynb
+      - data/gold/clients_churn_gold.parquet
+      - data/gold/gold_manifest.json
+      - src/tracking.py
+    outs:
+      - data/model/model.joblib
+      - data/model/courbes_roc_pr.png
+      - data/model/cout_seuil_sensibilite.png
+      - data/model/model_card.md:
+          cache: false
+      - data/model/model_manifest.json:
+          cache: false
+      - reports/notebooks/04_modelisation_churn.ipynb:
+          cache: false
+    metrics:
+      - data/model/metrics.json:
+          cache: false
+
+  train_clv:
+    cmd: ${nbexec} notebooks/05_modelisation_clv.ipynb
+    deps:
+      - notebooks/05_modelisation_clv.ipynb
+      - data/gold/clients_churn_gold.parquet
+      - data/gold/gold_manifest.json
+      - src/tracking.py
+    outs:
+      - data/model/model_clv.joblib
+      - data/model/clv_reel_vs_predit.png
+      - data/model/model_card_clv.md:
+          cache: false
+      - data/model/model_clv_manifest.json:
+          cache: false
+      - reports/notebooks/05_modelisation_clv.ipynb:
+          cache: false
+    metrics:
+      - data/model/metrics_clv.json:
+          cache: false
+
+  scoring:
+    cmd: ${nbexec} notebooks/06_implementation_scoring.ipynb
+    deps:
+      - notebooks/06_implementation_scoring.ipynb
+      - data/gold/clients_churn_gold.parquet
+      - data/gold/gold_manifest.json
+      - data/model/model.joblib
+      - data/model/model_clv.joblib
+    outs:
+      - data/model/scoring_exemple_cycle.parquet
+      - data/model/scoring_manifest.json:
+          cache: false
+      - reports/notebooks/06_implementation_scoring.ipynb:
+          cache: false
