@@ -222,8 +222,11 @@ dvc status -c                                      # "Cache and remote 'origin' 
   Git. Vérifié : le jeton n'apparaît dans aucun commit.
 - Les 14 fichiers : 3 CSV bruts, 5 parquets (bronze, silver, gold, scoring), 2 modèles joblib,
   3 graphiques. Les clés RGPD ne sont pas envoyées (`cache: false`).
-- Test à faire un jour : `git clone` du dépôt GitHub dans un autre dossier, puis `dvc pull`. Il
-  doit récupérer toutes les données : c'est la preuve que le projet est reproductible par un tiers.
+- **Testé** : `git clone` depuis GitHub dans un dossier vierge, puis `dvc pull` : « 14 files
+  fetched », modèles et données présents. Un tiers peut donc récupérer le projet complet.
+  `dvc status` n'y signale que les deux clés RGPD, qui manquent volontairement. Conséquence : chez
+  un tiers, `dvc repro` rejouerait le stage `rgpd`, avec une nouvelle clé, puis tout le pipeline.
+  C'est attendu : les clés ne quittent jamais ton poste.
 - ⚠️ Le jeton a été collé dans la conversation avec l'assistant : **en générer un nouveau** sur
   DagsHub, supprimer l'ancien, puis relancer les deux commandes `--local`.
 
