@@ -1,11 +1,11 @@
 {
   "couche": "silver",
   "version": "v1",
-  "processed_at_utc": "2026-09-23T08:29:19.088580+00:00",
+  "processed_at_utc": "2026-09-23T14:43:09.197317+00:00",
   "source": "data/bronze/clients_churn_bronze.parquet + catalogue_plans_bronze.parquet",
   "sha256_source_bronze": {
-    "clients_churn_bronze.parquet": "6a54da7f210fc59f765245dd05925a49c1ea4454ae7ae1813e7f03e8559ee8a5",
-    "catalogue_plans_bronze.parquet": "a69a4a4876614867c0fd6eb72b3af3b4526b5401c60aeb92338b87bff3626320"
+    "clients_churn_bronze.parquet": "e5921acf5296adfca7fbbe3a704128023efadc83b490210cc6b7b44f75798da4",
+    "catalogue_plans_bronze.parquet": "6073506191a53c866c36e440b327b8e020628c32f96c1ea0b995d761b2a26900"
   },
   "lignes": 5000,
   "colonnes": [

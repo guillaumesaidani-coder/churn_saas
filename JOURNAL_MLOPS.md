@@ -408,8 +408,18 @@ diapositive a des notes pour l'oral. Généré par `Livrables/sources_soutenance
 La relecture a fait corriger une figure du notebook : les titres des matrices de confusion se
 chevauchaient et les axes étaient en anglais. **Cette correction de code impose de réexécuter
 le notebook**, ce qui a révélé un problème : le jeton DagsHub enregistré est désormais refusé
-(erreur 401) par DVC comme par MLflow. La réexécution et le `dvc push` sont en attente d'un
-jeton valide (§3).
+(erreur 401) par DVC comme par MLflow. Après renouvellement du jeton (§3.2 bis), le notebook
+a été réexécuté : figure corrigée, runs MLflow v2 publiés, toutes les vérifications passent.
+
+Deux remarques sur cette réexécution :
+- **Jeton** : `access_key_id` contenait le nouveau jeton, mais `secret_access_key` gardait
+  l'ancien. DVC fonctionnait, car DagsHub ne vérifie que la clé d'accès ; MLflow, lui, lisait
+  la seconde valeur et renvoyait 401. Les deux champs ont été alignés sur le jeton valide.
+- **Erreur de ma part** : `dvc repro -f certification` a forcé aussi les étapes en amont
+  (RGPD, Bronze, Silver, Gold, entraînement v1). Vérifié : Silver, Gold, modèles et métriques
+  sont identiques octet par octet. Seuls les fichiers Bronze changent (horodatage d'ingestion,
+  attendu), et un run MLflow v1 figure en double sur DagsHub. Pour ne rejouer qu'une étape
+  sans ses amonts : `dvc repro -f -s certification` (`-s` = cette étape seulement).
 
 ---
 
@@ -444,7 +454,7 @@ jeton valide (§3).
 5. ✅ Secret `DAGSHUB_TOKEN` ajouté dans GitHub, CI verte (§2.7).
 6. Reporte les liens GitHub, DagsHub et MLflow dans `README.md`, puis dans le notebook final.
 
-### 3.2 bis Jeton DagsHub à renouveler (bloquant, 2026-09-23)
+### 3.2 bis Jeton DagsHub à renouveler ✅ fait (2026-09-23)
 Le jeton enregistré dans `.dvc/config.local` et dans le secret GitHub `DAGSHUB_TOKEN` est refusé
 (401). Utilise le **Default Access Token** (https://dagshub.com/user/settings/tokens), qui
 fonctionne pour Git, DVC et MLflow :

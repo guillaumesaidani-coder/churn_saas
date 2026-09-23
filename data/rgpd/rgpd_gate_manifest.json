@@ -1,7 +1,7 @@
 {
   "version": "v1",
   "sha256_source_csv": "2fc45e8c3c74d3ddcdbda162c5bb50184587201b46d877cc06742afd13063844",
-  "controle_effectue_le": "2026-09-23T08:29:13.365156+00:00",
+  "controle_effectue_le": "2026-09-23T14:43:03.581960+00:00",
   "fichier_controle": "churn_saas_complet.csv",
   "colonnes_identifiantes_detectees": [],
   "motifs_nominatifs_detectes": 0,

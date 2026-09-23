@@ -1,7 +1,7 @@
 {
   "couche": "bronze",
   "version": "v1",
-  "ingested_at_utc": "2026-09-23T08:29:16.299341+00:00",
+  "ingested_at_utc": "2026-09-23T14:43:06.401770+00:00",
   "tables": {
     "clients_churn_bronze": {
       "fichier_source": "churn_saas_complet.csv",
@@ -41,7 +41,7 @@
       ],
       "chemin_bronze": "..\\data\\bronze\\clients_churn_bronze.parquet",
       "sha256_source_csv": "2fc45e8c3c74d3ddcdbda162c5bb50184587201b46d877cc06742afd13063844",
-      "sha256_bronze": "6a54da7f210fc59f765245dd05925a49c1ea4454ae7ae1813e7f03e8559ee8a5"
+      "sha256_bronze": "e5921acf5296adfca7fbbe3a704128023efadc83b490210cc6b7b44f75798da4"
     },
     "catalogue_plans_bronze": {
       "fichier_source": "catalogue_plans.csv",
@@ -58,7 +58,7 @@
       ],
       "chemin_bronze": "..\\data\\bronze\\catalogue_plans_bronze.parquet",
       "sha256_source_csv": "c94f6f52652532c578cb7a44d752b8b197ef84f5e6c6e17a58579fa195e9ad08",
-      "sha256_bronze": "a69a4a4876614867c0fd6eb72b3af3b4526b5401c60aeb92338b87bff3626320"
+      "sha256_bronze": "6073506191a53c866c36e440b327b8e020628c32f96c1ea0b995d761b2a26900"
     },
     "clients_churn_echantillon_bronze": {
       "fichier_source": "churn_saas_echantillon.csv",
@@ -98,7 +98,7 @@
       ],
       "chemin_bronze": "..\\data\\bronze\\clients_churn_echantillon_bronze.parquet",
       "sha256_source_csv": "680f5371c406f47a3a67f1611cb016c17efd61e93a52d1b4b8dbd3a39dc2f296",
-      "sha256_bronze": "54ca98a12c803ff857daa88c97f281248e64580e0c898d32ac043cf6f8745226"
+      "sha256_bronze": "7116d78130f6e1023e6acdef6a34d672c6ed59d6099a20afd9036a44fc779a13"
     }
   },
   "avertissement": "Données brutes non corrigées. Aucune transformation (dédoublonnage, parsing de dates, typage numérique, normalisation catégorielle) n'a été appliquée -- voir la couche Silver."

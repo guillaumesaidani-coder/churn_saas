@@ -1,9 +1,9 @@
 {
   "couche": "gold",
   "version": "v2",
-  "processed_at_utc": "2026-09-23T10:06:39.861602+00:00",
+  "processed_at_utc": "2026-09-23T14:43:40.104852+00:00",
   "produit_par": "notebooks/notebook_certifiant_churn_saas.ipynb",
-  "commit_git": "75bd79e",
+  "commit_git": "0a9b4a6",
   "sources": {
     "churn_saas_complet.csv": "2fc45e8c3c74d3ddcdbda162c5bb50184587201b46d877cc06742afd13063844",
     "catalogue_plans.csv": "c94f6f52652532c578cb7a44d752b8b197ef84f5e6c6e17a58579fa195e9ad08"

@@ -1,6 +1,6 @@
 {
   "couche": "model",
-  "processed_at_utc": "2026-09-23T09:26:53.330431+00:00",
+  "processed_at_utc": "2026-09-23T14:43:16.983128+00:00",
   "source": "data/gold/clients_churn_gold.parquet",
   "gold_version": "v1",
   "gold_sha256": "c3f400321b243989443155f1dc62a95353eb1d2dc67e9c868f80f689bcd630a6",

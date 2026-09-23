@@ -1,7 +1,7 @@
 {
   "couche": "gold",
   "version": "v1",
-  "processed_at_utc": "2026-09-23T08:29:22.803496+00:00",
+  "processed_at_utc": "2026-09-23T14:43:12.782009+00:00",
   "source": "data/silver/clients_churn_silver.parquet",
   "sha256_source_silver": "44fd8d9a1d4d09188767545cf12caade627c270009f64dbb8298bb55c3a5c0be",
   "lignes": 5000,
