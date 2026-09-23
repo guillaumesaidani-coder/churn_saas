@@ -8,8 +8,8 @@ Customer Success à prioriser leurs actions de rétention.
 | Ressource | Lien |
 |---|---|
 | Code (GitHub) | https://github.com/guillaumesaidani-coder/churn_saas |
-| Jeu de données et modèles (DagsHub, DVC) | `<URL DagsHub à compléter>` |
-| Runs d'entraînement (MLflow sur DagsHub) | `<URL DagsHub>.mlflow` |
+| Jeu de données et modèles (DagsHub, DVC) | https://dagshub.com/guillaume.saidani/churn_saas |
+| Runs d'entraînement (MLflow sur DagsHub) | à venir : https://dagshub.com/guillaume.saidani/churn_saas.mlflow |
 
 ## Résultats (jeu de test, 1 000 comptes, seed 42)
 

@@ -7,7 +7,7 @@ pour que tu puisses le défendre devant le jury (compétences C6 et C9 surtout).
 Sommaire :
 0. État de départ
 1. À quoi sert chaque outil
-2. Actions réalisées, pas à pas (§2.1 à §2.10)
+2. Actions réalisées, pas à pas (§2.1 à §2.11)
 3. Ce qu'il te reste à faire (avec les commandes)
 4. Livrable final : où on en est
 5. Points d'attention et questions probables du jury
@@ -203,6 +203,29 @@ contenait.
   est à assumer ou à reformuler.
 Nom `origin` : le remote Git et le remote DVC s'appellent tous les deux `origin`, sans conflit, car
 ce sont deux outils distincts.
+
+### 2.11 Remote DVC sur DagsHub et `dvc push` (2026-09-23)
+Dépôt DagsHub : https://dagshub.com/guillaume.saidani/churn_saas. Il a été créé vide, sans
+connexion à GitHub : ne pas suivre les commandes `git clone` / `touch README.md` que DagsHub
+affiche pour un dépôt vide, elles créeraient un second historique git.
+```bash
+dvc remote add origin s3://dvc                     # stockage compatible S3 de DagsHub
+dvc remote modify origin endpointurl https://dagshub.com/guillaume.saidani/churn_saas.s3
+dvc remote default origin
+# jeton : DagsHub > avatar > Settings > Tokens (https://dagshub.com/user/settings/tokens)
+dvc remote modify origin --local access_key_id <jeton>
+dvc remote modify origin --local secret_access_key <jeton>
+dvc push                                           # 14 fichiers envoyés
+dvc status -c                                      # "Cache and remote 'origin' are in sync."
+```
+- `.dvc/config` (URL du remote) est **commité** ; `.dvc/config.local` (jeton) est **ignoré** par
+  Git. Vérifié : le jeton n'apparaît dans aucun commit.
+- Les 14 fichiers : 3 CSV bruts, 5 parquets (bronze, silver, gold, scoring), 2 modèles joblib,
+  3 graphiques. Les clés RGPD ne sont pas envoyées (`cache: false`).
+- Test à faire un jour : `git clone` du dépôt GitHub dans un autre dossier, puis `dvc pull`. Il
+  doit récupérer toutes les données : c'est la preuve que le projet est reproductible par un tiers.
+- ⚠️ Le jeton a été collé dans la conversation avec l'assistant : **en générer un nouveau** sur
+  DagsHub, supprimer l'ancien, puis relancer les deux commandes `--local`.
 
 ---
 
