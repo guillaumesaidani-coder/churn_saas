@@ -1,0 +1,7 @@
+# Sorties du pipeline DVC : aucune conversion de fin de ligne par Git.
+# dvc.lock enregistre le hash MD5 exact de ces fichiers ; une conversion CRLF<->LF au
+# checkout (Windows vs Linux/CI) ferait croire à DVC qu'ils ont changé.
+data/**/*.json -text
+data/**/*.md -text
+reports/** -text
+*.ipynb -text
