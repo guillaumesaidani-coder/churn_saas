@@ -7,7 +7,7 @@ pour que tu puisses le défendre devant le jury (compétences C6 et C9 surtout).
 Sommaire :
 0. État de départ
 1. À quoi sert chaque outil
-2. Actions réalisées, pas à pas (§2.1 à §2.8)
+2. Actions réalisées, pas à pas (§2.1 à §2.10)
 3. Ce qu'il te reste à faire (avec les commandes)
 4. Livrable final : où on en est
 5. Points d'attention et questions probables du jury
@@ -176,8 +176,29 @@ git push -u origin main
 `-u` associe la branche locale `main` à `origin/main` : ensuite, `git push` et `git pull` suffisent.
 Le push a déclenché la CI (onglet **Actions**) ; le job `docker` reste ignoré tant que les secrets
 DagsHub ne sont pas en place.
-Le dépôt semble **privé** : pour le jury, il faudra le rendre public ou l'y inviter
-(Settings → Collaborators).
+### 2.10 Retrait de `Livrables/` et recréation du dépôt GitHub
+Tu ne voulais pas publier `Livrables/` (comptes rendus, relevés de décision, présentations), ni
+`questions_jury_ml_mlops_v2.md`, que tu as déplacé dans ce dossier. Or le premier push les
+contenait.
+- Un simple `git rm --cached` ne suffit pas : les fichiers resteraient lisibles dans l'historique
+  (n'importe quel ancien commit sur GitHub).
+- Ce qui a été fait :
+  1. sauvegarde complète du dépôt (`git bundle`) et du dossier ;
+  2. `Livrables/` ajouté au `.gitignore` ;
+  3. réécriture de l'historique **local** pour enlever ces fichiers de tous les commits :
+     ```bash
+     git filter-branch --prune-empty --index-filter        'git rm -r -q --cached --ignore-unmatch Livrables questions_jury_ml_mlops_v2.md' -- main
+     ```
+  4. tu as **supprimé le dépôt GitHub et en as recréé un vide**, ce qui évite de forcer un push
+     sur un historique déjà publié ;
+  5. push de l'historique propre.
+- Vérification : 0 occurrence de `Livrables/` dans tous les commits de `main`. Le dossier est
+  intact sur ton disque.
+- Leçon à retenir : **on écrit le `.gitignore` avant le premier push**. Une fois publié, un fichier
+  ne se retire proprement qu'en réécrivant l'historique.
+- Certains documents publiés (`dat_churn_saas_v1.md`, `data/README.md`, `model_card.md`, fiche Gold)
+  citent des fichiers de `Livrables/`. Ces références pointent vers des documents non publiés, ce qui
+  est à assumer ou à reformuler.
 Nom `origin` : le remote Git et le remote DVC s'appellent tous les deux `origin`, sans conflit, car
 ce sont deux outils distincts.
 
@@ -185,7 +206,7 @@ ce sont deux outils distincts.
 
 ## 3. Ce qu'il te reste à faire (je ne peux pas le faire à ta place : ça demande tes comptes)
 
-### 3.1 GitHub ✅ fait (§2.9)
+### 3.1 GitHub ✅ fait (§2.9, §2.10)
 1. Sur github.com : **New repository**, par exemple `churn-saas-certification`, **sans** README ni
    .gitignore (le dépôt local en a déjà). Public (lien jury) ou privé avec invitation du jury.
 2. Donne-moi l'URL, ou lance toi-même :
@@ -219,8 +240,7 @@ ce sont deux outils distincts.
 
 ### 3.3 Tâches de fond
 - Relire `git log` et ce journal ; savoir expliquer chaque commit.
-- Décider pour les fichiers pédagogiques de `Livrables/` (ex. `lois_generales_churn_saas_lyceen.pptx`,
-  `churn_saas_cadrage_mlops_pedagogique.pptx`) : faut-il les publier ?
+- `Livrables/` : conservé en local, non publié (§2.10).
 - Les doublons manuels `_v2`, `_v3`, `_old2` n'ont plus de raison d'exister maintenant que Git garde
   l'historique. Tu peux garder la dernière version et supprimer les autres, en le faisant dans un commit.
 
