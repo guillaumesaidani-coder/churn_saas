@@ -25,7 +25,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src ./src
 COPY scripts ./scripts
-COPY data/model ./data/model
+# Modèle v2 : pipeline avec imputation (accepte les valeurs manquantes), CLV de 1,5 Mo.
+# Retour à la v1 : reconstruire l'image depuis un commit antérieur (git checkout + dvc checkout).
+COPY data/model_v2 ./data/model_v2
 COPY data/gold ./data/gold
 
 RUN mkdir -p /app && chown -R appuser:appgroup /app

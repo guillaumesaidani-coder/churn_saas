@@ -5,7 +5,7 @@ services:
       target: runtime
     environment:
       API_KEY: dev-local-key
-      MODEL_DIR: /app/data/model
+      MODEL_DIR: /app/data/model_v2   # modèle v2 (notebook de certification)
     ports:
       - "8011:8000"
     # HEALTHCHECK déjà défini dans le Dockerfile (GET /health).
@@ -25,6 +25,8 @@ services:
       retries: 3
     environment:
       GOLD_DIR: /app/data/gold
+      GOLD_FICHIER: clients_churn_gold_v2.parquet
+      GOLD_MANIFESTE: gold_v2_manifest.json
       DRIFT_EXPORTER_PORT: "9110"
       DRIFT_REFRESH_SECONDS: "60"
     ports:

@@ -20,3 +20,6 @@ mlruns_docker
 reports
 data/model/mlflow.db
 data/model/mlartifacts
+data/model
+data/model_v2/mlflow.db
+data/model_v2/mlartifacts

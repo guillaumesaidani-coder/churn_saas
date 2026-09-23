@@ -29,6 +29,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from src.drift import drift_table  # noqa: E402
 
 GOLD_DIR = Path(os.getenv("GOLD_DIR", "data/gold"))
+# Gold v1 par défaut ; compose.yaml sélectionne le Gold v2 (celui du modèle servi par l'API).
+GOLD_FICHIER = os.getenv("GOLD_FICHIER", "clients_churn_gold.parquet")
+GOLD_MANIFESTE = os.getenv("GOLD_MANIFESTE", "gold_manifest.json")
 PORT = int(os.getenv("DRIFT_EXPORTER_PORT", "9110"))
 REFRESH_SECONDS = int(os.getenv("DRIFT_REFRESH_SECONDS", "60"))
 PSI_ALERT_THRESHOLD = 0.25
@@ -45,14 +48,16 @@ def numeric_feature_columns(gold: pd.DataFrame, feature_columns: list[str]) -> l
 def _reload() -> int:
     """Relit le Gold dataset, recalcule la table de dérive, met à jour les gauges.
     Retourne le nombre de features suivies (0 si le Gold dataset n'est pas encore disponible)."""
-    gold_path = GOLD_DIR / "clients_churn_gold.parquet"
-    manifest_path = GOLD_DIR / "gold_manifest.json"
+    gold_path = GOLD_DIR / GOLD_FICHIER
+    manifest_path = GOLD_DIR / GOLD_MANIFESTE
     if not gold_path.exists() or not manifest_path.exists():
         return 0
 
     import json
     with open(manifest_path, "r", encoding="utf-8") as f:
-        feature_columns = json.load(f)["features_modele_principal"]
+        manifeste = json.load(f)
+    # clé du manifeste v2 (features_modele) ou v1 (features_modele_principal)
+    feature_columns = manifeste.get("features_modele") or manifeste["features_modele_principal"]
 
     gold = pd.read_parquet(gold_path)
     features = numeric_feature_columns(gold, feature_columns)

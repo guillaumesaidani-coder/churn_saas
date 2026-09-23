@@ -7,7 +7,7 @@ pour que tu puisses le défendre devant le jury (compétences C6 et C9 surtout).
 Sommaire :
 0. État de départ
 1. À quoi sert chaque outil
-2. Actions réalisées, pas à pas (§2.1 à §2.15)
+2. Actions réalisées, pas à pas (§2.1 à §2.16)
 3. Ce qu'il te reste à faire (avec les commandes)
 4. Livrable final : où on en est
 5. Points d'attention et questions probables du jury
@@ -322,9 +322,7 @@ poussées sur DagsHub (`dvc push`, 21 fichiers). `dvc metrics show` compare les 
 Lancé avec les variables MLflow DagsHub (§2.12), le notebook publie ses runs à côté des runs v1.
 
 **Ce qui n'est pas encore fait** :
-- l'API et l'image Docker servent toujours le modèle **v1** (`data/model`). Pour passer en v2, il
-  faut pointer `MODEL_DIR` vers `data/model_v2` dans `compose.yaml` et copier ce dossier dans
-  l'image (`Dockerfile`) ;
+- ~~l'API et l'image Docker servent toujours le modèle v1~~ : fait en §2.16 ;
 - le support de présentation (`Livrables/`) n'a pas été mis à jour avec les résultats v2.
 
 ### 2.14 Code poussé aussi vers DagsHub : page de données consultable (2026-09-23)
@@ -367,6 +365,17 @@ GitHub** : https://github.com/guillaumesaidani-coder/churn_saas/releases/tag/v2.
   la même modification a été appliquée au notebook source et à sa version exécutée, puis
   enregistrée par `dvc commit certification`, sans réexécution (DagsHub était injoignable à ce
   moment, et une réexécution n'aurait rien changé aux résultats).
+
+### 2.16 L'API et Docker servent le modèle v2 (2026-09-23)
+- `compose.yaml` : `MODEL_DIR=/app/data/model_v2` pour l'API ; l'exporteur de dérive lit le Gold
+  v2 (`GOLD_FICHIER`, `GOLD_MANIFESTE`) et suit ses 17 variables numériques.
+- `scripts/export_drift_metrics.py` : fichier Gold et manifeste configurables (v1 par défaut),
+  lecture des clés de manifeste v1 et v2.
+- `Dockerfile` : l'image embarque `data/model_v2` au lieu de `data/model`, soit 60 Mo de moins
+  grâce au modèle CLV v2. Retour à la v1 : reconstruire l'image depuis un commit antérieur.
+- CI : le test de fumée interroge `/ready` (modèles chargés) et plus seulement `/health`.
+- Vérifié sur la stack Docker : `/ready` OK, `/score-batch` accepte une valeur manquante
+  (erreur 500 en v1), scores identiques au modèle v2 chargé localement, 4 services en bonne santé.
 
 ---
 
@@ -424,7 +433,7 @@ fournir les **liens GitHub et vers le jeu de données**.
 | Code sur GitHub | ✅ https://github.com/guillaumesaidani-coder/churn_saas (CI verte) |
 | **Notebook unique au plan imposé** | ✅ `reports/notebooks/notebook_certifiant_churn_saas.ipynb`, exécuté par `dvc repro certification` (§2.13) |
 | Support de présentation | présent dans `Livrables/soutenance_churn_saas_C1_C9.pptx` (non vérifié ici), **à mettre à jour avec les résultats v2** |
-| Modèle v2 servi par l'API | ⏳ l'API et Docker servent encore la v1 (§2.13) |
+| Modèle v2 servi par l'API | ✅ API et Docker sur la v2 (§2.16) |
 
 ---
 

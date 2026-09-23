@@ -3,7 +3,7 @@ name: CI
 # À chaque push / pull request :
 #   1. tests unitaires (données synthétiques, aucun secret requis) ;
 #   2. récupération des données/modèles versionnés par DVC depuis DagsHub (`dvc pull`),
-#      build de l'image API et test de fumée /health.
+#      build de l'image API et test de fumée /ready (modèles v2 chargés).
 #      Étape 2 ignorée tant que le secret DAGSHUB_TOKEN n'est pas configuré.
 
 on:
@@ -51,9 +51,9 @@ jobs:
         if: env.DAGSHUB_TOKEN != ''
         run: |
           docker build --target runtime -t churn-api:ci .
-          docker run -d --name api -p 8000:8000 -e API_KEY=ci-key -e MODEL_DIR=/app/data/model churn-api:ci
+          docker run -d --name api -p 8000:8000 -e API_KEY=ci-key -e MODEL_DIR=/app/data/model_v2 churn-api:ci
           for i in $(seq 1 30); do
-            curl -fsS http://localhost:8000/health && exit 0
+            curl -fsS http://localhost:8000/ready && exit 0
             sleep 2
           done
           docker logs api
