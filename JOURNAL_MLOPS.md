@@ -7,7 +7,7 @@ pour que tu puisses le défendre devant le jury (compétences C6 et C9 surtout).
 Sommaire :
 0. État de départ
 1. À quoi sert chaque outil
-2. Actions réalisées, pas à pas (§2.1 à §2.13)
+2. Actions réalisées, pas à pas (§2.1 à §2.14)
 3. Ce qu'il te reste à faire (avec les commandes)
 4. Livrable final : où on en est
 5. Points d'attention et questions probables du jury
@@ -325,6 +325,31 @@ Lancé avec les variables MLflow DagsHub (§2.12), le notebook publie ses runs �
   faut pointer `MODEL_DIR` vers `data/model_v2` dans `compose.yaml` et copier ce dossier dans
   l'image (`Dockerfile`) ;
 - le support de présentation (`Livrables/`) n'a pas été mis à jour avec les résultats v2.
+
+### 2.14 Code poussé aussi vers DagsHub : page de données consultable (2026-09-23)
+**Problème** : le dépôt DagsHub avait été créé vide. Il recevait les données (`dvc push`) mais pas
+le code. Or DagsHub lit les fichiers `.dvc` et `dvc.lock` pour savoir quels fichiers de données
+afficher : sans eux, la page restait vide, alors que les données étaient bien stockées.
+
+**Solution** : une seconde adresse de push sur le remote `origin`. **Un seul `git push` met
+maintenant à jour GitHub et DagsHub.**
+```bash
+git remote set-url --add --push origin https://github.com/guillaumesaidani-coder/churn_saas.git
+git remote set-url --add --push origin https://dagshub.com/guillaume.saidani/churn_saas.git
+git push origin main
+```
+Résultat : `git remote -v` affiche une adresse de lecture (GitHub) et deux adresses de push (GitHub
+et DagsHub).
+
+**Piège rencontré** : le jeton personnel fonctionnait pour DVC et MLflow, mais DagsHub l'a refusé
+pour git (« Authentication failed »). Pour git, DagsHub demande le **jeton par défaut** du compte
+(*Default Access Token*), ou un mot de passe si le compte en a un. Tu as fait ce push toi-même
+depuis ton terminal : les identifiants sont gardés par le gestionnaire d'identifiants de Windows,
+et ne figurent ni dans le projet ni dans la conversation.
+
+À vérifier : ouvrir https://dagshub.com/guillaume.saidani/churn_saas en navigation privée. La page
+doit montrer le code et les dossiers de données sans demander de connexion ; sinon, rendre le
+dépôt public dans ses Settings.
 
 ---
 
