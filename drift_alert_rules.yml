@@ -1,0 +1,13 @@
+groups:
+  - name: churn-saas-drift
+    rules:
+      - alert: ChurnSaasDriftPSIEleve
+        expr: churn_saas_drift_psi > 0.25
+        labels:
+          severity: majeure
+        annotations:
+          summary: "PSI > 0.25 sur {{ $labels.feature }} (référence = split train du Gold dataset)"
+          description: >-
+            Isoler la feature, vérifier le rappel du modèle sur le cycle courant avant
+            toute action sur le modèle -- un PSI élevé seul ne dit pas si le modèle a
+            perdu en performance, seulement que la distribution d'entrée a changé.

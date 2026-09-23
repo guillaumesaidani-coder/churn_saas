@@ -1,0 +1,36 @@
+# --- Python / outils ---
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.ipynb_checkpoints/
+
+# --- Secrets et données ré-identifiantes (RGPD) : ne JAMAIS publier ---
+# keymap_secret.json = clé de pseudonymisation ; keymap_client_id.parquet = table
+# de correspondance client_id <-> pseudonyme. Les publier annulerait la pseudonymisation.
+data/rgpd/keymap_secret.json
+data/rgpd/keymap_client_id.parquet
+
+# --- Store MLflow local (régénérable, non diffable) ---
+data/model/mlflow.db
+mlruns/
+mlartifacts/
+
+# --- Brouillons et sorties ponctuelles ---
+scratchpad/
+verify_out*.txt
+
+# --- Supports de cours fournis par la formation (hors livrable) ---
+TP*.html
+explications*.html
+explications finales.html
+progression_pedagogique.pptx
+exemple_pipeline_artifacts/
+Examen_cas d'usage candidat/Enonce cas usage_churn_saas.pdf
+Examen_cas d'usage candidat/churn_echantillon_pedagogique.pptx
+
+# Store MLflow du conteneur pipeline
+mlruns_docker/
+
+# Variables locales (jetons DagsHub)
+.env

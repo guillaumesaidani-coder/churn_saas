@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 15s
+
+rule_files:
+  - drift_alert_rules.yml
+
+scrape_configs:
+  - job_name: churn-saas-api
+    static_configs:
+      - targets: ["api:8000"]
+    metrics_path: /metrics
+
+  - job_name: churn-saas-drift
+    static_configs:
+      - targets: ["drift-exporter:9110"]
+    metrics_path: /metrics
