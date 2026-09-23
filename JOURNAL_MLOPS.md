@@ -347,9 +347,8 @@ pour git (« Authentication failed »). Pour git, DagsHub demande le **jeton par
 depuis ton terminal : les identifiants sont gardés par le gestionnaire d'identifiants de Windows,
 et ne figurent ni dans le projet ni dans la conversation.
 
-À vérifier : ouvrir https://dagshub.com/guillaume.saidani/churn_saas en navigation privée. La page
-doit montrer le code et les dossiers de données sans demander de connexion ; sinon, rendre le
-dépôt public dans ses Settings.
+Visibilité vérifiée : le dépôt DagsHub est **public** (Settings → Danger Zone → Change visibility :
+« This repository is currently public »). Le jury peut ouvrir le lien sans compte.
 
 ---
 
