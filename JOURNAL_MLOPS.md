@@ -7,7 +7,7 @@ pour que tu puisses le défendre devant le jury (compétences C6 et C9 surtout).
 Sommaire :
 0. État de départ
 1. À quoi sert chaque outil
-2. Actions réalisées, pas à pas (§2.1 à §2.18)
+2. Actions réalisées, pas à pas (§2.1 à §2.19)
 3. Ce qu'il te reste à faire (avec les commandes)
 4. Livrable final : où on en est
 5. Points d'attention et questions probables du jury
@@ -420,6 +420,24 @@ Deux remarques sur cette réexécution :
   sont identiques octet par octet. Seuls les fichiers Bronze changent (horodatage d'ingestion,
   attendu), et un run MLflow v1 figure en double sur DagsHub. Pour ne rejouer qu'une étape
   sans ses amonts : `dvc repro -f -s certification` (`-s` = cette étape seulement).
+
+### 2.19 Pipeline remis à jour et fins de ligne fixées (2026-09-24)
+En préparant une démonstration de `dvc repro` dans un clone jetable, deux problèmes sont apparus :
+1. **`train_clv` et `scoring` étaient périmés** dans le vrai projet. Ma réexécution forcée du
+   §2.18 avait réécrit `gold_manifest.json` (nouvel horodatage), dont ces deux étapes dépendent,
+   sans les rejouer. Je ne l'avais pas vu : j'avais vérifié la synchronisation avec DagsHub
+   (`dvc status -c`), pas l'état du pipeline (`dvc status`). Corrigé par un `dvc repro` normal,
+   qui n'a rejoué que ces deux étapes : modèle CLV v1 identique octet par octet, seuls du bruit
+   de calcul flottant et des horodatages changent.
+2. **Fins de ligne** : trois fichiers (`src/silver.py`, `src/tracking.py`,
+   `scripts/export_drift_metrics.py`) avaient été réécrits en CRLF par mes scripts Python sous
+   Windows ; un clone (Git en `autocrlf=true`) produisait d'autres octets, donc d'autres MD5, et
+   DVC croyait le code modifié. Correction : fichiers remis en LF, `.gitattributes` impose
+   `eol=lf` à `src/*.py` et `scripts/*.py`, et les nouvelles empreintes sont enregistrées par
+   `dvc commit` (sans réexécution, car seules les fins de ligne changent).
+
+Leçon : après toute réexécution, vérifier **`dvc status`** (le pipeline est-il à jour ?) et pas
+seulement `dvc status -c` (le remote est-il synchronisé ?).
 
 ---
 

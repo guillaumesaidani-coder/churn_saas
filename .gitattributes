@@ -5,3 +5,8 @@ data/**/*.json -text
 data/**/*.md -text
 reports/** -text
 *.ipynb -text
+
+# Code suivi comme entrée du pipeline DVC : toujours en LF, pour que son MD5 soit le même
+# sur un clone Windows (core.autocrlf=true) que dans dvc.lock et sur la CI Linux.
+src/*.py text eol=lf
+scripts/*.py text eol=lf

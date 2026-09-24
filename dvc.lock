@@ -156,8 +156,8 @@ stages:
       size: 217229
     - path: src/tracking.py
       hash: md5
-      md5: 56e16825571b32ec4f3b319e9a74b418
-      size: 4542
+      md5: 0108bc971a8fb22e626e4a1548fcdba0
+      size: 4439
     outs:
     - path: data/model/courbes_roc_pr.png
       hash: md5
@@ -199,7 +199,7 @@ stages:
       size: 218818
     - path: data/gold/gold_manifest.json
       hash: md5
-      md5: 8946db3bfb2fa830950e34bb8a49e37b
+      md5: b5c9335ff54f32319440f4ecf0d611ed
       size: 4665
     - path: notebooks/05_modelisation_clv.ipynb
       hash: md5
@@ -207,8 +207,8 @@ stages:
       size: 178942
     - path: src/tracking.py
       hash: md5
-      md5: 56e16825571b32ec4f3b319e9a74b418
-      size: 4542
+      md5: 0108bc971a8fb22e626e4a1548fcdba0
+      size: 4439
     outs:
     - path: data/model/clv_reel_vs_predit.png
       hash: md5
@@ -216,7 +216,7 @@ stages:
       size: 143741
     - path: data/model/metrics_clv.json
       hash: md5
-      md5: 7381cacdf1cb405ada8658ab36695eb8
+      md5: 393f373996c2b7eac3917c6cb29d9bc9
       size: 1133
     - path: data/model/model_card_clv.md
       hash: md5
@@ -228,12 +228,12 @@ stages:
       size: 62538058
     - path: data/model/model_clv_manifest.json
       hash: md5
-      md5: 32a0ef21feea99f94937ac90894263bb
+      md5: 45bfee71e6ca0fad95bbfb429cd1a39c
       size: 2809
     - path: reports/notebooks/05_modelisation_clv.ipynb
       hash: md5
-      md5: df72e66981b5ffada5ec4763bf5d444a
-      size: 180549
+      md5: 1c87a9de782cb4f1e1c06b85097a6a7b
+      size: 180006
   scoring:
     cmd: python -m jupyter nbconvert --to notebook --execute 
       --ExecutePreprocessor.timeout=1800 
@@ -246,7 +246,7 @@ stages:
       size: 218818
     - path: data/gold/gold_manifest.json
       hash: md5
-      md5: 8946db3bfb2fa830950e34bb8a49e37b
+      md5: b5c9335ff54f32319440f4ecf0d611ed
       size: 4665
     - path: data/model/model.joblib
       hash: md5
@@ -267,11 +267,11 @@ stages:
       size: 20777
     - path: data/model/scoring_manifest.json
       hash: md5
-      md5: c7a911a9d7062bda882d003e16be7ea3
+      md5: 6e9332669b881e00032a6287691d0dc5
       size: 1681
     - path: reports/notebooks/06_implementation_scoring.ipynb
       hash: md5
-      md5: 24c228d94e33e1011cad3f26150f86ac
+      md5: eb5741a7f87cabe0f1a31c53b6c2fddf
       size: 44770
   certification:
     cmd: python -m jupyter nbconvert --to notebook --execute 
@@ -341,12 +341,12 @@ stages:
       size: 4163
     - path: src/silver.py
       hash: md5
-      md5: eb0d5535e89ba5d58999860fd91bfafd
-      size: 8103
+      md5: 2754b0cf2c55f474210fa649c8731ae1
+      size: 7912
     - path: src/tracking.py
       hash: md5
-      md5: 56e16825571b32ec4f3b319e9a74b418
-      size: 4542
+      md5: 0108bc971a8fb22e626e4a1548fcdba0
+      size: 4439
     - path: src/versioning.py
       hash: md5
       md5: 5943ea9ac2baa95851ab942772123868
