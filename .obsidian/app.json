@@ -1,0 +1,15 @@
+{
+  "useMarkdownLinks": true,
+  "newLinkFormat": "relative",
+  "userIgnoreFilters": [
+    "Livrables/",
+    "reports/",
+    "scratchpad/",
+    "dist/",
+    "exemple_pipeline_artifacts/",
+    "data/bronze/",
+    "data/silver/",
+    "data/rgpd/",
+    "mlruns_docker/"
+  ]
+}

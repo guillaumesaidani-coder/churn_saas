@@ -1,3 +1,17 @@
+---
+type: archive
+statut: historique
+remplace_par: cahier_de_tests.md
+---
+
+[← Documentation](../../index.md)
+
+> [!WARNING]
+> **Document historique (version v1 du projet), conservé tel quel.** Il décrit l'état du dépôt
+> avant le notebook de certification : modèle v1 à 30 variables, 87 tests, pas encore de CI ni
+> d'explicabilité. Pour l'état actuel, voir [le cahier de tests v2](../../qualite/cahier_de_tests.md).
+> Les fichiers cités dans `Livrables/` sont des documents de travail non publiés.
+
 # Cahier de tests — Churn SaaS, mécanismes portés depuis InduSense
 
 > **Public** : évaluateurs, testeurs, formateur — toute personne qui doit vérifier que les

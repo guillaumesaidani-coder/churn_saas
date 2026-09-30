@@ -1,0 +1,83 @@
+---
+type: explication
+statut: à jour
+mise_a_jour: 2026-09-29
+sources: notebook §1, §8 et §9
+---
+
+[← Documentation](../index.md)
+
+# Protocole expérimental
+
+Comment le modèle a été choisi, réglé et évalué, sans que le jeu de test influence aucun choix.
+
+## Règle centrale : le test ne sert qu'une fois
+
+Le jeu de test (20 % des comptes, 1 000) est mis de côté **dès la préparation** et n'est utilisé
+qu'**une seule fois**, pour mesurer la performance du modèle final (notebook §9.3). Tous les
+choix (variables, famille de modèle, hyperparamètres, seuil de décision) sont faits en
+**validation croisée sur le seul jeu d'entraînement** (4 000 comptes).
+
+> [!NOTE]
+> C'est une **correction de la v1**, qui choisissait le modèle et calibrait le seuil sur le jeu de
+> test : ses mesures étaient optimistes par construction.
+
+> [!WARNING]
+> **Révision v2.1 : seconde lecture assumée du test** (notebook §9.3). La neutralisation des
+> retards de paiement impossibles a été décidée sur un critère de qualité des données (notebook
+> §6.5), pas sur le score ; le test a ensuite été relu une seconde fois pour mesurer le modèle v2.1.
+
+## Étapes
+
+| Étape | Méthode | Où |
+|---|---|---|
+| Métrique principale | **PR-AUC**, plus informative que la ROC-AUC quand la classe d'intérêt est minoritaire (28 %) ; ROC-AUC en complément (exigée par l'énoncé) ; jamais l'exactitude seule | §6, §8.1 |
+| Validation | Validation croisée **stratifiée à 5 plis**, graine 42 : moyenne **et** dispersion de chaque score | §8.1 |
+| Références à battre | Baseline naïve (PR-AUC ≈ 0,28) et **baseline métier** [D8](../cadrage/decisions/D08.md), reformulée sans la variable de fuite | §8.2 |
+| Familles comparées | Régression logistique, forêt aléatoire, gradient boosting | §8.3 |
+| Règle de sélection, **fixée à l'avance** | Le meilleur score moyen, sauf si un modèle plus simple et plus explicable fait jeu égal (écart inférieur à un écart-type) ; appliquée par le code | §8.1 |
+| Ablation | Retirer ou ajouter des groupes de variables pour justifier le Gold v2 | §8.4 |
+| Réglage | Recherche sur grille de la régularisation `C` en validation croisée | §9.1 |
+| Seuil de décision | Calculé sur des **prédictions hors pli** de l'entraînement ([D9](../cadrage/decisions/D09.md)) | §9.2 |
+| Évaluation finale | Une seule fois sur le test : PR-AUC, ROC-AUC, matrices de confusion, critère D8 | §9.3 |
+| Calibration | Courbe de calibration et score de Brier | §9.4 |
+| Explicabilité | Coefficients, importance par permutation, contrôles par la base de connaissance | §9.6 |
+
+## Résultats du choix
+
+- Les trois familles battent largement les deux baselines ; la **régression logistique** obtient
+  le meilleur score moyen. Les modèles plus complexes n'apportent rien : la relation entre signaux
+  d'engagement et churn est essentiellement linéaire (au sens du logit). Le modèle le plus simple
+  est aussi le plus performant et le plus explicable.
+- **Ablation** : retirer les 5 leurres et les 5 colonnes redondantes ne coûte rien (30 → 20
+  variables, même score). Des indicateurs de valeur manquante et d'autres ratios ont été testés :
+  ils n'apportent rien et ne sont pas retenus. Retirer `sieges_souscrits` est neutre.
+  v2.1 : conserver les retards impossibles (v2.0) donnait 0,791 contre 0,783, écart inférieur à un
+  écart-type ; l'indicateur « retards manquants » seul donne 0,786 mais réintroduirait le défaut :
+  non retenu.
+- **Régularisation** : `C = 0,03`, sur une courbe plate autour de l'optimum ; le modèle est
+  robuste à ce choix.
+- **Pas de pondération des classes** : `class_weight="balanced"` ne change ni la ROC-AUC ni la
+  PR-AUC ; il déplace seulement le point de fonctionnement, ce que le seuil D9 fait déjà. Les deux
+  leviers sont redondants ; on garde le seuil, plus simple à expliquer et à faire varier sans
+  réentraîner.
+
+Chiffres détaillés : [model card churn v2](model_card_churn_v2.md) et
+[model card CLV v2](model_card_clv_v2.md).
+
+## Pourquoi un seuil de rappel plutôt qu'un seuil de coût minimal
+
+Pour chaque seuil, l'analyse de coût (notebook §9.5) calcule
+`coût = faux négatifs × 6 879 € + faux positifs × coût d'une relance`, avec les deux bornes de
+[H01](../cadrage/hypotheses.md). Le seuil de coût minimal obligerait à contacter la majorité des
+comptes, bien au-delà de la capacité de l'équipe ([D10](../cadrage/decisions/D10.md)). D9 fixe
+donc un objectif de rappel atteignable, et D10/D14 gèrent la capacité.
+
+## Reproductibilité
+
+Graine unique (42), découpage matérialisé dans la table Gold, pipeline DVC, versions des
+bibliothèques figées (`requirements*.txt`) et affichées par le notebook (§15.1). Chaque
+entraînement est tracé dans MLflow avec l'empreinte du Gold utilisé.
+
+Voir aussi : [préparation des données](../donnees/preparation.md) ·
+[contrôles d'explicabilité](../explicabilite/controles.md)

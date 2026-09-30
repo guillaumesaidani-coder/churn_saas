@@ -41,3 +41,9 @@ data/model_v2/mlflow.db
 
 # Archives de release (publiées sur GitHub Releases, pas dans git)
 dist/
+
+# Obsidian (le dépôt sert de coffre) : seule la configuration des liens est versionnée
+# (liens Markdown standard, chemins relatifs : cliquables sur GitHub). L'état des
+# fenêtres et les autres réglages restent propres à chaque poste.
+.obsidian/*
+!.obsidian/app.json

@@ -8,20 +8,41 @@ Customer Success à prioriser leurs actions de rétention.
 | Ressource | Lien |
 |---|---|
 | **Notebook de certification exécuté (livrable)** | [`reports/notebooks/notebook_certifiant_churn_saas.ipynb`](reports/notebooks/notebook_certifiant_churn_saas.ipynb) |
+| **Documentation** (architecture, API, model cards, décisions, exploitation) | [`docs/index.md`](docs/index.md) |
 | Code (GitHub) | https://github.com/guillaumesaidani-coder/churn_saas |
 | **Jeu de données et modèles (téléchargement libre, release v2.0)** | https://github.com/guillaumesaidani-coder/churn_saas/releases/tag/v2.0 |
 | Versioning DVC (DagsHub, compte gratuit requis pour naviguer) | https://dagshub.com/guillaume.saidani/churn_saas |
 | Runs d'entraînement (MLflow sur DagsHub) | https://dagshub.com/guillaume.saidani/churn_saas.mlflow |
 
-## Résultats du modèle v2 (notebook de certification, jeu de test de 1 000 comptes)
+## Résultats du modèle v2.1 (notebook de certification, jeu de test de 1 000 comptes)
 
 | | Valeur |
 |---|---|
-| Modèle churn | Régression logistique, 20 variables (Gold v2) |
-| PR-AUC / ROC-AUC (test) | 0,761 / 0,883 (baseline métier : 0,593 / 0,791) |
-| Seuil D9 (calculé hors pli) | 0,286 : rappel 80,7 %, précision 62,4 % |
-| 150 priorités Hautes | 97 comptes réellement partis (hasard : 42), 84 % de la perte réelle captée |
-| CLV | Gradient boosting sur log(CLV) : R² log 0,89, erreur relative médiane 43 % |
+| Modèle churn | Régression logistique, 20 variables (Gold v2, version v2.1 : retards de paiement impossibles neutralisés) |
+| PR-AUC / ROC-AUC (test) | 0,748 / 0,882 (baseline métier : 0,593 / 0,791) |
+| Seuil D9 (calculé hors pli) | 0,283 : rappel 82,5 %, précision 63,1 % |
+| 150 priorités Hautes | 102 comptes réellement partis (hasard : 42), 82 % de la perte réelle captée |
+| CLV | Gradient boosting sur log(CLV) : R² log 0,89, erreur relative médiane 42 % |
+
+## Explicabilité et base de connaissance
+
+Chaque score est expliqué, et le modèle est confronté à ce que l'on sait du domaine
+(`src/explain.py`, notebook §9.6.1 à §9.6.3, §10.2.1, §12.4.1, §13.1.1) :
+
+- **Base de connaissance** [`knowledge/base_connaissance.yaml`](knowledge/base_connaissance.yaml),
+  écrite avant de regarder le modèle : libellé, unité, plage et sens d'effet attendu de chaque
+  variable, variables exclues (fuite, cibles, leurres, redondances) et leur raison, règles de décision.
+- **Explication de chaque compte** : contributions exactes au score (régression logistique :
+  coefficient × écart à la moyenne d'entraînement, égales aux valeurs SHAP), les 3 facteurs qui
+  augmentent et les 3 qui diminuent le risque, la trace de la règle D9/D10/D14, et des
+  avertissements (valeur manquante imputée, hors plage, modalité inconnue).
+- **Contrôles** : variable exclue présente, effet de sens contraire à l'attendu, une variable qui
+  porte plus de 50 % de l'explication (signature de fuite), modalités hors dictionnaire.
+- **API** : `POST /score-batch?explain=true` ajoute l'explication à chaque compte ; `/ready`
+  répond 503 si le modèle servi contient une variable exclue par la base (donc la CI échoue).
+
+Détail : [base de connaissance](docs/explicabilite/base_de_connaissance.md),
+[contrôles](docs/explicabilite/controles.md), [lire une explication](docs/explicabilite/lire_une_explication.md).
 
 ## Résultats v1 (notebooks 04 à 06, conservés pour comparaison)
 
@@ -41,7 +62,9 @@ Examen_cas d'usage candidat/*.csv.dvc   données brutes (versionnées par DVC)
 notebooks/            notebook_certifiant_churn_saas.ipynb (livrable) + notebooks v1 par étape (00 à 06)
 reports/notebooks/    mêmes notebooks exécutés par le pipeline, avec leurs sorties
 data/{rgpd,bronze,silver,gold,model,model_v2}/   sorties du pipeline, avec un manifeste par étape (hash SHA-256)
-src/                  code réutilisable (nettoyage, gold, scoring, API, tracking MLflow, dérive)
+docs/                 documentation de référence (lisible sur GitHub et dans Obsidian) ; point d'entrée docs/index.md
+src/                  code réutilisable (nettoyage, gold, scoring, explicabilité, API, tracking MLflow, dérive)
+knowledge/            base de connaissance du domaine (explications et contrôles du modèle)
 tests/                tests unitaires (pytest)
 dvc.yaml / dvc.lock   pipeline reproductible RGPD → Bronze → Silver → Gold → modèles → scoring
 Dockerfile, compose.yaml   API de scoring, exporteur de dérive, Prometheus, Grafana, pipeline

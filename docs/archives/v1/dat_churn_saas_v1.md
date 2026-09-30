@@ -1,3 +1,17 @@
+---
+type: archive
+statut: historique
+remplace_par: architecture.md
+---
+
+[← Documentation](../../index.md)
+
+> [!WARNING]
+> **Document historique (version v1 du projet), conservé tel quel.** Il décrit l'état du dépôt
+> avant le notebook de certification : modèle v1 à 30 variables, 87 tests, pas encore de CI ni
+> d'explicabilité. Pour l'état actuel, voir [l'architecture v2](../../exploitation/architecture.md).
+> Les fichiers cités dans `Livrables/` sont des documents de travail non publiés.
+
 # DAT — Churn SaaS v1 (document d'architecture technique du build réel)
 
 > Décrit le système tel qu'il tourne réellement dans ce dépôt (mécanismes portés
