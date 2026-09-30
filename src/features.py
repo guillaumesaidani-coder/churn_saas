@@ -8,7 +8,9 @@ Différences avec le Gold v1 (`src/gold.py`) :
 - `taux_adoption_pct` manquant est recalculé ligne à ligne (`100 x actifs / sièges`) plutôt
   qu'imputé par une médiane ;
 - les autres valeurs manquantes sont laissées en NaN : l'imputation est faite dans le pipeline
-  sklearn, ajustée sur le seul jeu d'entraînement.
+  sklearn, ajustée sur le seul jeu d'entraînement ;
+- v2.1 : un nombre de retards de paiement **impossible** (plus de retards que de mois facturés)
+  est neutralisé en NaN avant le calcul du ratio (`neutraliser_incoherences`, §6.5 du notebook).
 
 La même fonction sert à l'entraînement et au scoring d'un export brut : aucune divergence
 possible entre les features vues à l'entraînement et celles reçues en production.
@@ -52,9 +54,34 @@ def completer_taux_adoption(clients: pd.DataFrame) -> pd.DataFrame:
     return clients
 
 
+def masque_retards_impossibles(clients: pd.DataFrame) -> pd.Series:
+    """Comptes dont `retards_paiement_12m` dépasse le nombre de mois facturés sur la fenêtre de
+    12 mois, min(ancienneté, 12) : avec une facturation mensuelle, au plus un retard par mois.
+    Sans l'une des deux colonnes (modèle v1 servi par l'API), aucun compte n'est signalé."""
+    if not {"anciennete_mois", "retards_paiement_12m"} <= set(clients.columns):
+        return pd.Series(False, index=clients.index)
+    mois_factures = pd.to_numeric(clients["anciennete_mois"], errors="coerce").clip(lower=1, upper=12)
+    retards = pd.to_numeric(clients["retards_paiement_12m"], errors="coerce")
+    return (retards > mois_factures).fillna(False)
+
+
+def neutraliser_incoherences(clients: pd.DataFrame) -> pd.DataFrame:
+    """Une valeur impossible n'est ni corrigeable (la vraie valeur est inconnue) ni utilisable :
+    elle devient une valeur manquante, imputée ensuite par le pipeline comme les autres. Le ratio
+    `taux_retard_paiement_par_mois`, s'il est déjà calculé (entrée de l'API), suit le même sort.
+    Règle ligne à ligne, donc identique à l'entraînement et au scoring, sans fuite."""
+    clients = clients.copy()
+    impossibles = masque_retards_impossibles(clients)
+    clients.loc[impossibles, "retards_paiement_12m"] = np.nan
+    if "taux_retard_paiement_par_mois" in clients.columns:
+        clients.loc[impossibles, "taux_retard_paiement_par_mois"] = np.nan
+    return clients
+
+
 def construire_features_v2(clients_silver: pd.DataFrame) -> pd.DataFrame:
     """Table Silver (sortie de `clean_silver`, avec ou sans imputation) -> les 20 features du
     Gold v2, dans l'ordre de `FEATURES_V2`. Les NaN restants sont laissés au pipeline."""
     clients = completer_taux_adoption(clients_silver)
+    clients = neutraliser_incoherences(clients)
     clients = add_ratio_features(clients)
     return clients[FEATURES_V2].copy()

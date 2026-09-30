@@ -1,13 +1,13 @@
 {
   "couche": "model",
   "sous_etape": "regle_de_decision",
-  "version": "v2",
+  "version": "v2.1",
   "regle_decision": {
-    "seuil_D9_valeur": 0.2864,
+    "seuil_D9_valeur": 0.2832,
     "seuil_D9_calcule_sur": "prédictions hors pli du jeu d'entraînement (jamais le test)",
     "seuil_D9_rappel_cible": 0.8,
-    "rappel_test": 0.8071,
-    "precision_test": 0.6243,
+    "rappel_test": 0.825,
+    "precision_test": 0.6311,
     "capacite_csm_D10": 150,
     "formule_priorite_D14": "perte_attendue = score_churn x valeur_vie_estimee_eur",
     "catalogue_actions_D11": {

@@ -153,6 +153,8 @@ stages:
       - src/tracking.py
       - src/api.py
       - src/versioning.py
+      - src/explain.py
+      - knowledge/base_connaissance.yaml
     outs:
       - data/gold/clients_churn_gold_v2.parquet
       - data/gold/gold_v2_manifest.json:
@@ -166,6 +168,8 @@ stages:
       - data/model_v2/model_manifest.json:
           cache: false
       - data/model_v2/scoring_manifest.json:
+          cache: false
+      - data/model_v2/explication_reference.json:
           cache: false
       - reports/notebooks/notebook_certifiant_churn_saas.ipynb:
           cache: false

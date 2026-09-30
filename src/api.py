@@ -10,6 +10,11 @@ et la règle de décision D9/D10/D14 (seuil + capacité CSM, figés dans
 
 Aucune nouvelle logique de scoring : `/score-batch` appelle `src.scoring.scorer_batch` et
 `assigner_priorites`, déjà testés indépendamment de l'API (`tests/test_scoring.py`).
+
+Explicabilité (`src/explain.py`) : `/score-batch?explain=true` ajoute à chaque compte les
+facteurs qui augmentent et diminuent son risque, la trace de la règle de décision et les
+avertissements sur ses valeurs d'entrée. Garde-fou : `/ready` répond 503 si le modèle chargé
+contient une variable que la base de connaissance exclut (fuite, cible, leurre...).
 """
 from __future__ import annotations
 
@@ -23,12 +28,16 @@ from pathlib import Path
 
 import joblib
 import pandas as pd
+import yaml
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, Security
 from fastapi.responses import JSONResponse
 from fastapi.security import APIKeyHeader
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
 from pydantic import BaseModel
 
+from src.explain import (CHEMIN_BASE_DEFAUT, NOM_FICHIER_REFERENCE, charger_base_connaissance,
+                         controler_exclusions, expliquer_batch)
+from src.features import neutraliser_incoherences
 from src.scoring import assigner_priorites, scorer_batch
 
 app = FastAPI(title="Churn SaaS -- API de scoring")
@@ -37,6 +46,7 @@ logger = logging.getLogger("churn_saas.api")
 _api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
 MODEL_DIR = Path(os.getenv("MODEL_DIR", "data/model"))
+KNOWLEDGE_PATH = Path(os.getenv("KNOWLEDGE_PATH", str(CHEMIN_BASE_DEFAUT)))
 MAX_BODY_BYTES = int(os.getenv("MAX_BODY_BYTES", 256 * 1024))
 RATE_LIMIT_PER_MINUTE = int(os.getenv("RATE_LIMIT_PER_MINUTE", "60"))
 RATE_LIMIT_WINDOW_SECONDS = 60
@@ -47,6 +57,9 @@ _model_clv = None
 _feature_columns: list[str] = []
 _seuil_d9: float = 0.0
 _capacite_haute: int = 0
+_reference_explication: dict | None = None
+_base_connaissance: dict | None = None
+_anomalies_bloquantes: list[dict] = []
 
 # IP -> horodatages des appels dans la fenêtre courante. En mémoire, par process : suffisant
 # pour une seule instance, pas pour un déploiement multi-instance.
@@ -68,10 +81,12 @@ _scoring_batch_size = Histogram(
 )
 
 
-def load_artifacts(model_dir: Path | None = None) -> None:
-    """(Re)charge les modèles et la règle de décision D9/D10 depuis disque. Ne lève jamais :
-    laisse les artefacts à None si absents -- c'est `/ready` qui traduit ça en 503."""
+def load_artifacts(model_dir: Path | None = None, knowledge_path: Path | None = None) -> None:
+    """(Re)charge les modèles, la règle de décision D9/D10, la référence d'explication et la
+    base de connaissance depuis disque. Ne lève jamais : laisse les artefacts à None si
+    absents -- c'est `/ready` (ou `/score-batch?explain=true`) qui traduit ça en 503."""
     global _model_churn, _model_clv, _feature_columns, _seuil_d9, _capacite_haute
+    global _reference_explication, _base_connaissance, _anomalies_bloquantes
 
     model_dir = Path(model_dir) if model_dir else MODEL_DIR
     churn_path = model_dir / "model.joblib"
@@ -95,6 +110,24 @@ def load_artifacts(model_dir: Path | None = None) -> None:
         _capacite_haute = int(regle["capacite_csm_D10"])
     else:
         _seuil_d9, _capacite_haute = 0.0, 0
+
+    reference_path = model_dir / NOM_FICHIER_REFERENCE
+    if reference_path.exists():
+        with open(reference_path, "r", encoding="utf-8") as f:
+            _reference_explication = json.load(f)
+    else:
+        _reference_explication = None
+
+    knowledge_path = Path(knowledge_path) if knowledge_path else KNOWLEDGE_PATH
+    try:
+        _base_connaissance = charger_base_connaissance(knowledge_path)
+    except (OSError, yaml.YAMLError) as erreur:
+        logger.warning("Base de connaissance illisible (%s) : explications et contrôles désactivés", erreur)
+        _base_connaissance = None
+    _anomalies_bloquantes = [
+        a for a in (controler_exclusions(_feature_columns, _base_connaissance) if _base_connaissance else [])
+        if a["gravite"] == "bloquant"
+    ]
 
 
 load_artifacts()
@@ -166,6 +199,22 @@ class ScoreBatchRequest(BaseModel):
     clients: list[ClientFeatures]
 
 
+class Facteur(BaseModel):
+    variable: str
+    libelle: str
+    valeur: float | str | None
+    moyenne: float | None
+    contribution: float
+    texte: str
+
+
+class Explication(BaseModel):
+    facteurs_hausse: list[Facteur]
+    facteurs_baisse: list[Facteur]
+    decision: str
+    avertissements: list[str]
+
+
 class ScoredClient(BaseModel):
     client_id: str
     score_churn: float
@@ -173,6 +222,7 @@ class ScoredClient(BaseModel):
     perte_attendue_eur: float
     priorite: str
     action_recommandee: str
+    explication: Explication | None = None
 
 
 class ScoreBatchResponse(BaseModel):
@@ -199,29 +249,46 @@ def ready():
         raise HTTPException(status_code=503, detail="Modèles non chargés")
     if not _feature_columns:
         raise HTTPException(status_code=503, detail="Colonnes de features non chargées (model_manifest.json)")
+    if _anomalies_bloquantes:
+        variables = ", ".join(a["variable"] for a in _anomalies_bloquantes)
+        raise HTTPException(status_code=503, detail=f"Modèle non conforme à la base de connaissance : {variables}")
     return {"status": "ready"}
 
 
 @app.post(
     "/score-batch",
     response_model=ScoreBatchResponse,
+    # sans `explain`, le champ `explication` n'est pas renseigné : il est omis de la réponse
+    response_model_exclude_unset=True,
     dependencies=[Depends(require_api_key), Depends(rate_limit_dependency)],
 )
-def score_batch(payload: ScoreBatchRequest):
+def score_batch(payload: ScoreBatchRequest, explain: bool = False):
     if _model_churn is None or _model_clv is None:
         raise HTTPException(status_code=503, detail="Modèles non chargés")
+    if explain and (_reference_explication is None or _base_connaissance is None):
+        raise HTTPException(status_code=503, detail="Explications indisponibles : référence ou base de connaissance absente")
 
     if not payload.clients:
         raise HTTPException(status_code=422, detail="clients ne peut pas être vide")
 
     client_ids = pd.Series([c.client_id for c in payload.clients])
     X = pd.DataFrame([c.features for c in payload.clients]).reindex(columns=_feature_columns)
+    X = neutraliser_incoherences(X)       # même règle qu'à l'entraînement (retards impossibles)
 
     resultats = scorer_batch(X, client_ids, _model_churn, _model_clv)
     resultats = assigner_priorites(resultats, seuil_d9=_seuil_d9, capacite_haute=_capacite_haute)
 
     _scoring_batch_size.observe(len(payload.clients))
 
-    return ScoreBatchResponse(resultats=resultats[
+    lignes = resultats[
         ["client_id", "score_churn", "valeur_vie_estimee_eur", "perte_attendue_eur", "priorite", "action_recommandee"]
-    ].to_dict(orient="records"))
+    ].to_dict(orient="records")
+    if explain:
+        try:
+            explications = expliquer_batch(_model_churn, X, resultats, _reference_explication, _base_connaissance,
+                                           seuil_d9=_seuil_d9, capacite_haute=_capacite_haute)
+        except (TypeError, ValueError) as erreur:
+            raise HTTPException(status_code=503, detail=f"Explications indisponibles : {erreur}")
+        for ligne, explication in zip(lignes, explications):
+            ligne["explication"] = explication
+    return ScoreBatchResponse(resultats=lignes)

@@ -311,14 +311,18 @@ stages:
       hash: md5
       md5: 9a22a783c778860f1236bc80aeac31f8
       size: 878
+    - path: knowledge/base_connaissance.yaml
+      hash: md5
+      md5: 6c284e3555cf9ac15d90493b990711ba
+      size: 11314
     - path: notebooks/notebook_certifiant_churn_saas.ipynb
       hash: md5
-      md5: 329cb40a074a1d8866ea4c8060bf4213
-      size: 202416
+      md5: 26ad95254eb34438e5fd4d2d3eaa3f5c
+      size: 291944
     - path: src/api.py
       hash: md5
-      md5: 002411dd1030ead9d09ef768b98df2fe
-      size: 8315
+      md5: 6839f7991099a5e225b4a2d049a083ab
+      size: 11651
     - path: src/bronze.py
       hash: md5
       md5: c9ee95d65a299dbb0ccb9e5cdcdc66a8
@@ -327,18 +331,22 @@ stages:
       hash: md5
       md5: ebb4e5c2cb4a3cdcb42279bb37a89933
       size: 2830
+    - path: src/explain.py
+      hash: md5
+      md5: 6c5d7ae9b8e522fba18552ee7965210e
+      size: 21273
     - path: src/features.py
       hash: md5
-      md5: 1c399a7ac34e613dc17b03c51a5aac87
-      size: 2847
+      md5: 7d1335d3dc6215bdeb3533e83f730366
+      size: 4575
     - path: src/gold.py
       hash: md5
       md5: 6b92e4b21c9761c89a13b4a2ed02ccf2
       size: 8736
     - path: src/scoring.py
       hash: md5
-      md5: a4736cd07d9403e7f50d9d93887db164
-      size: 4163
+      md5: db6247d75299722fa5ea1012c746a259
+      size: 4463
     - path: src/silver.py
       hash: md5
       md5: 2754b0cf2c55f474210fa649c8731ae1
@@ -354,50 +362,54 @@ stages:
     outs:
     - path: data/gold/clients_churn_gold_v2.parquet
       hash: md5
-      md5: f3c1963c441e6abee1194763df91e936
-      size: 200600
+      md5: 87bf854eb19f70016661397341845d24
+      size: 200436
     - path: data/gold/gold_fiche_identite_v2.md
       hash: md5
-      md5: 61191b0942a89e059e49f9802db19a66
-      size: 1123
+      md5: 47a4d933fc31cfbd1c73ef61a05ab37c
+      size: 1261
     - path: data/gold/gold_v2_manifest.json
       hash: md5
-      md5: 960eab6faadae1c0eda33d52e3a7712f
-      size: 2083
+      md5: 6418b69747314ac79cdf203aa1738d6d
+      size: 2146
+    - path: data/model_v2/explication_reference.json
+      hash: md5
+      md5: 1f15afafa31ce8269f035f3b44893496
+      size: 5804
     - path: data/model_v2/figures
       hash: md5
-      md5: 95c184fff35ef536b0da7c5336ca8d0f.dir
-      size: 832782
-      nfiles: 16
+      md5: cfa6381f4041d4b726da38cb53ac2b41.dir
+      size: 1267143
+      nfiles: 19
     - path: data/model_v2/metrics.json
       hash: md5
-      md5: f6bac67157996143182ed665fef78af6
+      md5: e6768678bc0dc5fe9765cb33fa79b3b6
       size: 435
     - path: data/model_v2/metrics_clv.json
       hash: md5
-      md5: 3379a32bd168943bf9ff45cdac5fff25
-      size: 242
+      md5: bad4ce3fca156e95502a17ec3caed550
+      size: 243
     - path: data/model_v2/model.joblib
       hash: md5
-      md5: c85f271b71f3ef6cd2ca050018d79149
+      md5: 4ab0ed181cab6c9df936ac05ca4d12fa
       size: 6058
     - path: data/model_v2/model_clv.joblib
       hash: md5
-      md5: 380e91cd320cac6c760299eccdafa983
-      size: 1467282
+      md5: 04a4f9baee362ad4591a5c34f96c6310
+      size: 1467186
     - path: data/model_v2/model_manifest.json
       hash: md5
-      md5: a628f47ef9deac93eb7ec67dc2c89c2f
-      size: 2115
+      md5: 0c6034b275928bf941ad45d4e8934928
+      size: 2119
     - path: data/model_v2/scoring_exemple_cycle.parquet
       hash: md5
-      md5: e6e87f657b380b585eeda753fe134ee1
-      size: 21063
+      md5: c1e4cf6edfa294f558df8efc6afafb70
+      size: 21006
     - path: data/model_v2/scoring_manifest.json
       hash: md5
-      md5: 4c3d8a624c2843b4055eaf69b86eb64a
-      size: 840
+      md5: 64bf5910a1673c61de282a761f33723f
+      size: 841
     - path: reports/notebooks/notebook_certifiant_churn_saas.ipynb
       hash: md5
-      md5: 9a45a4a1f91b78d249991965c9b8e599
-      size: 1289065
+      md5: 920c1f63f81daffdc389f8543916bba5
+      size: 1932217

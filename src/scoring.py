@@ -69,6 +69,9 @@ def assigner_priorites(resultats: pd.DataFrame, seuil_d9: float, capacite_haute:
 
     signales = out[out["signale_D9"]].sort_values("perte_attendue_eur", ascending=False)
     client_ids_haute = set(signales.head(capacite_haute)["client_id"])
+    # Rang D14 parmi les signalés (1 = plus forte perte attendue), repris par l'explication de
+    # la décision (`src.explain.expliquer_decision`) ; vide pour un compte non signalé.
+    out["rang_perte_attendue"] = pd.Series(np.arange(1, len(signales) + 1), index=signales.index).astype("Int64")
 
     def _priorite(row):
         if not row["signale_D9"]:

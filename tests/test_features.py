@@ -9,6 +9,8 @@ from src.features import (
     REDONDANTES_CATALOGUE,
     completer_taux_adoption,
     construire_features_v2,
+    masque_retards_impossibles,
+    neutraliser_incoherences,
 )
 
 
@@ -70,3 +72,39 @@ class TestConstruireFeaturesV2:
 
         assert out.loc[0, "taux_utilisation_fonctionnalites"] == 0.5
         assert out.loc[0, "taux_retard_paiement_par_mois"] == 0.0
+
+
+class TestNeutraliserIncoherences:
+    def _silver(self, anciennete, retards):
+        silver = _silver_minimal().head(1)
+        return pd.concat([silver.assign(anciennete_mois=a, retards_paiement_12m=r)
+                          for a, r in zip(anciennete, retards)], ignore_index=True)
+
+    def test_plus_de_retards_que_de_mois_factures_est_impossible(self):
+        silver = self._silver([1, 1, 3, 30, 30], [1, 5, 4, 12, 13])
+
+        assert masque_retards_impossibles(silver).tolist() == [False, True, True, False, True]
+
+    def test_valeur_impossible_neutralisee_en_nan_et_ratio_aussi(self):
+        out = construire_features_v2(self._silver([1, 1], [1, 5]))
+
+        assert out.loc[0, "retards_paiement_12m"] == 1
+        assert out.loc[0, "taux_retard_paiement_par_mois"] == 1.0
+        assert np.isnan(out.loc[1, "retards_paiement_12m"])
+        assert np.isnan(out.loc[1, "taux_retard_paiement_par_mois"])
+
+    def test_ratio_deja_calcule_neutralise_entree_api(self):
+        X = pd.DataFrame({"anciennete_mois": [1, 12], "retards_paiement_12m": [7, 2],
+                          "taux_retard_paiement_par_mois": [7.0, 2 / 12]})
+
+        out = neutraliser_incoherences(X)
+
+        assert out["retards_paiement_12m"].isna().tolist() == [True, False]
+        assert out["taux_retard_paiement_par_mois"].isna().tolist() == [True, False]
+        assert X.loc[0, "retards_paiement_12m"] == 7          # l'entrée n'est pas modifiée
+
+    def test_valeurs_manquantes_et_colonnes_absentes_sans_effet(self):
+        X = pd.DataFrame({"anciennete_mois": [np.nan, 2], "retards_paiement_12m": [3, np.nan]})
+
+        assert not masque_retards_impossibles(X).any()
+        assert not masque_retards_impossibles(X.drop(columns="anciennete_mois")).any()

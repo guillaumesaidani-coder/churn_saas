@@ -25,6 +25,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src ./src
 COPY scripts ./scripts
+# Base de connaissance : libellés des explications et garde-fou de /ready (src/explain.py)
+COPY knowledge ./knowledge
 # Modèle v2 : pipeline avec imputation (accepte les valeurs manquantes), CLV de 1,5 Mo.
 # Retour à la v1 : reconstruire l'image depuis un commit antérieur (git checkout + dvc checkout).
 COPY data/model_v2 ./data/model_v2

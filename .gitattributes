@@ -10,3 +10,4 @@ reports/** -text
 # sur un clone Windows (core.autocrlf=true) que dans dvc.lock et sur la CI Linux.
 src/*.py text eol=lf
 scripts/*.py text eol=lf
+knowledge/*.yaml text eol=lf

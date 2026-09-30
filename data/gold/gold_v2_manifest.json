@@ -1,14 +1,14 @@
 {
   "couche": "gold",
-  "version": "v2",
-  "processed_at_utc": "2026-09-23T14:43:40.104852+00:00",
+  "version": "v2.1",
+  "processed_at_utc": "2026-09-30T14:31:25.450282+00:00",
   "produit_par": "notebooks/notebook_certifiant_churn_saas.ipynb",
-  "commit_git": "0a9b4a6",
+  "commit_git": "e2b5086",
   "sources": {
     "churn_saas_complet.csv": "2fc45e8c3c74d3ddcdbda162c5bb50184587201b46d877cc06742afd13063844",
     "catalogue_plans.csv": "c94f6f52652532c578cb7a44d752b8b197ef84f5e6c6e17a58579fa195e9ad08"
   },
-  "sha256_gold": "d443920d4245d3c6bd7e2605151402345a4d074b787a585743dcc32719001a3e",
+  "sha256_gold": "0dcb0bbd659c6479569accc19cde05629fe20acfbfdc43e3194d3af9abd1f865",
   "lignes": 5000,
   "features_modele": [
     "secteur",
@@ -49,7 +49,7 @@
     "quota_stockage_go": "redondante (catalogue)",
     "support_dedie": "redondante (catalogue)"
   },
-  "imputation": "médiane dans le pipeline sklearn, ajustée sur le train ; taux_adoption_pct recalculé",
+  "imputation": "médiane dans le pipeline sklearn, ajustée sur le train ; taux_adoption_pct recalculé ; retards de paiement impossibles neutralisés en NaN (v2.1)",
   "split": {
     "random_state": 42,
     "test_size": 0.2,

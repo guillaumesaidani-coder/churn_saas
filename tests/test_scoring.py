@@ -114,6 +114,21 @@ class TestAssignerPriorites:
             "D": "Basse",    # non signalé (score < seuil)
         }
 
+    def test_rang_perte_attendue_parmi_les_signales(self):
+        resultats = pd.DataFrame({
+            "client_id": ["A", "B", "C", "D"],
+            "score_churn": [0.9, 0.8, 0.7, 0.1],
+            "perte_attendue_eur": [100, 500, 300, 50],
+        })
+
+        out = assigner_priorites(resultats, seuil_d9=0.5, capacite_haute=2).set_index("client_id")
+
+        assert out["rang_perte_attendue"].dropna().to_dict() == {"A": 3, "B": 1, "C": 2}
+        assert pd.isna(out.loc["D", "rang_perte_attendue"])   # non signalé : pas de rang
+        # Haute <=> signalé et rang <= capacité : l'explication de la décision peut s'appuyer sur le rang
+        signales = out[out["signale_D9"]]
+        assert ((signales["rang_perte_attendue"] <= 2) == (signales["priorite"] == "Haute")).all()
+
     def test_action_recommandee_correspond_a_la_priorite(self):
         resultats = pd.DataFrame({
             "client_id": ["A"], "score_churn": [0.9], "perte_attendue_eur": [100],

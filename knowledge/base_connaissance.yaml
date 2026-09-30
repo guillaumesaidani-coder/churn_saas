@@ -1,0 +1,255 @@
+# Base de connaissance du cas d'usage churn SaaS
+#
+# Ce que l'on sait du domaine AVANT de regarder le modèle : libellés et plages du dictionnaire
+# de données, sens d'effet attendu de chaque variable, variables exclues et pourquoi, règles du
+# système de décision. Elle sert à deux choses (`src/explain.py`) :
+#   1. formuler les explications en langage métier (libellé, unité, valeur de référence) ;
+#   2. CONFRONTER le modèle à ce savoir : un écart (variable exclue présente, effet de sens
+#      contraire, variable qui écrase toutes les autres, valeur hors plage) signale une erreur
+#      possible dans les données, la préparation ou le modèle.
+#
+# Règle de maintenance : le sens attendu est fixé à partir du métier et de l'analyse
+# exploratoire (effets pris un par un), JAMAIS recopié depuis les coefficients du modèle ;
+# sinon le contrôle ne contrôlerait plus rien. Toute modification passe par un commit relu.
+#
+# Sources :
+#   enonce  : Examen_cas d'usage candidat/Enonce cas usage_churn_saas.pdf, §2.1 (dictionnaire)
+#   eda     : notebook de certification, §6 (distributions par statut, AUC univariée)
+#   metier  : raisonnement métier du cadrage (§2), à confirmer par l'équipe Customer Success
+#   feature : variable construite (src/gold.py::add_ratio_features)
+
+version: 1
+
+# unite : affichée après la valeur ; vide quand le libellé dit déjà ce que l'on compte.
+# sens_attendu : effet attendu d'une HAUSSE de la variable sur le risque de churn
+#   hausse      -> une valeur plus élevée augmente le risque
+#   baisse      -> une valeur plus élevée diminue le risque
+#   indetermine -> aucune hypothèse défendable a priori : pas de contrôle de sens
+variables:
+  secteur:
+    libelle: Secteur d'activité
+    type: categorielle
+    modalites: [Tech, Finance, Commerce, Santé, Industrie, Public, Éducation]
+    modalites_ajoutees_par_nettoyage: [Inconnu]   # secteur manquant (src/silver.py)
+    sens_attendu: indetermine
+    justification: Aucune hypothèse métier ; segment suivi par l'audit d'équité (§12.5).
+    sources: [enonce]
+  taille_entreprise:
+    libelle: Taille de l'entreprise
+    type: categorielle
+    modalites: [TPE, PME, ETI, GE]
+    sens_attendu: indetermine
+    justification: Aucune hypothèse métier ; segment suivi par l'audit d'équité (§12.5).
+    sources: [enonce]
+  plan:
+    libelle: Formule d'abonnement
+    type: categorielle
+    modalites: [Starter, Pro, Business, Enterprise]
+    sens_attendu: indetermine
+    justification: L'effet du plan dépend du prix et de l'usage ; pas d'hypothèse a priori.
+    sources: [enonce]
+  anciennete_mois:
+    libelle: Ancienneté du compte
+    type: numerique
+    unite: mois
+    decimales: 0
+    plage: [1, 36]
+    sens_attendu: baisse
+    justification: Les comptes récents ne sont pas encore installés dans l'outil ; l'EDA montre des comptes qui résilient plus récents.
+    sources: [enonce, eda]
+  sieges_souscrits:
+    libelle: Licences souscrites
+    type: numerique
+    unite: ""
+    decimales: 0
+    plage: [1, 898]
+    sens_attendu: indetermine
+    justification: Taille du contrat ; effet ambigu (plus d'enjeu pour le client, mais adoption plus difficile).
+    sources: [enonce]
+  utilisateurs_actifs:
+    libelle: Utilisateurs actifs
+    type: numerique
+    unite: ""
+    decimales: 0
+    plage: [0, 829]
+    sens_attendu: baisse
+    justification: Plus d'utilisateurs actifs = usage réel de l'outil, donc engagement.
+    sources: [enonce, metier]
+  taux_adoption_pct:
+    libelle: Taux d'adoption des licences
+    type: numerique
+    unite: "%"
+    decimales: 1
+    plage: [0, 100]
+    sens_attendu: baisse
+    justification: Licences payées mais inutilisées = valeur perçue faible ; l'EDA montre une adoption plus faible chez les comptes qui résilient.
+    sources: [enonce, eda]
+  connexions_30j:
+    libelle: Connexions sur 30 jours
+    type: numerique
+    unite: ""
+    decimales: 0
+    plage: [0, 156]
+    sens_attendu: baisse
+    justification: Indicateur direct d'usage.
+    sources: [enonce, metier]
+  heures_usage_30j:
+    libelle: Heures d'usage sur 30 jours
+    type: numerique
+    unite: h
+    decimales: 1
+    plage: [0, 170.4]
+    sens_attendu: baisse
+    justification: Indicateur direct d'usage.
+    sources: [enonce, metier]
+  fonctionnalites_total:
+    libelle: Fonctionnalités offertes par le plan
+    type: numerique
+    unite: ""
+    decimales: 0
+    plage: [8, 40]
+    sens_attendu: indetermine
+    justification: Caractéristique de l'offre, pas du comportement du client.
+    sources: [enonce]
+  fonctionnalites_utilisees:
+    libelle: Fonctionnalités utilisées
+    type: numerique
+    unite: ""
+    decimales: 0
+    plage: [0, 40]
+    sens_attendu: baisse
+    justification: Profondeur d'usage de l'outil.
+    sources: [enonce, metier]
+  nb_integrations:
+    libelle: Intégrations tierces connectées
+    type: numerique
+    unite: ""
+    decimales: 0
+    plage: [0, 16]
+    sens_attendu: baisse
+    justification: Chaque intégration augmente le coût de sortie ; l'EDA montre moins d'intégrations chez les comptes qui résilient.
+    sources: [enonce, eda]
+  derniere_connexion_jours:
+    libelle: Jours depuis la dernière connexion
+    type: numerique
+    unite: j
+    decimales: 0
+    plage: [0, 200]
+    sens_attendu: hausse
+    justification: Désengagement ; l'EDA montre des connexions moins récentes chez les comptes qui résilient.
+    sources: [enonce, eda]
+  tickets_support_90j:
+    libelle: Tickets support sur 90 jours
+    type: numerique
+    unite: ""
+    decimales: 0
+    plage: [0, 17]
+    sens_attendu: hausse
+    justification: Difficultés rencontrées ; l'EDA montre plus de tickets chez les comptes qui résilient.
+    sources: [enonce, eda]
+  delai_reponse_support_h:
+    libelle: Délai moyen de réponse du support
+    type: numerique
+    unite: h
+    decimales: 1
+    plage: [0.5, 56.5]
+    sens_attendu: hausse
+    justification: Un support lent dégrade l'expérience client.
+    sources: [enonce, metier]
+  csat:
+    libelle: Satisfaction client (CSAT)
+    type: numerique
+    unite: /5
+    decimales: 0
+    plage: [1, 5]
+    sens_attendu: baisse
+    justification: Un client satisfait reste ; l'EDA montre un CSAT plus faible chez les comptes qui résilient.
+    sources: [enonce, eda]
+  retards_paiement_12m:
+    libelle: Retards de paiement sur 12 mois
+    type: numerique
+    unite: ""
+    decimales: 0
+    plage: [0, 7]
+    sens_attendu: hausse
+    justification: Difficulté financière ou désintérêt pour le service. Au plus un retard par mois facturé ; au-delà, la valeur est impossible et neutralisée (src/features.py, v2.1).
+    sources: [enonce, metier]
+  revenu_mensuel_recurrent_eur:
+    libelle: Revenu mensuel récurrent (MRR)
+    type: numerique
+    unite: €
+    decimales: 0
+    plage: [9.1, 89402.9]
+    sens_attendu: indetermine
+    justification: Taille du contrat ; effet ambigu.
+    sources: [enonce]
+  taux_utilisation_fonctionnalites:
+    libelle: Part des fonctionnalités du plan utilisées
+    type: numerique
+    unite: ""
+    decimales: 2
+    plage: [0, 1]
+    sens_attendu: baisse
+    justification: Fonctionnalités utilisées / offertes ; profondeur d'usage rapportée à l'offre.
+    sources: [feature, metier]
+  taux_retard_paiement_par_mois:
+    libelle: Retards de paiement par mois d'ancienneté
+    type: numerique
+    unite: ""
+    decimales: 2
+    plage: [0, 1]
+    sens_attendu: hausse
+    justification: Retards sur 12 mois / ancienneté (au moins 1 mois) ; même logique que les retards bruts. Au plus 1 depuis la v2.1 (valeurs impossibles neutralisées).
+    sources: [feature, metier]
+
+# Colonnes du jeu de données qui ne doivent JAMAIS être des variables du modèle de churn.
+# La catégorie fixe la gravité du contrôle (section `controles`).
+exclusions:
+  client_id: {categorie: identifiant, raison: Aucune valeur prédictive légitime.}
+  churn: {categorie: cible, raison: Cible du modèle.}
+  sante_compte_fin_periode: {categorie: fuite, raison: "Calculée en fin de période, après la décision (AUC univariée 0,999)."}
+  valeur_vie_client_eur: {categorie: cible_secondaire, raison: "Interdite comme variable du churn (énoncé §3.2)."}
+  commentaire_csm: {categorie: conformite, raison: "Texte libre, risque de données personnelles (D7)."}
+  jour_souscription: {categorie: leurre, raison: Aucun effet mesurable sur le churn (§6).}
+  pays: {categorie: leurre, raison: "Aucun effet mesurable (§6) ; risque de traitement différencié (§4)."}
+  code_datacenter: {categorie: leurre, raison: Aucun effet mesurable sur le churn (§6).}
+  couleur_theme_interface: {categorie: leurre, raison: Aucun effet mesurable sur le churn (§6).}
+  groupe_experimentation: {categorie: leurre, raison: Aucun effet mesurable sur le churn (§6).}
+  date_souscription: {categorie: redondante, raison: Information portée par anciennete_mois.}
+  prix_mensuel_par_siege_eur: {categorie: redondante, raison: Une seule valeur par plan (catalogue).}
+  fonctionnalites_incluses: {categorie: redondante, raison: Une seule valeur par plan (catalogue).}
+  sla_reponse_h: {categorie: redondante, raison: Une seule valeur par plan (catalogue).}
+  quota_stockage_go: {categorie: redondante, raison: Une seule valeur par plan (catalogue).}
+  support_dedie: {categorie: redondante, raison: Une seule valeur par plan (catalogue).}
+
+# Règles du système de décision (brique 3), reprises dans l'explication de chaque priorité.
+# Les VALEURS (seuil, capacité) ne sont pas ici : elles sont lues dans scoring_manifest.json,
+# pour qu'il n'y ait qu'une seule source.
+decisions:
+  D9: Un compte est signalé si sa probabilité de churn atteint le seuil, calculé pour détecter au moins 80 % des comptes qui partent.
+  D10: L'équipe Customer Success traite au plus un nombre fixe de comptes en priorité Haute par cycle.
+  D14: Parmi les comptes signalés, la priorité suit la perte attendue (probabilité × valeur vie estimée).
+  D3: L'action est une recommandation ; aucune décision n'est exécutée sans intervention humaine.
+
+controles:
+  # Gravité d'une variable exclue retrouvée dans le modèle. `bloquant` fait échouer le contrôle
+  # (notebook §15.3 et CI) ; `avertissement` est signalé sans bloquer.
+  gravite_exclusion:
+    identifiant: bloquant
+    cible: bloquant
+    fuite: bloquant
+    cible_secondaire: bloquant
+    conformite: bloquant
+    leurre: bloquant
+    redondante: avertissement
+  # Effet appris de sens contraire à l'attendu : avertissement, pas blocage. Dans un modèle
+  # multivarié, le coefficient d'une variable corrélée à d'autres peut changer de signe sans
+  # erreur ; l'écart impose une analyse (stabilité, ablation), pas un refus automatique.
+  gravite_sens_contraire: avertissement
+  # Signature possible de fuite : une seule variable porte plus de cette part de l'explication
+  # totale (moyenne des |contributions| sur un jeu de données). Fixé a priori : « plus de la
+  # moitié de l'explication repose sur une seule variable ». Bloquant, car aucune variable
+  # disponible avant la décision ne dépasse seule une AUC de 0,76 (§6) : un modèle qui repose
+  # à ce point sur une variable est suspect de fuite jusqu'à preuve du contraire.
+  part_max_une_variable: 0.5
+  gravite_concentration: bloquant
