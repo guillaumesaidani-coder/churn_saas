@@ -35,6 +35,7 @@ certification.
 - [2.21 Documentation de référence dans `docs/`, coffre Obsidian (2026-09-29)](2.21_documentation.md)
 - [2.22 Portrait de la donnée, distributions et matrice de corrélation (2026-09-29)](2.22_portrait_distributions_correlations.md)
 - [2.23 Révision v2.1 : valeurs atypiques et incohérences (2026-09-29)](2.23_revision_v21_incoherences.md)
+- [2.24 Rejeu officiel de la v2.1, vérification de la documentation, publication (2026-09-30)](2.24_rejeu_v21_et_publication.md)
 
 ---
 

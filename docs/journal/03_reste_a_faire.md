@@ -56,4 +56,4 @@ Sans cela, le job `docker` de la CI échoue au `dvc pull`.
 
 ---
 
-Précédent : [2.23_revision_v21_incoherences](actions/2.23_revision_v21_incoherences.md) · Suivant : [04_livrable_final](04_livrable_final.md)
+Précédent : [2.24_rejeu_v21_et_publication](actions/2.24_rejeu_v21_et_publication.md) · Suivant : [04_livrable_final](04_livrable_final.md)
