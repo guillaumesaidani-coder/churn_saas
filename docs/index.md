@@ -72,13 +72,13 @@ affirmation à son code ou à son artefact.
 | Compétence | Documentation |
 |---|---|
 | C1 Identifier un jeu de données pertinent | [Besoin et solution](cadrage/besoin_et_solution.md), [décisions](cadrage/decisions/index.md), [sources](donnees/sources.md) |
-| C2 Risques éthiques, sociétaux et conformité | [RGPD, éthique et équité](donnees/rgpd_et_ethique.md), [D3](cadrage/decisions/D03.md), [D7](cadrage/decisions/D07.md) |
+| C2 Risques éthiques, sociétaux & conformité | [RGPD, éthique et équité](donnees/rgpd_et_ethique.md), [D3](cadrage/decisions/D03.md), [D7](cadrage/decisions/D07.md) |
 | C3 Préparer les données | [Préparation](donnees/preparation.md), [dictionnaire](donnees/dictionnaire.md), [pipeline](donnees/pipeline_et_lignage.md) |
-| C4 Choisir un modèle | [Protocole expérimental](modeles/protocole_experimental.md) |
-| C5 Entraîner et ajuster | [Model cards](modeles/model_card_churn_v2.md), [explicabilité](explicabilite/controles.md) |
-| C6 Implémenter et déployer | [Système de décision](modeles/systeme_de_decision.md), [API](exploitation/api.md), [guide de démarrage](exploitation/guide_de_demarrage.md) |
-| C7 Architecture et contraintes | [Architecture](exploitation/architecture.md) |
-| C8 Mesurer performance et impacts | [Model cards](modeles/model_card_churn_v2.md), [système de décision](modeles/systeme_de_decision.md) |
+| C4 Choisir un modèle (démarche scientifique) | [Protocole expérimental](modeles/protocole_experimental.md) |
+| C5 Entraîner le modèle | [Model cards](modeles/model_card_churn_v2.md), [explicabilité](explicabilite/controles.md) |
+| C6 Implémenter la solution | [Système de décision](modeles/systeme_de_decision.md), [API](exploitation/api.md), [guide de démarrage](exploitation/guide_de_demarrage.md) |
+| C7 Architecture cible & contraintes | [Architecture](exploitation/architecture.md) |
+| C8 Mesurer performance & impacts | [Model cards](modeles/model_card_churn_v2.md), [système de décision](modeles/systeme_de_decision.md) |
 | C9 Amélioration continue | [Runbook](exploitation/runbook.md), [supervision](exploitation/supervision.md), [CI](qualite/integration_continue.md), [journal](journal/index.md) |
 
 ## Conventions de cette documentation

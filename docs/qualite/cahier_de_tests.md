@@ -16,7 +16,7 @@ obtenus sur ce dépôt ; les commandes permettent de les reproduire.
 
 | Niveau | Quoi | Quand | Commande |
 |---|---|---|---|
-| 1. Tests unitaires | 134 tests sur données synthétiques, sans secret ni données réelles | À chaque push (CI), en local à chaque modification | `python -m pytest -q` |
+| 1. Tests unitaires | 129 tests sur données synthétiques, sans secret ni données réelles | À chaque push (CI), en local à chaque modification | `python -m pytest -q` |
 | 2. Vérifications du notebook | 10 assertions sur le livrable réel (§15.3) : le notebook s'arrête si l'une échoue | À chaque `dvc repro -s certification` | `dvc repro -s certification` |
 | 3. Test de fumée de l'image | Construction de l'image avec les vrais modèles, puis `/ready` | À chaque push (CI, si le secret DagsHub est configuré) | Voir [intégration continue](integration_continue.md) |
 
@@ -29,13 +29,12 @@ obtenus sur ce dépôt ; les commandes permettent de les reproduire.
 | Nettoyage Silver | [`test_silver.py`](../../tests/test_silver.py) | 21 | Doublons, dates multi-formats, nombres en texte, normalisation des secteurs, chaîne complète |
 | Gold v1 | [`test_gold.py`](../../tests/test_gold.py) | 13 | Ratios, sélection des variables, découpage, détection de fuite (AUC) et des leurres |
 | Variables v2 | [`test_features.py`](../../tests/test_features.py) | 10 | Recalcul du taux d'adoption, neutralisation des retards de paiement impossibles (v2.1), construction des 20 variables |
-| Recherche de modèle | [`test_model_search.py`](../../tests/test_model_search.py) | 5 | Pipeline, PR-AUC en validation croisée, reproductibilité de la recherche |
 | Suivi MLflow | [`test_tracking.py`](../../tests/test_tracking.py) | 10 | Résolution du store (local ou distant), runs, métriques, artefacts |
 | Système de décision | [`test_scoring.py`](../../tests/test_scoring.py) | 18 | Perte attendue, seuil D9, priorités et rang D14/D10, actions D11, conformité D3 |
 | Explicabilité | [`test_explain.py`](../../tests/test_explain.py) | 25 | Décomposition exacte, explication d'un compte, trace de la décision, 5 contrôles, attribution de dérive, **cohérence de la base de connaissance avec le code** |
 | API | [`test_api.py`](../../tests/test_api.py) | 16 | Santé, disponibilité, authentification, calcul bout en bout, neutralisation des retards impossibles, taille de requête, limite de débit, métriques, explications, garde-fou de `/ready` |
 | Dérive | [`test_drift.py`](../../tests/test_drift.py) | 7 | PSI et KS sur distributions identiques et décalées, bornes figées sur la référence, valeurs manquantes |
-| **Total** | | **134** | |
+| **Total** | | **129** | |
 
 Les tests n'utilisent jamais les données réelles ni les `.joblib` : ils construisent des données
 synthétiques ou des modèles factices dont on connaît le résultat attendu. Ils tournent donc en CI

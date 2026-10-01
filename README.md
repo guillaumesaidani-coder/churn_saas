@@ -79,7 +79,7 @@ dvc pull            # récupère données et modèles depuis DagsHub
 dvc repro           # rejoue uniquement les étapes dont une dépendance a changé
 dvc repro certification   # exécute le notebook de certification
 pytest              # tests unitaires
-mlflow ui --backend-store-uri sqlite:///data/model/mlflow.db   # runs tracés en local
+mlflow ui --backend-store-uri sqlite:///data/model_v2/mlflow.db   # runs v2 tracés en local (sans MLFLOW_TRACKING_URI)
 # Pour tracer sur le serveur MLflow de DagsHub plutôt qu'en local :
 #   MLFLOW_TRACKING_URI=https://dagshub.com/guillaume.saidani/churn_saas.mlflow
 #   MLFLOW_TRACKING_USERNAME=<user DagsHub>  MLFLOW_TRACKING_PASSWORD=<jeton DagsHub>
