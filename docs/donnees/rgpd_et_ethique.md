@@ -1,8 +1,8 @@
 ---
 type: explication
 statut: à jour
-mise_a_jour: 2026-09-29
-sources: notebook §3.2, §4 et §12.5 ; data/rgpd/rgpd_gate_manifest.json
+mise_a_jour: 2026-10-01
+sources: notebook §3.2, §4 (dont §4.5 et §4.6) et §12.5 ; data/rgpd/rgpd_gate_manifest.json
 ---
 
 [← Documentation](../index.md)
@@ -40,6 +40,23 @@ publiées** : exclues de Git et du cache DVC (voir [`.gitignore`](../../.gitigno
 Restent à faire côté client, selon le manifeste RGPD : documenter formellement base légale et
 finalité, rédiger le registre, vérifier le contrat de sous-traitance en cas d'hébergement tiers
 (art. 28).
+
+## Cadre réglementaire et chartes éthiques (notebook §4.5)
+
+| Référence | Ce qu'elle demande | Application dans le projet |
+|---|---|---|
+| **Règlement (UE) 2024/1689 sur l'IA** (« AI Act ») | Classement par niveau de risque ; maîtrise de l'IA par les personnes qui l'utilisent (article 4) | Score de résiliation de comptes **professionnels**, servant à prioriser des relances humaines : ni pratique interdite (article 5) ni usage à haut risque (annexe III), donc **risque minimal**. Les explications livrées avec chaque priorité servent la maîtrise de l'IA par les CSM. À revoir si l'usage change |
+| **Lignes directrices pour une IA digne de confiance** (groupe d'experts de haut niveau, Commission européenne, 2019) | Sept exigences : action et contrôle humains, robustesse, vie privée, transparence, équité, bien-être sociétal et environnemental, responsabilité | Chaque exigence est reliée à un choix du projet dans le notebook (§4.5) : par exemple [D3](../cadrage/decisions/D03.md) pour le contrôle humain, l'audit par segment pour l'équité, la mesure énergétique (§8.6) pour l'environnement |
+| **CNIL** | RGPD ; recommandations sur le développement des systèmes d'IA : finalité déterminée, base légale, minimisation, information des personnes | Principes appliqués ci-dessus ; AIPD non obligatoire d'après le portique (un seul critère réuni) |
+
+## Dilemmes éthiques (notebook §4.6)
+
+| Dilemme | Arbitrage proposé | À valider par |
+|---|---|---|
+| Aider les clients en difficulté, ou ne pas solliciter inutilement des comptes fidèles | Le rappel prime ([D9](../cadrage/decisions/D09.md)) : action bienveillante et réversible, volume borné par la capacité CS ([D10](../cadrage/decisions/D10.md)) | Direction CS |
+| Valeur ou égalité de traitement : à risque égal, un petit compte reçoit un email plutôt qu'un appel ([D14](../cadrage/decisions/D14.md)) | Priorité à la valeur, assumée ; aucun compte signalé n'est ignoré ([D11](../cadrage/decisions/D11.md)) | Direction CS |
+| Anticiper ou surveiller : exploiter les données d'usage peut être perçu comme une surveillance | Données agrégées par compte, finalité unique, information des clients à prévoir | DPO, juristes |
+| Un seuil unique ou un seuil par segment | Seuil unique, sans traitement différencié ; surveillance des segments signalés par l'audit | Direction CS, DPO |
 
 ## L'explication au service de l'intervention humaine
 
@@ -105,6 +122,9 @@ différencié explicite.
 ## Limites
 
 - Le registre de traitement est un exercice : il devrait être validé par un DPO.
+- La classification au titre de l'AI Act, les dilemmes et le
+  [cycle de vie des données](pipeline_et_lignage.md#cycle-de-vie-du-jeu-de-données) n'ont pas été
+  présentés à un DPO ni à un commanditaire : c'est une condition de mise en service.
 - Les effectifs par segment sont petits (15 à 125 comptes partis) : l'audit détecte les écarts
   importants, pas les écarts modérés.
 

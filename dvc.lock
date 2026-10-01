@@ -317,8 +317,8 @@ stages:
       size: 11314
     - path: notebooks/notebook_certifiant_churn_saas.ipynb
       hash: md5
-      md5: 26ad95254eb34438e5fd4d2d3eaa3f5c
-      size: 291944
+      md5: 067aedcca92ebb4d5e9318adeb3a6d25
+      size: 314833
     - path: src/api.py
       hash: md5
       md5: 6839f7991099a5e225b4a2d049a083ab
@@ -366,11 +366,11 @@ stages:
       size: 200436
     - path: data/gold/gold_fiche_identite_v2.md
       hash: md5
-      md5: 47a4d933fc31cfbd1c73ef61a05ab37c
+      md5: 32c81bd98915345081bc1045b5f1e1cd
       size: 1261
     - path: data/gold/gold_v2_manifest.json
       hash: md5
-      md5: 6418b69747314ac79cdf203aa1738d6d
+      md5: 4086ca5a48d243234d113e8aba09aadf
       size: 2146
     - path: data/model_v2/explication_reference.json
       hash: md5
@@ -399,7 +399,7 @@ stages:
       size: 1467186
     - path: data/model_v2/model_manifest.json
       hash: md5
-      md5: 0c6034b275928bf941ad45d4e8934928
+      md5: ac5042d5423a7d6fb0a3ff91c663be72
       size: 2119
     - path: data/model_v2/scoring_exemple_cycle.parquet
       hash: md5
@@ -411,5 +411,5 @@ stages:
       size: 841
     - path: reports/notebooks/notebook_certifiant_churn_saas.ipynb
       hash: md5
-      md5: 920c1f63f81daffdc389f8543916bba5
-      size: 1932217
+      md5: 0c9d7004c913164ebe98272962ff21b2
+      size: 1960155

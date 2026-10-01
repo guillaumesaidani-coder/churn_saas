@@ -1,8 +1,8 @@
 ---
 type: explication
 statut: à jour
-mise_a_jour: 2026-09-29
-sources: notebook §1, §8 et §9
+mise_a_jour: 2026-10-01
+sources: notebook §1, §8 (dont §8.5 et §8.6) et §9
 ---
 
 [← Documentation](../index.md)
@@ -64,6 +64,32 @@ choix (variables, famille de modèle, hyperparamètres, seuil de décision) sont
 
 Chiffres détaillés : [model card churn v2](model_card_churn_v2.md) et
 [model card CLV v2](model_card_clv_v2.md).
+
+## Solutions sur étagère et nature du résultat (notebook §8.5)
+
+Trois options ont été comparées : un score intégré à un outil du marché (CRM, plateforme Customer
+Success), un AutoML de fournisseur cloud, un modèle développé. Le modèle développé est retenu : le
+contrôle de la fuite et le système de décision ([D9](../cadrage/decisions/D09.md),
+[D10](../cadrage/decisions/D10.md), [D14](../cadrage/decisions/D14.md)) exigent un contrôle complet,
+et une régression logistique suffit. La comparaison est qualitative, sans essai des produits ; un
+outil du marché devrait être comparé sur le même jeu de test avant tout remplacement.
+
+Le résultat est **probabiliste** (probabilité de résiliation, CLV estimée), rendu **déterministe**
+par le système de décision : la même entrée donne toujours la même liste priorisée.
+
+## Éco-conception (notebook §8.6)
+
+Mesure avec CodeCarbon (hors ligne, mix électrique français), lors du rejeu du 1er octobre 2026 :
+
+| Modèle | PR-AUC (CV) | Énergie de la sélection (mWh) | Scoring de 1 000 comptes (ms) | Taille du modèle |
+|---|---|---|---|---|
+| Régression logistique (retenue) | 0,783 | 2,96 | 4,6 | 4,8 Ko |
+| Forêt aléatoire | 0,764 | 51,8 (18 fois plus) | 63,6 | 28,7 Mo |
+| Gradient boosting | 0,755 | 82,4 (28 fois plus) | 9,5 | 1,1 Mo |
+
+Le modèle retenu est aussi le plus sobre. Les valeurs absolues sont infimes et estimées : à
+cette échelle, l'éco-conception tient aux choix de sobriété (pas de modèle plus lourd sans gain,
+scoring mensuel, réentraînement sur déclencheur).
 
 ## Pourquoi un seuil de rappel plutôt qu'un seuil de coût minimal
 

@@ -1,8 +1,8 @@
 ---
 type: référence
 statut: à jour
-mise_a_jour: 2026-09-29
-sources: dvc.yaml, dvc.lock, manifestes data/*/, notebook §3.2
+mise_a_jour: 2026-10-01
+sources: dvc.yaml, dvc.lock, manifestes data/*/, notebook §3.2 et §7.11
 ---
 
 [← Documentation](../index.md)
@@ -75,6 +75,28 @@ modèle servi jusqu'au fichier brut :
 Les manifestes v1 et la façon de répondre aux questions courantes avec eux sont décrits dans
 [`data/README.md`](../../data/README.md). La composition et les choix du Gold v2 sont résumés dans
 sa [fiche d'identité](../../data/gold/gold_fiche_identite_v2.md).
+
+## Cycle de vie du jeu de données
+
+Notebook §7.11 : chaque état de la donnée, de l'export brut aux scores.
+
+| Étape | Format et stockage | Conservation aujourd'hui | Accès |
+|---|---|---|---|
+| Export brut (CSV fournis) | Versionné par DVC, sur DagsHub (stockage objet compatible S3) | Toutes les versions | Équipe data |
+| Portique RGPD | Manifeste JSON ; pseudonymisation hors Git et hors DVC | Clé conservée en local uniquement | Équipe data, DPO |
+| Bronze, Silver, Gold v2 | Parquet versionné par DVC ; manifestes et empreintes dans Git | Toutes les versions | Équipe data |
+| Modèles et règle de décision | joblib et manifestes, runs MLflow | Version en service et précédentes | Équipe data |
+| Scores du cycle | Export de 5 colonnes vers le CRM | Écrasés à chaque cycle | Équipes CS |
+
+- **Stockage** : le Parquet en stockage objet suffit à 5 000 comptes traités par lots mensuels ;
+  une base relationnelle ne deviendrait utile que pour un scoring en continu
+  ([architecture](../exploitation/architecture.md#scénarios-et-contraintes-économiques-notebook-114)).
+- **Accessibilité** : `dvc pull` depuis DagsHub, vérifié à chaque push par la CI.
+- **Usages futurs** : réentraînement, mesure de la dérive (le train sert de référence), audit
+  d'une décision passée.
+- **À soumettre au DPO** : les durées de conservation (aujourd'hui, toutes les versions sont
+  gardées, ce que la limitation de la conservation du RGPD, article 5.1.e, ne permet pas sans
+  justification) et les droits d'accès à la clé de pseudonymisation. Pas encore présenté.
 
 ## Commandes utiles
 
