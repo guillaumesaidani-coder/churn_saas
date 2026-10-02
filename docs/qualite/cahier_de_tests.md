@@ -16,7 +16,7 @@ obtenus sur ce dépôt ; les commandes permettent de les reproduire.
 
 | Niveau | Quoi | Quand | Commande |
 |---|---|---|---|
-| 1. Tests unitaires | 129 tests sur données synthétiques, sans secret ni données réelles | À chaque push (CI), en local à chaque modification | `python -m pytest -q` |
+| 1. Tests unitaires | 142 tests sur données synthétiques, sans secret ni données réelles | À chaque push (CI), en local à chaque modification | `python -m pytest -q` |
 | 2. Vérifications du notebook | 10 assertions sur le livrable réel (§15.3) : le notebook s'arrête si l'une échoue | À chaque `dvc repro -s certification` | `dvc repro -s certification` |
 | 3. Test de fumée de l'image | Construction de l'image avec les vrais modèles, puis `/ready` | À chaque push (CI, si le secret DagsHub est configuré) | Voir [intégration continue](integration_continue.md) |
 
@@ -34,7 +34,8 @@ obtenus sur ce dépôt ; les commandes permettent de les reproduire.
 | Explicabilité | [`test_explain.py`](../../tests/test_explain.py) | 25 | Décomposition exacte, explication d'un compte, trace de la décision, 5 contrôles, attribution de dérive, **cohérence de la base de connaissance avec le code** |
 | API | [`test_api.py`](../../tests/test_api.py) | 16 | Santé, disponibilité, authentification, calcul bout en bout, neutralisation des retards impossibles, taille de requête, limite de débit, métriques, explications, garde-fou de `/ready` |
 | Dérive | [`test_drift.py`](../../tests/test_drift.py) | 7 | PSI et KS sur distributions identiques et décalées, bornes figées sur la référence, valeurs manquantes |
-| **Total** | | **129** | |
+| Production simulée | [`test_production.py`](../../tests/test_production.py) | 13 | Lots M+1 (format brut, étiquettes vides, ancienneté + 1, baisse d'engagement, déterminisme, lot stable sans dérive et lot dérivé en alerte, relecture par la chaîne d'entraînement), scoring d'un cycle, journal des scores (traçabilité, aucune donnée par compte, rejeu d'un cycle), purge des scores, cycle courant de l'exporteur |
+| **Total** | | **142** | |
 
 Les tests n'utilisent jamais les données réelles ni les `.joblib` : ils construisent des données
 synthétiques ou des modèles factices dont on connaît le résultat attendu. Ils tournent donc en CI

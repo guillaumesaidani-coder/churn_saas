@@ -24,7 +24,7 @@ flowchart LR
 
 | Job | Étapes | Ce qu'il garantit |
 |---|---|---|
-| `tests` | Installation de l'environnement complet, `python -m pytest -q` | Les 129 tests passent sur Linux, Python 3.13 |
+| `tests` | Installation de l'environnement complet, `python -m pytest -q` | Les 142 tests passent sur Linux, Python 3.13 |
 | `docker` | `dvc pull` depuis DagsHub, construction de l'image d'exécution, démarrage, interrogation de `/ready` | L'image démarre avec les **vrais** modèles v2 ; le modèle servi ne contient aucune variable exclue par la base de connaissance (sinon `/ready` répond 503 et le job échoue) |
 
 ## Secret requis

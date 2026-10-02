@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 """Expose en métriques Prometheus la dérive entre le Gold dataset de référence (split
-`train`, figé au moment de l'entraînement du modèle en production) et le cycle courant
-(split `test`, qui tient lieu de "prochain cycle mensuel" en l'absence d'un nouvel export
-CRM réel -- voir `notebooks/06_implementation_scoring.ipynb` §0, même convention).
+`train`, figé au moment de l'entraînement du modèle en production) et le cycle courant :
+les variables du dernier cycle scoré (`CYCLE_COURANT`, fichier `features.parquet` écrit par
+`scripts/scorer_cycle.py`) ou, à défaut, le split `test`, qui tient alors lieu de "prochain
+cycle mensuel".
 
 Recalcule (`src.drift.drift_table`) à chaque relecture plutôt que de relire un CSV déjà
 produit (contrairement à `py-init/ml/scripts/export_drift_metrics.py`, qui republie un
@@ -13,6 +14,7 @@ Port 9110 (même convention que py-init/ml : le 9109 y était déjà occupé par
 exporteur -- non applicable ici, mais gardé pour cohérence entre les deux projets).
 
 Usage : python scripts/export_drift_metrics.py
+        CYCLE_COURANT=data/production/m1_derive/features.parquet python scripts/export_drift_metrics.py
 """
 from __future__ import annotations
 
@@ -34,6 +36,8 @@ GOLD_FICHIER = os.getenv("GOLD_FICHIER", "clients_churn_gold.parquet")
 GOLD_MANIFESTE = os.getenv("GOLD_MANIFESTE", "gold_manifest.json")
 PORT = int(os.getenv("DRIFT_EXPORTER_PORT", "9110"))
 REFRESH_SECONDS = int(os.getenv("DRIFT_REFRESH_SECONDS", "60"))
+# Variables du cycle à comparer à la référence ; vide = split `test` du Gold dataset.
+CYCLE_COURANT = os.getenv("CYCLE_COURANT", "")
 PSI_ALERT_THRESHOLD = 0.25
 
 drift_psi = Gauge("churn_saas_drift_psi", "PSI par feature (référence = split train)", ["feature"])
@@ -43,6 +47,14 @@ drift_alerte = Gauge("churn_saas_drift_alerte", "1 si PSI > seuil, 0 sinon", ["f
 
 def numeric_feature_columns(gold: pd.DataFrame, feature_columns: list[str]) -> list[str]:
     return [c for c in feature_columns if pd.api.types.is_numeric_dtype(gold[c])]
+
+
+def fenetre_courante(gold: pd.DataFrame, chemin_cycle: str) -> pd.DataFrame:
+    """Le cycle à comparer à la référence : le fichier `chemin_cycle` s'il est donné, sinon le
+    split `test` du Gold dataset."""
+    if chemin_cycle:
+        return pd.read_parquet(chemin_cycle)
+    return gold[gold["split"] == "test"]
 
 
 def _reload() -> int:
@@ -63,7 +75,9 @@ def _reload() -> int:
     features = numeric_feature_columns(gold, feature_columns)
 
     reference = gold[gold["split"] == "train"]
-    current = gold[gold["split"] == "test"]
+    if CYCLE_COURANT and not Path(CYCLE_COURANT).exists():
+        return 0
+    current = fenetre_courante(gold, CYCLE_COURANT)
 
     table = drift_table(reference, current, features)
     for _, row in table.iterrows():
@@ -76,7 +90,8 @@ def _reload() -> int:
 
 def main() -> None:
     start_http_server(PORT)
-    print(f"Exporteur dérive démarré sur :{PORT}/metrics (recalcul toutes les {REFRESH_SECONDS}s)")
+    print(f"Exporteur dérive démarré sur :{PORT}/metrics (recalcul toutes les {REFRESH_SECONDS}s) ; "
+          f"cycle courant : {CYCLE_COURANT or 'split test du Gold dataset'}")
     while True:
         n = _reload()
         print(f"{n} feature(s) évaluée(s) depuis {GOLD_DIR}")

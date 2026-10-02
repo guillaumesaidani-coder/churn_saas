@@ -4,7 +4,9 @@
 > Ce guide décrit les manifestes de la **v1** (notebooks 00 à 06). Pour la v2 en service (Gold v2,
 > `data/model_v2/`), voir [pipeline et lignage](../docs/donnees/pipeline_et_lignage.md) et les
 > [model cards v2](../docs/modeles/model_card_churn_v2.md). Les manifestes v2 sont
-> `gold/gold_v2_manifest.json` et `model_v2/*_manifest.json`. Les documents de `Livrables/` cités
+> `gold/gold_v2_manifest.json` et `model_v2/*_manifest.json`. Les cycles de production simulés
+> (exports du mois suivant, scores, journal des scores) sont dans `production/` : voir le
+> [runbook](../docs/exploitation/runbook.md). Les documents de `Livrables/` cités
 > plus bas sont des documents de travail non publiés.
 
 Chaque étape (`rgpd/`, `bronze/`, `silver/`, `gold/`, `model/`) écrit un

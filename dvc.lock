@@ -413,3 +413,132 @@ stages:
       hash: md5
       md5: 0c9d7004c913164ebe98272962ff21b2
       size: 1960155
+  lots_simules:
+    cmd: python scripts/simuler_lots_mensuels.py
+    deps:
+    - path: Examen_cas d'usage candidat/catalogue_plans.csv
+      hash: md5
+      md5: 6e1d25ff7514ef0766625891ac1dac57
+      size: 203
+    - path: Examen_cas d'usage candidat/churn_saas_complet.csv
+      hash: md5
+      md5: 2b44e1405bf6a5c13cc71652cc90cf34
+      size: 727622
+    - path: scripts/simuler_lots_mensuels.py
+      hash: md5
+      md5: 43bc9c2f15ab9c9174bdf7d69850a66e
+      size: 3260
+    - path: src/bronze.py
+      hash: md5
+      md5: c9ee95d65a299dbb0ccb9e5cdcdc66a8
+      size: 2290
+    - path: src/production.py
+      hash: md5
+      md5: 8a277ac8d12f45167f9c12182155e3aa
+      size: 9464
+    - path: src/silver.py
+      hash: md5
+      md5: 2754b0cf2c55f474210fa649c8731ae1
+      size: 7912
+    outs:
+    - path: data/production/lots_simules_manifest.json
+      hash: md5
+      md5: da62d8e6035aa164b31049473374d904
+      size: 1511
+    - path: data/production/m1_derive/export_crm.csv
+      hash: md5
+      md5: bbef61976a9a0baa7d0d32407511ac99
+      size: 667978
+    - path: data/production/m1_stable/export_crm.csv
+      hash: md5
+      md5: a2881205e728bfe9c2c63b620e4b976e
+      size: 664306
+  cycles_simules:
+    cmd:
+    - python scripts/scorer_cycle.py --cycle m1_stable --export 
+      data/production/m1_stable/export_crm.csv
+    - python scripts/scorer_cycle.py --cycle m1_derive --export 
+      data/production/m1_derive/export_crm.csv
+    deps:
+    - path: Examen_cas d'usage candidat/catalogue_plans.csv
+      hash: md5
+      md5: 6e1d25ff7514ef0766625891ac1dac57
+      size: 203
+    - path: data/gold/clients_churn_gold_v2.parquet
+      hash: md5
+      md5: 87bf854eb19f70016661397341845d24
+      size: 200436
+    - path: data/model_v2/model.joblib
+      hash: md5
+      md5: 4ab0ed181cab6c9df936ac05ca4d12fa
+      size: 6058
+    - path: data/model_v2/model_clv.joblib
+      hash: md5
+      md5: 04a4f9baee362ad4591a5c34f96c6310
+      size: 1467186
+    - path: data/model_v2/model_manifest.json
+      hash: md5
+      md5: ac5042d5423a7d6fb0a3ff91c663be72
+      size: 2119
+    - path: data/model_v2/scoring_manifest.json
+      hash: md5
+      md5: 64bf5910a1673c61de282a761f33723f
+      size: 841
+    - path: data/production/m1_derive/export_crm.csv
+      hash: md5
+      md5: bbef61976a9a0baa7d0d32407511ac99
+      size: 667978
+    - path: data/production/m1_stable/export_crm.csv
+      hash: md5
+      md5: a2881205e728bfe9c2c63b620e4b976e
+      size: 664306
+    - path: scripts/scorer_cycle.py
+      hash: md5
+      md5: f1f935fc060a529da5954c52ecd268e8
+      size: 4912
+    - path: src/drift.py
+      hash: md5
+      md5: ebb4e5c2cb4a3cdcb42279bb37a89933
+      size: 2830
+    - path: src/features.py
+      hash: md5
+      md5: 7d1335d3dc6215bdeb3533e83f730366
+      size: 4575
+    - path: src/production.py
+      hash: md5
+      md5: 8a277ac8d12f45167f9c12182155e3aa
+      size: 9464
+    - path: src/scoring.py
+      hash: md5
+      md5: db6247d75299722fa5ea1012c746a259
+      size: 4463
+    - path: src/silver.py
+      hash: md5
+      md5: 2754b0cf2c55f474210fa649c8731ae1
+      size: 7912
+    outs:
+    - path: data/production/journal_scores.jsonl
+      hash: md5
+      md5: 81d9251103bdf2bccda8d2d441ad053e
+      size: 1353
+    - path: data/production/m1_derive/derive.json
+      hash: md5
+      md5: 4d0c9ada2e5e9606b2e09672ed40a169
+      size: 1553
+    - path: data/production/m1_derive/features.parquet
+      hash: md5
+      md5: 68751969f0c5d4f003edc72892a549d0
+      size: 162191
+    - path: data/production/m1_stable/derive.json
+      hash: md5
+      md5: 07e16f26dee0509ef72a4d2fb929180f
+      size: 1557
+    - path: data/production/m1_stable/features.parquet
+      hash: md5
+      md5: ab5f00939e1d3f35a68b79e853c850a9
+      size: 164253
+    - path: data/production/scores
+      hash: md5
+      md5: ad6e9a9ac7c0044058b2ca9dd012706e.dir
+      size: 248046
+      nfiles: 2

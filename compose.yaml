@@ -29,6 +29,12 @@ services:
       GOLD_MANIFESTE: gold_v2_manifest.json
       DRIFT_EXPORTER_PORT: "9110"
       DRIFT_REFRESH_SECONDS: "60"
+      # Cycle comparé à la référence (sortie de scripts/scorer_cycle.py), chemin dans le
+      # conteneur ; vide = split test du Gold v2. Exemple :
+      #   CYCLE_COURANT=/app/data/production/m1_derive/features.parquet docker compose up -d
+      CYCLE_COURANT: ${CYCLE_COURANT:-}
+    volumes:
+      - ./data/production:/app/data/production:ro
     ports:
       - "9111:9110"
 

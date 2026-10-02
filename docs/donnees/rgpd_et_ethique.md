@@ -1,7 +1,7 @@
 ---
 type: explication
 statut: à jour
-mise_a_jour: 2026-10-01
+mise_a_jour: 2026-10-02
 sources: notebook §3.2, §4 (dont §4.5 et §4.6) et §12.5 ; data/rgpd/rgpd_gate_manifest.json
 ---
 
@@ -35,7 +35,7 @@ publiées** : exclues de Git et du cache DVC (voir [`.gitignore`](../../.gitigno
 | **Finalité** (art. 5.1.b) | Priorisation des actions de rétention uniquement ; tout autre usage (évaluation d'un CSM, scoring commercial) exigerait une nouvelle analyse |
 | **Minimisation** (art. 5.1.c) | Données agrégées au compte ([D1](../cadrage/decisions/D01.md)) ; texte libre exclu ([D7](../cadrage/decisions/D07.md)) ; export CRM limité à 5 colonnes |
 | **Décision automatisée** (art. 22) | Score et recommandation, **jamais d'action exécutée** ([D3](../cadrage/decisions/D03.md)) : vérifié par un test automatique |
-| **Registre de traitement** (art. 30) | Texte proposé (finalité, base légale, données, conservation : table de scores écrasée à chaque cycle, destinataires : équipes CS), rédigé à titre d'exercice ([H04](../cadrage/hypotheses.md)) |
+| **Registre de traitement** (art. 30) | Texte proposé (finalité, base légale, données, conservation, destinataires : équipes CS), rédigé à titre d'exercice ([H04](../cadrage/hypotheses.md)). Conservation des scores : écrasés à chaque cycle dans le texte initial ; le journal des scores (2 octobre) propose de garder les scores par compte 3 cycles pour mesurer les comptes sauvés ([D12](../cadrage/decisions/D12.md)), à faire valider par le DPO avant d'amender le registre |
 
 Restent à faire côté client, selon le manifeste RGPD : documenter formellement base légale et
 finalité, rédiger le registre, vérifier le contrat de sous-traitance en cas d'hébergement tiers

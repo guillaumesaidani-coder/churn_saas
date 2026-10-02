@@ -1,7 +1,7 @@
 ---
 type: référence
 statut: à jour
-mise_a_jour: 2026-10-01
+mise_a_jour: 2026-10-02
 sources: dvc.yaml, dvc.lock, manifestes data/*/, notebook §3.2 et §7.11
 ---
 
@@ -28,6 +28,9 @@ flowchart LR
     CSV --> CERT["certification<br/>Gold v2, modèles v2,<br/>explicabilité, MLflow"]
     GO1 --> CERT
     TC --> CERT
+    CSV --> LOTS["lots_simules<br/>exports M+1 simulés"]
+    LOTS --> CYC["cycles_simules<br/>scores, dérive, journal"]
+    CERT --> CYC
 ```
 
 La **v2 en service** (version v2.1 : retards de paiement impossibles neutralisés, voir
@@ -46,6 +49,8 @@ relit le Gold v1 et le modèle v1 pour mesurer ce que la v2 corrige.
 | `train_churn`, `train_clv` | `notebooks/04`, `notebooks/05` | Modèles v1 dans `data/model/` |
 | `scoring` | `notebooks/06_implementation_scoring.ipynb` | Règle de décision v1 |
 | `certification` | `notebooks/notebook_certifiant_churn_saas.ipynb` | Gold v2, modèles v2, `explication_reference.json`, figures, manifestes et métriques v2 |
+| `lots_simules` | `scripts/simuler_lots_mensuels.py` | Deux exports du mois suivant au format brut (`data/production/m1_stable/`, `m1_derive/`) et leur manifeste |
+| `cycles_simules` | `scripts/scorer_cycle.py`, une fois par lot | Scores par compte, variables et dérive de chaque cycle, `journal_scores.jsonl` |
 
 Chaque étape écrit la version exécutée de son notebook dans `reports/notebooks/` : c'est la preuve
 d'exécution consultable sur GitHub. L'étape `certification` dépend aussi du code qu'elle importe
@@ -86,7 +91,7 @@ Notebook §7.11 : chaque état de la donnée, de l'export brut aux scores.
 | Portique RGPD | Manifeste JSON ; pseudonymisation hors Git et hors DVC | Clé conservée en local uniquement | Équipe data, DPO |
 | Bronze, Silver, Gold v2 | Parquet versionné par DVC ; manifestes et empreintes dans Git | Toutes les versions | Équipe data |
 | Modèles et règle de décision | joblib et manifestes, runs MLflow | Version en service et précédentes | Équipe data |
-| Scores du cycle | Export de 5 colonnes vers le CRM | Écrasés à chaque cycle | Équipes CS |
+| Scores du cycle | Export de 5 colonnes vers le CRM ; scores par compte dans `data/production/scores/` | 3 derniers cycles, le temps d'observer l'issue (proposition à valider par le DPO) ; journal des cycles sans donnée par compte | Équipes CS, équipe data |
 
 - **Stockage** : le Parquet en stockage objet suffit à 5 000 comptes traités par lots mensuels ;
   une base relationnelle ne deviendrait utile que pour un scoring en continu

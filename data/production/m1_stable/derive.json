@@ -1,0 +1,74 @@
+{
+  "reference": "split train du Gold v2",
+  "seuil_alerte_psi": 0.25,
+  "variables": {
+    "anciennete_mois": {
+      "psi": 0.0141,
+      "ks_pvalue": 0.0
+    },
+    "sieges_souscrits": {
+      "psi": 0.0004,
+      "ks_pvalue": 0.9997
+    },
+    "utilisateurs_actifs": {
+      "psi": 0.0013,
+      "ks_pvalue": 0.9968
+    },
+    "taux_adoption_pct": {
+      "psi": 0.0003,
+      "ks_pvalue": 1.0
+    },
+    "connexions_30j": {
+      "psi": 0.0008,
+      "ks_pvalue": 0.9992
+    },
+    "heures_usage_30j": {
+      "psi": 0.0006,
+      "ks_pvalue": 0.9905
+    },
+    "fonctionnalites_total": {
+      "psi": 0.0001,
+      "ks_pvalue": 1.0
+    },
+    "fonctionnalites_utilisees": {
+      "psi": 0.0002,
+      "ks_pvalue": 1.0
+    },
+    "nb_integrations": {
+      "psi": 0.0005,
+      "ks_pvalue": 1.0
+    },
+    "derniere_connexion_jours": {
+      "psi": 0.0002,
+      "ks_pvalue": 1.0
+    },
+    "tickets_support_90j": {
+      "psi": 0.0002,
+      "ks_pvalue": 1.0
+    },
+    "delai_reponse_support_h": {
+      "psi": 0.0006,
+      "ks_pvalue": 1.0
+    },
+    "csat": {
+      "psi": 0.0007,
+      "ks_pvalue": 1.0
+    },
+    "retards_paiement_12m": {
+      "psi": 0.0096,
+      "ks_pvalue": 0.0273
+    },
+    "revenu_mensuel_recurrent_eur": {
+      "psi": 0.0003,
+      "ks_pvalue": 1.0
+    },
+    "taux_utilisation_fonctionnalites": {
+      "psi": 0.0003,
+      "ks_pvalue": 1.0
+    },
+    "taux_retard_paiement_par_mois": {
+      "psi": 0.0043,
+      "ks_pvalue": 0.0939
+    }
+  }
+}

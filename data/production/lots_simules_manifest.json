@@ -1,0 +1,40 @@
+{
+  "objet": "exports CRM simulés du mois suivant (M+1), au format de l'export brut",
+  "genere_le_utc": "2026-10-02T09:26:46.326360+00:00",
+  "source": "Examen_cas d'usage candidat/churn_saas_complet.csv",
+  "sha256_source": "2fc45e8c3c74d3ddcdbda162c5bb50184587201b46d877cc06742afd13063844",
+  "sha256_catalogue": "c94f6f52652532c578cb7a44d752b8b197ef84f5e6c6e17a58579fa195e9ad08",
+  "graine": 42,
+  "comptes": "les comptes de la table Silver (doublons retirés), reconduits un mois plus tard ; population non renouvelée (simplification)",
+  "evolution_commune": {
+    "anciennete_mois": "+1",
+    "bruit_usage": {
+      "connexions_30j": "x lognormal(0, 0.05)",
+      "heures_usage_30j": "x lognormal(0, 0.05)",
+      "tickets_support_90j": "x lognormal(0, 0.05)"
+    }
+  },
+  "derive_engagement_m1_derive": {
+    "derniere_connexion_jours": "+30 jours",
+    "nb_integrations": "-1 (minimum 0)",
+    "csat": "-1 point (minimum 1)",
+    "heures_usage_30j": "x 0,6"
+  },
+  "colonnes_vides": [
+    "sante_compte_fin_periode",
+    "valeur_vie_client_eur",
+    "churn"
+  ],
+  "lots": {
+    "m1_stable": {
+      "chemin": "data/production/m1_stable/export_crm.csv",
+      "lignes": 5000,
+      "sha256": "04b3db328dd802bcf376e188cb30f2c8e8c60bb4dd690e3ba4b3adc562fbb491"
+    },
+    "m1_derive": {
+      "chemin": "data/production/m1_derive/export_crm.csv",
+      "lignes": 5000,
+      "sha256": "d9d37d78585b3412f8a94206b40fe2d87b7e55912e239e398d9d87df57af5f27"
+    }
+  }
+}

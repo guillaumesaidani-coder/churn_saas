@@ -178,3 +178,52 @@ stages:
           cache: false
       - data/model_v2/metrics_clv.json:
           cache: false
+
+  # Production simulée (lot 1) : deux exports CRM du mois suivant au format brut, puis leur
+  # scoring par la même chaîne qu'à l'entraînement, avec journal des scores et dérive par cycle.
+  # En production réelle, le journal s'allonge à chaque cycle ; ici, l'étape rejoue les deux
+  # cycles simulés de zéro (DVC supprime les sorties avant de relancer l'étape).
+  lots_simules:
+    cmd: python scripts/simuler_lots_mensuels.py
+    deps:
+      - scripts/simuler_lots_mensuels.py
+      - src/production.py
+      - src/bronze.py
+      - src/silver.py
+      - Examen_cas d'usage candidat/churn_saas_complet.csv
+      - Examen_cas d'usage candidat/catalogue_plans.csv
+    outs:
+      - data/production/m1_stable/export_crm.csv
+      - data/production/m1_derive/export_crm.csv
+      - data/production/lots_simules_manifest.json:
+          cache: false
+
+  cycles_simules:
+    cmd:
+      - python scripts/scorer_cycle.py --cycle m1_stable --export data/production/m1_stable/export_crm.csv
+      - python scripts/scorer_cycle.py --cycle m1_derive --export data/production/m1_derive/export_crm.csv
+    deps:
+      - scripts/scorer_cycle.py
+      - src/production.py
+      - src/scoring.py
+      - src/features.py
+      - src/silver.py
+      - src/drift.py
+      - data/production/m1_stable/export_crm.csv
+      - data/production/m1_derive/export_crm.csv
+      - Examen_cas d'usage candidat/catalogue_plans.csv
+      - data/model_v2/model.joblib
+      - data/model_v2/model_clv.joblib
+      - data/model_v2/scoring_manifest.json
+      - data/model_v2/model_manifest.json
+      - data/gold/clients_churn_gold_v2.parquet
+    outs:
+      - data/production/scores
+      - data/production/m1_stable/features.parquet
+      - data/production/m1_derive/features.parquet
+      - data/production/m1_stable/derive.json:
+          cache: false
+      - data/production/m1_derive/derive.json:
+          cache: false
+      - data/production/journal_scores.jsonl:
+          cache: false
