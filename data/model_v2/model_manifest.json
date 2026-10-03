@@ -1,8 +1,8 @@
 {
   "couche": "model",
   "version": "v2.1",
-  "processed_at_utc": "2026-10-03T13:41:56.307105+00:00",
-  "commit_git": "334f698",
+  "processed_at_utc": "2026-10-03T15:51:57.770432+00:00",
+  "commit_git": "1aaf3f3",
   "gold_version": "v2.1",
   "gold_sha256": "0dcb0bbd659c6479569accc19cde05629fe20acfbfdc43e3194d3af9abd1f865",
   "modele_retenu": "Régression logistique",
