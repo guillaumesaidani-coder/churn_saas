@@ -2,7 +2,7 @@
 type: référence
 statut: à jour
 mise_a_jour: 2026-10-03
-sources: document de cadrage de l'atelier n°1 (non publié) pour H01 à H04 ; notebook §12.3 pour H05 ; énoncé du cas d'usage et réponse du formateur (2026-10-03) pour H06
+sources: document de cadrage de l'atelier n°1 (non publié) pour H01 à H04 ; notebook §12.3 pour H05 ; énoncé du cas d'usage et réponse du formateur (2026-10-03) pour H06 ; notebook §2.6
 ---
 
 [← Documentation](../index.md)
@@ -29,7 +29,7 @@ comme un fait mesuré.
 les données, pas une hypothèse ; elle sert de coût d'un faux négatif dans l'analyse de coût
 (§9.5).
 
-## Indice dans les données pour H06
+## Indice dans les données pour H06 ; notebook §2.6
 
 Taux de churn selon l'ancienneté (table Silver, 5 000 comptes) :
 

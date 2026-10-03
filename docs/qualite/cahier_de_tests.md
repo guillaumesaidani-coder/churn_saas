@@ -16,7 +16,7 @@ obtenus sur ce dépôt ; les commandes permettent de les reproduire.
 
 | Niveau | Quoi | Quand | Commande |
 |---|---|---|---|
-| 1. Tests unitaires | 214 tests sur données synthétiques, sans secret ni données réelles | À chaque push (CI), en local à chaque modification | `python -m pytest -q` |
+| 1. Tests unitaires | 215 tests sur données synthétiques, sans secret ni données réelles | À chaque push (CI), en local à chaque modification | `python -m pytest -q` |
 | 2. Vérifications du notebook | 10 assertions sur le livrable réel (§15.3) : le notebook s'arrête si l'une échoue | À chaque `dvc repro -s certification` | `dvc repro -s certification` |
 | 3. Test de fumée de l'image | Construction de l'image avec les vrais modèles, puis `/ready` | À chaque push (CI, si le secret DagsHub est configuré) | Voir [intégration continue](integration_continue.md) |
 
@@ -32,14 +32,14 @@ obtenus sur ce dépôt ; les commandes permettent de les reproduire.
 | Suivi MLflow | [`test_tracking.py`](../../tests/test_tracking.py) | 10 | Résolution du store (local ou distant), runs, métriques, artefacts |
 | Système de décision | [`test_scoring.py`](../../tests/test_scoring.py) | 22 | Perte attendue, seuil D9, priorités et rang D14/D10, filet de sécurité D14, actions D11, conformité D3 |
 | Explicabilité | [`test_explain.py`](../../tests/test_explain.py) | 26 | Décomposition exacte, explication d'un compte, trace de la décision (filet D14 compris), 5 contrôles, attribution de dérive, **cohérence de la base de connaissance avec le code** |
-| API | [`test_api.py`](../../tests/test_api.py) | 27 | Santé, disponibilité, authentification, service fermé sans `API_KEY`, calcul bout en bout, neutralisation des retards impossibles, validation des entrées (variable inconnue, type, bornes), taille de requête, limite de débit, métriques, explications, garde-fous de `/ready` (base de connaissance, empreinte certifiée) |
+| API | [`test_api.py`](../../tests/test_api.py) | 28 | Santé, disponibilité, authentification, service fermé sans `API_KEY`, calcul bout en bout, neutralisation des retards impossibles, validation des entrées (variable inconnue, type, bornes), taille de requête, limite de débit, métriques, explications, garde-fous de `/ready` (base de connaissance, empreinte certifiée), requête sans variable catégorielle |
 | Validation des entrées | [`test_validation.py`](../../tests/test_validation.py) | 14 | Une borne physique par variable numérique, valeurs refusées et acceptées, troncature des erreurs, aucune valeur du Gold v2 refusée |
 | Dérive | [`test_drift.py`](../../tests/test_drift.py) | 7 | PSI et KS sur distributions identiques et décalées, bornes figées sur la référence, valeurs manquantes |
 | Production simulée | [`test_production.py`](../../tests/test_production.py) | 14 | Lots M+1 (format brut, étiquettes vides, ancienneté + 1, baisse d'engagement, déterminisme, lot stable sans dérive et lot dérivé en alerte, relecture par la chaîne d'entraînement), scoring d'un cycle, journal des scores (traçabilité, aucune donnée par compte, rejeu d'un cycle), purge du suivi (2 cycles), cycle courant de l'exporteur |
 | Mesure d'impact | [`test_mesure_impact.py`](../../tests/test_mesure_impact.py) | 16 | Tirage D12 (effectifs B et D, renforts, 150 appels, aucun compte Haute sans action, reproductibilité), suivi minimal, rapprochement (taux, écarts et intervalles, rappel réel et son déclencheur, recette D15 (b') et (c'), écarts au protocole, aucune donnée par compte), consolidation D13, complément du journal |
 | Évaluation et promotion | [`test_evaluation.py`](../../tests/test_evaluation.py) | 16 | Métriques et baseline D8, critères de promotion (un par un), reproduction des métriques publiées, trois décisions (refus, champion conservé, promouvable), déclencheurs (dérive du top 5, volume, rappel réel) |
 | Ré-entraînement | [`test_reentrainement.py`](../../tests/test_reentrainement.py) | 9 | Trois familles de challengers, découpage, seuil D9 hors pli, contrôles complets ou limités, ré-entraînement à l'identique sans promotion, journal des décisions en ajout |
-| **Total** | | **214** | |
+| **Total** | | **215** | |
 
 Les tests n'utilisent jamais les données réelles ni les `.joblib` : ils construisent des données
 synthétiques ou des modèles factices dont on connaît le résultat attendu. Ils tournent donc en CI

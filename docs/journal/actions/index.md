@@ -42,6 +42,7 @@ certification.
 - [2.28 Arbitrages : échéance mensuelle, conservation, filet, recette, groupe témoin (2026-10-03)](2.28_arbitrages_h06_d12_d14_d15.md)
 - [2.29 Lot 2 : déclencheurs, challenger contre modèle en service, évaluation en CI, revue trimestrielle (2026-10-03)](2.29_lot2_reentrainement.md)
 - [2.30 Lot 3 : robustesse, sécurité et déploiement continu (2026-10-03)](2.30_lot3_robustesse_deploiement.md)
+- [2.31 Lot 4 : notebook mis à jour, rejeu officiel, un défaut de l'API corrigé (2026-10-03)](2.31_lot4_notebook_rejeu.md)
 
 ---
 

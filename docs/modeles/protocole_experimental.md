@@ -1,7 +1,7 @@
 ---
 type: explication
 statut: à jour
-mise_a_jour: 2026-10-01
+mise_a_jour: 2026-10-03
 sources: notebook §1, §8 (dont §8.5 et §8.6) et §9
 ---
 
@@ -40,7 +40,7 @@ choix (variables, famille de modèle, hyperparamètres, seuil de décision) sont
 | Réglage | Recherche sur grille de la régularisation `C` en validation croisée | §9.1 |
 | Seuil de décision | Calculé sur des **prédictions hors pli** de l'entraînement ([D9](../cadrage/decisions/D09.md)) | §9.2 |
 | Évaluation finale | Une seule fois sur le test : PR-AUC, ROC-AUC, matrices de confusion, critère D8 | §9.3 |
-| Calibration | Courbe de calibration et score de Brier | §9.4 |
+| Calibration | Courbe de calibration, score de Brier, ECE ; recalibration (Platt, isotonique) comparée, non retenue | §9.4 |
 | Explicabilité | Coefficients, importance par permutation, contrôles par la base de connaissance | §9.6 |
 
 ## Résultats du choix

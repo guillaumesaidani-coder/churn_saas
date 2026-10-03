@@ -242,6 +242,16 @@ class TestExplications:
         assert "« Premium » inconnue du modèle" in avertissements and "manquante" in avertissements
 
 
+class TestVariableCategorielleAbsente:
+    def test_requete_sans_variable_categorielle(self, client_explicable):
+        """Défaut corrigé au lot 4 : sans `plan` dans toute la requête, la colonne vide était de
+        type numérique et l'encodeur one-hot levait une erreur (500)."""
+        payload = {"clients": [{"client_id": "CLI-1", "features": {"derniere_connexion_jours": 40}}]}
+        response = client_explicable.post("/score-batch?explain=true", json=payload, headers=_headers())
+        assert response.status_code == 200
+        assert "manquante" in " ".join(response.json()["resultats"][0]["explication"]["avertissements"])
+
+
 class TestGardeFouBaseDeConnaissance:
     def test_ready_503_si_le_modele_contient_une_variable_exclue(self, artifacts_dir, client):
         (artifacts_dir / "model_manifest.json").write_text(

@@ -27,7 +27,7 @@ flowchart LR
 
 | Job | Étapes | Ce qu'il garantit |
 |---|---|---|
-| `tests` | Installation de l'environnement complet, lint `ruff check .` (règles par défaut, [`ruff.toml`](../../ruff.toml)), `python -m pytest -q` | Le code ne contient ni erreur de syntaxe, ni nom indéfini, ni import inutile ; les 214 tests passent sur Linux, Python 3.13 (le test qui lit le Gold v2 est sauté : pas de `dvc pull` dans ce job) |
+| `tests` | Installation de l'environnement complet, lint `ruff check .` (règles par défaut, [`ruff.toml`](../../ruff.toml)), `python -m pytest -q` | Le code ne contient ni erreur de syntaxe, ni nom indéfini, ni import inutile ; les 215 tests passent sur Linux, Python 3.13 (le test qui lit le Gold v2 est sauté : pas de `dvc pull` dans ce job) |
 | `docker` | `dvc pull` depuis DagsHub, **évaluation du modèle en service** sur le jeu de test (rapport `evaluation-modele` en artefact du run), construction de l'image d'exécution, démarrage, interrogation de `/ready` | Le modèle livré tient ses critères ([D8](../cadrage/decisions/D08.md), rappel au seuil [D9](../cadrage/decisions/D09.md), calibration, aucun contrôle bloquant) et redonne les métriques publiées dans `metrics.json` ; l'image démarre avec les **vrais** modèles v2 ; **sur un push sur `main`**, l'image testée est publiée sur GitHub Container Registry (`ghcr.io/guillaumesaidani-coder/churn_saas`), taguée par les 12 premiers caractères du commit et `latest` |
 
 ## Secret requis

@@ -47,7 +47,7 @@ from pydantic import BaseModel, Field
 
 from src.explain import (CHEMIN_BASE_DEFAUT, NOM_FICHIER_REFERENCE, charger_base_connaissance,
                          controler_exclusions, expliquer_batch)
-from src.features import neutraliser_incoherences
+from src.features import CATEGORIELLES_V2, neutraliser_incoherences
 from src.scoring import assigner_priorites, scorer_batch
 from src.validation import valider_entrees
 from src.versioning import sha256_of
@@ -312,6 +312,11 @@ def score_batch(payload: ScoreBatchRequest, explain: bool = False):
 
     client_ids = pd.Series([c.client_id for c in payload.clients])
     X = pd.DataFrame([c.features for c in payload.clients]).reindex(columns=_feature_columns)
+    # Une variable catégorielle absente de toute la requête devient une colonne vide de type
+    # numérique, que l'encodeur one-hot refuse : on la garde en type objet, comme à l'entraînement
+    # (valeur manquante -> modalité inconnue, ignorée par l'encodeur).
+    for colonne in set(CATEGORIELLES_V2) & set(X.columns):
+        X[colonne] = X[colonne].astype(object)
     X = neutraliser_incoherences(X)       # même règle qu'à l'entraînement (retards impossibles)
 
     resultats = scorer_batch(X, client_ids, _model_churn, _model_clv)

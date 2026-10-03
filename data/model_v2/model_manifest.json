@@ -1,8 +1,8 @@
 {
   "couche": "model",
   "version": "v2.1",
-  "processed_at_utc": "2026-10-01T12:45:51.128686+00:00",
-  "commit_git": "fee286e",
+  "processed_at_utc": "2026-10-03T11:14:11.485246+00:00",
+  "commit_git": "0ca94d1",
   "gold_version": "v2.1",
   "gold_sha256": "0dcb0bbd659c6479569accc19cde05629fe20acfbfdc43e3194d3af9abd1f865",
   "modele_retenu": "Régression logistique",
@@ -77,5 +77,9 @@
   "modele_clv": {
     "modele_retenu": "Gradient boosting",
     "cible": "log1p(valeur_vie_client_eur)"
+  },
+  "empreintes_sha256": {
+    "model.joblib": "bf74f0389bb44eb55f4f7f1d1f8305ad191a3342b399f3be99b76c486a884998",
+    "model_clv.joblib": "43246fe2eb12ed081c9e337170a70b7dd51ff5a45a547a61c259a4f8b5de6bfe"
   }
 }

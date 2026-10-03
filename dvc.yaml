@@ -154,6 +154,11 @@ stages:
       - src/api.py
       - src/versioning.py
       - src/explain.py
+      - src/production.py
+      - src/mesure_impact.py
+      - src/evaluation.py
+      - src/reentrainement.py
+      - src/validation.py
       - knowledge/base_connaissance.yaml
     outs:
       - data/gold/clients_churn_gold_v2.parquet
