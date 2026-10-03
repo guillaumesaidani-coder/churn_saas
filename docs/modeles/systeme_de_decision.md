@@ -1,7 +1,7 @@
 ---
 type: référence
 statut: à jour
-mise_a_jour: 2026-09-29
+mise_a_jour: 2026-10-03
 sources: src/scoring.py, data/model_v2/scoring_manifest.json ; notebook §10.2, §12.3 et §12.4
 ---
 
@@ -63,7 +63,7 @@ comptes). Même avec les hypothèses les plus prudentes (taux de succès des rel
 [H05](../cadrage/hypotheses.md), et relance à 150 €), le gain net estimé reste positif. Ces chiffres
 sont **estimés** : seul le groupe témoin ([D12](../cadrage/decisions/D12.md)) mesurera l'impact réel.
 
-## Recette D15 : partiellement satisfaite
+## Recette D15 : critère d'origine non respecté, critères révisés
 
 | Critère | Résultat |
 |---|---|
@@ -71,16 +71,18 @@ sont **estimés** : seul le groupe témoin ([D12](../cadrage/decisions/D12.md)) 
 | (b) Spearman ≥ 0,7 entre perte attendue et perte réelle | **0,29 : non respecté.** 72 % des pertes réelles sont nulles, ce qui écrase la corrélation globale ; parmi les comptes partis, Spearman ≈ 0,85 |
 | (c) Aucun faux négatif à forte perte réelle | **Non respecté** : 14 comptes, sans aucun signal de désengagement dans les données ([explication](../explicabilite/controles.md)) |
 
-**Propositions soumises au métier** (sans modifier le critère après coup) : remplacer (b) par la
-**part de la perte réelle captée par la priorité Haute** ; ajouter un **filet de sécurité** qui
-ferait passer en Moyenne les comptes sous le seuil dont la perte attendue dépasse celle du
-150ᵉ compte Haut. Ces deux évolutions touchent D14 et D15 : elles relèvent d'un arbitrage métier.
+**Arbitrage du 3 octobre** : (b) et (c) sont remplacés par (b') part de la perte réelle captée
+par la priorité Haute **≥ 75 %** (82 % sur le test) et (c') part des comptes partis à forte perte
+couverts par Haute ou Moyenne **≥ 85 %** (80 % sans filet, 91 % avec). Le **filet de sécurité**
+est adopté ([D14](../cadrage/decisions/D14.md)) : un compte sous le seuil passe en Moyenne si sa
+perte attendue dépasse celle du dernier compte Haute du lot. Les nouveaux critères valent à
+partir du premier cycle réel ([D15](../cadrage/decisions/D15.md)).
 
 ## Limites
 
 - La capacité s'applique au **lot scoré** : pour que « 150 » ait son sens, il faut scorer le cycle
   complet en un seul lot.
-- Un compte de très grande valeur mais sous le seuil n'entre jamais dans la liste (D14).
+- Le filet de sécurité ([D14](../cadrage/decisions/D14.md)) dépend de la taille du lot : 135 comptes ajoutés sur le cycle de test de 1 000 comptes, 38 sur le portefeuille complet de 5 000.
 - Seuil et capacité sont figés : ils doivent être revus à chaque ré-entraînement
   ([runbook](../exploitation/runbook.md)).
 

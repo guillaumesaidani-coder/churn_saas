@@ -2,12 +2,16 @@
 """Score un cycle mensuel à partir d'un export CRM brut, et le trace dans le journal des scores.
 
 Étapes : export brut -> même chaîne qu'à l'entraînement (`preparer_lot`) -> modèles v2 et règle
-de décision D9/D10/D14 (`scorer_cycle`) -> dérive des 17 variables numériques contre la
-référence (split `train` du Gold v2) -> fichiers du cycle et entrée de journal.
+de décision D9/D10/D14 avec filet (`scorer_cycle`) -> tirage des groupes de mesure D12
+(`tirer_groupes_d12`) -> dérive des 17 variables numériques contre la référence (split `train`
+du Gold v2) -> fichiers du cycle et entrée de journal.
 
 Écrit :
-- `<sortie>/scores/scores_<cycle>.parquet` : une ligne par compte (score, CLV estimée, perte
-  attendue, priorité, action) ; seuls les `--conserver` derniers cycles sont gardés ;
+- `<dossier de l'export>/liste_csm.parquet` : la liste transmise aux CSM, aux 5 colonnes de l'export
+  CRM (identifiant, score, CLV estimée, priorité, action ; l'action tient compte du groupe D12) ;
+- `<sortie>/scores/suivi_<cycle>.parquet` : le suivi de mesure par compte (identifiant, priorité,
+  groupe D12, bande autour du seuil ; ni probabilité ni variables) ; seuls les `--conserver`
+  derniers cycles sont gardés (2 : l'horizon d'un mois, H06, plus le cycle du rapprochement) ;
 - `<dossier de l'export>/features.parquet` : les 20 variables du cycle (lues par l'exporteur de
   dérive, `scripts/export_drift_metrics.py`) ;
 - `<dossier de l'export>/derive.json` : PSI et p-value KS par variable ;
@@ -32,9 +36,14 @@ from src.features import NUMERIQUES_V2  # noqa: E402
 from src.production import (  # noqa: E402
     ajouter_au_journal, entree_journal, preparer_lot, purger_scores, scorer_cycle,
 )
+from src.mesure_impact import (  # noqa: E402
+    graine_du_cycle, resume_groupes, suivi_du_cycle, tirer_groupes_d12,
+)
+from src.scoring import seuil_filet_d14  # noqa: E402
 from src.versioning import read_manifest  # noqa: E402
 
 PSI_SEUIL_ALERTE = 0.25   # même seuil que l'alerte Prometheus (drift_alert_rules.yml)
+COLONNES_LISTE_CSM = ["client_id", "score_churn", "valeur_vie_estimee_eur", "priorite", "action_recommandee"]
 
 
 def main() -> None:
@@ -45,8 +54,8 @@ def main() -> None:
     parser.add_argument("--model-dir", type=Path, default=Path("data/model_v2"))
     parser.add_argument("--gold", type=Path, default=Path("data/gold/clients_churn_gold_v2.parquet"))
     parser.add_argument("--sortie", type=Path, default=Path("data/production"))
-    parser.add_argument("--conserver", type=int, default=3,
-                        help="nombre de cycles dont les scores par compte sont conservés (défaut : 3)")
+    parser.add_argument("--conserver", type=int, default=2,
+                        help="nombre de cycles dont le suivi par compte est conservé (défaut : 2)")
     args = parser.parse_args()
 
     regle = read_manifest(args.model_dir / "scoring_manifest.json")["regle_decision"]
@@ -58,6 +67,8 @@ def main() -> None:
     X, client_ids = preparer_lot(args.export, catalogue)
     resultats = scorer_cycle(X, client_ids, joblib.load(chemin_churn), joblib.load(chemin_clv),
                              seuil_d9, capacite_d10)
+    graine = graine_du_cycle(args.cycle)
+    resultats = tirer_groupes_d12(resultats, graine)
 
     gold = pd.read_parquet(args.gold)
     derive = drift_table(gold[gold["split"] == "train"], X, NUMERIQUES_V2).set_index("feature")
@@ -70,24 +81,33 @@ def main() -> None:
          "variables": derive.round(4).to_dict(orient="index")},
         ensure_ascii=False, indent=2), encoding="utf-8")
 
+    resultats[COLONNES_LISTE_CSM].to_parquet(dossier_cycle / "liste_csm.parquet", index=False)
     dossier_scores = args.sortie / "scores"
     dossier_scores.mkdir(parents=True, exist_ok=True)
-    resultats.to_parquet(dossier_scores / f"scores_{args.cycle}.parquet", index=False)
+    suivi_du_cycle(resultats, args.cycle, seuil_d9).to_parquet(
+        dossier_scores / f"suivi_{args.cycle}.parquet", index=False)
 
     entree = entree_journal(
         args.cycle, resultats, export=args.export, modele_churn=chemin_churn, modele_clv=chemin_clv,
         gold_sha256=gold_sha256, seuil_d9=seuil_d9, capacite_d10=capacite_d10,
         psi_max=derive["psi"].max(), variables_en_alerte=en_alerte)
+    filet = seuil_filet_d14(resultats)
+    entree.update({
+        "filet_D14": {"comptes": int(resultats["filet_D14"].sum()),
+                      "seuil_perte_attendue_eur": None if filet is None else round(filet, 0)},
+        "protocole_D12": {"graine": graine, "effectifs": resume_groupes(resultats)},
+    })
     journal = ajouter_au_journal(args.sortie / "journal_scores.jsonl", entree)
     purges = purger_scores(dossier_scores, [e["cycle"] for e in journal], args.conserver)
 
     print(f"Cycle {args.cycle} : {entree['comptes_scores']} comptes, {entree['comptes_signales']} signalés "
           f"({entree['part_signales']:.0%}), {entree['priorite_haute']} en priorité haute ; "
           f"modèle {entree['version_modele_churn']}")
+    print(f"Filet D14 : {entree['filet_D14']['comptes']} comptes ; groupes D12 : {entree['protocole_D12']['effectifs']}")
     print(f"Dérive : PSI max {entree['psi_max']:.3f} ; variables en alerte (PSI > {PSI_SEUIL_ALERTE}) : "
           f"{en_alerte or 'aucune'}")
     if purges:
-        print(f"Scores par compte purgés (plus de {args.conserver} cycles) : {purges}")
+        print(f"Suivi par compte purgé (plus de {args.conserver} cycles) : {purges}")
 
 
 if __name__ == "__main__":

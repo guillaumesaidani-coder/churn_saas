@@ -1,7 +1,7 @@
 ---
 type: explication
 statut: à jour
-mise_a_jour: 2026-10-02
+mise_a_jour: 2026-10-03
 sources: notebook §3.2, §4 (dont §4.5 et §4.6) et §12.5 ; data/rgpd/rgpd_gate_manifest.json
 ---
 
@@ -33,9 +33,9 @@ publiées** : exclues de Git et du cache DVC (voir [`.gitignore`](../../.gitigno
 |---|---|
 | **Base légale** (art. 6) | Intérêt légitime de l'éditeur à assurer la continuité de la relation contractuelle B2B ([D6](../cadrage/decisions/D06.md)) |
 | **Finalité** (art. 5.1.b) | Priorisation des actions de rétention uniquement ; tout autre usage (évaluation d'un CSM, scoring commercial) exigerait une nouvelle analyse |
-| **Minimisation** (art. 5.1.c) | Données agrégées au compte ([D1](../cadrage/decisions/D01.md)) ; texte libre exclu ([D7](../cadrage/decisions/D07.md)) ; export CRM limité à 5 colonnes |
+| **Minimisation** (art. 5.1.c) | Données agrégées au compte ([D1](../cadrage/decisions/D01.md)) ; texte libre exclu ([D7](../cadrage/decisions/D07.md)) ; export CRM limité à 5 colonnes ; suivi de mesure limité à l'identifiant, la priorité et le groupe D12 |
 | **Décision automatisée** (art. 22) | Score et recommandation, **jamais d'action exécutée** ([D3](../cadrage/decisions/D03.md)) : vérifié par un test automatique |
-| **Registre de traitement** (art. 30) | Texte proposé (finalité, base légale, données, conservation, destinataires : équipes CS), rédigé à titre d'exercice ([H04](../cadrage/hypotheses.md)). Conservation des scores : écrasés à chaque cycle dans le texte initial ; le journal des scores (2 octobre) propose de garder les scores par compte 3 cycles pour mesurer les comptes sauvés ([D12](../cadrage/decisions/D12.md)), à faire valider par le DPO avant d'amender le registre |
+| **Registre de traitement** (art. 30) | Texte proposé (finalité, base légale, données, conservation, destinataires : équipes CS), rédigé à titre d'exercice ([H04](../cadrage/hypotheses.md)). Conservation : écrasés à chaque cycle dans le texte initial. Amendement proposé le 3 octobre, à faire valider par le DPO : un **suivi par compte** (identifiant, priorité, signalé ou non, filet, groupe D12, bande autour du seuil ; ni probabilité ni variables) est conservé **2 cycles**, soit l'horizon de la cible (1 mois, [H06](../cadrage/hypotheses.md)) plus le cycle du rapprochement, puis purgé automatiquement ; seuls des agrégats restent au journal. Nouvelle finalité à inscrire : **mesure d'impact** par tirage aléatoire de groupes témoins ([D12](../cadrage/decisions/D12.md)) |
 
 Restent à faire côté client, selon le manifeste RGPD : documenter formellement base légale et
 finalité, rédiger le registre, vérifier le contrat de sous-traitance en cas d'hébergement tiers

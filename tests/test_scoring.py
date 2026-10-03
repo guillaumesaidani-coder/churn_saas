@@ -15,6 +15,7 @@ from src.scoring import (
     calibrer_seuil_d9,
     recommander_action,
     scorer_batch,
+    seuil_filet_d14,
 )
 
 
@@ -137,6 +138,40 @@ class TestAssignerPriorites:
         out = assigner_priorites(resultats, seuil_d9=0.5, capacite_haute=10)
 
         assert out.loc[0, "action_recommandee"] == recommander_action("Haute")
+
+
+class TestFiletD14:
+    """Filet de sécurité D14 (2026-10-03) : un compte sous le seuil dont la perte attendue dépasse
+    celle du dernier compte Haute passe en Moyenne."""
+
+    @pytest.fixture
+    def resultats(self):
+        return pd.DataFrame({
+            "client_id": ["A", "B", "C", "D", "E"],
+            "score_churn": [0.9, 0.8, 0.7, 0.3, 0.2],   # D et E sous le seuil D9 de 0,5
+            "perte_attendue_eur": [100, 500, 300, 400, 200],
+        })
+
+    def test_gros_compte_sous_le_seuil_passe_en_moyenne(self, resultats):
+        out = assigner_priorites(resultats, seuil_d9=0.5, capacite_haute=2).set_index("client_id")
+        # Dernier compte Haute : C, perte 300. D (400) passe le filet, E (200) non.
+        assert out["priorite"].to_dict() == {"A": "Moyenne", "B": "Haute", "C": "Haute", "D": "Moyenne", "E": "Basse"}
+        assert out["filet_D14"].to_dict() == {"A": False, "B": False, "C": False, "D": True, "E": False}
+        assert out.loc["D", "action_recommandee"] == recommander_action("Moyenne")
+        assert not out.loc["D", "signale_D9"] and pd.isna(out.loc["D", "rang_perte_attendue"])
+
+    def test_filet_desactivable_rend_la_regle_d_origine(self, resultats):
+        out = assigner_priorites(resultats, seuil_d9=0.5, capacite_haute=2, filet_d14=False).set_index("client_id")
+        assert out.loc["D", "priorite"] == "Basse" and not out["filet_D14"].any()
+
+    def test_pas_de_filet_sans_compte_haute(self, resultats):
+        out = assigner_priorites(resultats, seuil_d9=0.95, capacite_haute=2)
+        assert (out["priorite"] == "Basse").all() and not out["filet_D14"].any()
+        assert seuil_filet_d14(out) is None
+
+    def test_seuil_du_filet_suit_le_lot(self, resultats):
+        assert seuil_filet_d14(assigner_priorites(resultats, seuil_d9=0.5, capacite_haute=2)) == 300
+        assert seuil_filet_d14(assigner_priorites(resultats, seuil_d9=0.5, capacite_haute=1)) == 500
 
 
 class TestRecommanderAction:

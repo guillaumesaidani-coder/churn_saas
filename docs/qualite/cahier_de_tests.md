@@ -1,7 +1,7 @@
 ---
 type: référence
 statut: à jour
-mise_a_jour: 2026-09-29
+mise_a_jour: 2026-10-03
 remplace: archives/v1/cahier_de_tests_churn_saas.md
 public: évaluateurs, formateur, contributeurs
 sources: tests/, notebook §15.3, .github/workflows/ci.yml
@@ -16,7 +16,7 @@ obtenus sur ce dépôt ; les commandes permettent de les reproduire.
 
 | Niveau | Quoi | Quand | Commande |
 |---|---|---|---|
-| 1. Tests unitaires | 142 tests sur données synthétiques, sans secret ni données réelles | À chaque push (CI), en local à chaque modification | `python -m pytest -q` |
+| 1. Tests unitaires | 161 tests sur données synthétiques, sans secret ni données réelles | À chaque push (CI), en local à chaque modification | `python -m pytest -q` |
 | 2. Vérifications du notebook | 10 assertions sur le livrable réel (§15.3) : le notebook s'arrête si l'une échoue | À chaque `dvc repro -s certification` | `dvc repro -s certification` |
 | 3. Test de fumée de l'image | Construction de l'image avec les vrais modèles, puis `/ready` | À chaque push (CI, si le secret DagsHub est configuré) | Voir [intégration continue](integration_continue.md) |
 
@@ -30,12 +30,13 @@ obtenus sur ce dépôt ; les commandes permettent de les reproduire.
 | Gold v1 | [`test_gold.py`](../../tests/test_gold.py) | 13 | Ratios, sélection des variables, découpage, détection de fuite (AUC) et des leurres |
 | Variables v2 | [`test_features.py`](../../tests/test_features.py) | 10 | Recalcul du taux d'adoption, neutralisation des retards de paiement impossibles (v2.1), construction des 20 variables |
 | Suivi MLflow | [`test_tracking.py`](../../tests/test_tracking.py) | 10 | Résolution du store (local ou distant), runs, métriques, artefacts |
-| Système de décision | [`test_scoring.py`](../../tests/test_scoring.py) | 18 | Perte attendue, seuil D9, priorités et rang D14/D10, actions D11, conformité D3 |
-| Explicabilité | [`test_explain.py`](../../tests/test_explain.py) | 25 | Décomposition exacte, explication d'un compte, trace de la décision, 5 contrôles, attribution de dérive, **cohérence de la base de connaissance avec le code** |
+| Système de décision | [`test_scoring.py`](../../tests/test_scoring.py) | 22 | Perte attendue, seuil D9, priorités et rang D14/D10, filet de sécurité D14, actions D11, conformité D3 |
+| Explicabilité | [`test_explain.py`](../../tests/test_explain.py) | 26 | Décomposition exacte, explication d'un compte, trace de la décision (filet D14 compris), 5 contrôles, attribution de dérive, **cohérence de la base de connaissance avec le code** |
 | API | [`test_api.py`](../../tests/test_api.py) | 16 | Santé, disponibilité, authentification, calcul bout en bout, neutralisation des retards impossibles, taille de requête, limite de débit, métriques, explications, garde-fou de `/ready` |
 | Dérive | [`test_drift.py`](../../tests/test_drift.py) | 7 | PSI et KS sur distributions identiques et décalées, bornes figées sur la référence, valeurs manquantes |
-| Production simulée | [`test_production.py`](../../tests/test_production.py) | 13 | Lots M+1 (format brut, étiquettes vides, ancienneté + 1, baisse d'engagement, déterminisme, lot stable sans dérive et lot dérivé en alerte, relecture par la chaîne d'entraînement), scoring d'un cycle, journal des scores (traçabilité, aucune donnée par compte, rejeu d'un cycle), purge des scores, cycle courant de l'exporteur |
-| **Total** | | **142** | |
+| Production simulée | [`test_production.py`](../../tests/test_production.py) | 14 | Lots M+1 (format brut, étiquettes vides, ancienneté + 1, baisse d'engagement, déterminisme, lot stable sans dérive et lot dérivé en alerte, relecture par la chaîne d'entraînement), scoring d'un cycle, journal des scores (traçabilité, aucune donnée par compte, rejeu d'un cycle), purge du suivi (2 cycles), cycle courant de l'exporteur |
+| Mesure d'impact | [`test_mesure_impact.py`](../../tests/test_mesure_impact.py) | 13 | Tirage D12 (effectifs B et D, renforts, 150 appels, aucun compte Haute sans action, reproductibilité), suivi minimal, rapprochement (taux, écarts et intervalles, rappel réel, aucune donnée par compte), consolidation D13, complément du journal |
+| **Total** | | **161** | |
 
 Les tests n'utilisent jamais les données réelles ni les `.joblib` : ils construisent des données
 synthétiques ou des modèles factices dont on connaît le résultat attendu. Ils tournent donc en CI
@@ -79,6 +80,6 @@ requête sans clé (§10.4).
   dérive.
 - **Les notebooks v1 (01 à 06) gardent leur propre copie de la logique** : seul `src/` est couvert
   par les tests. Le notebook de certification, lui, importe `src/`.
-- **Pas de mesure d'impact** post-déploiement ([D12](../cadrage/decisions/D12.md)).
+- **Mesure d'impact outillée mais jamais exécutée sur des issues réelles** ([D12](../cadrage/decisions/D12.md)) : les tests portent sur des issues fabriquées.
 
 Voir aussi : [intégration continue](integration_continue.md) · [guide de démarrage](../exploitation/guide_de_demarrage.md)

@@ -39,6 +39,7 @@ certification.
 - [2.25 Gap analysis face à InduSense, lot 0 : corrections immédiates (2026-10-01)](2.25_gap_analysis_lot0.md)
 - [2.26 Lot 3 bis : couverture des indicateurs de la grille d'évaluation (2026-10-01)](2.26_lot3bis_couverture_grille.md)
 - [2.27 Lot 1 : production simulée, journal des scores, alerte de dérive prouvée (2026-10-02)](2.27_lot1_production_simulee.md)
+- [2.28 Arbitrages : échéance mensuelle, conservation, filet, recette, groupe témoin (2026-10-03)](2.28_arbitrages_h06_d12_d14_d15.md)
 
 ---
 

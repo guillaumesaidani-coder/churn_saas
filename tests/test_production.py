@@ -174,13 +174,19 @@ class TestJournal:
         assert lire_journal(journal) == entrees
 
     def test_purge_ne_garde_que_les_derniers_cycles(self, tmp_path):
+        """Conservation de 2 cycles (H06 : issue connue au cycle suivant, puis rapprochement)."""
         cycles = ["2026-08", "2026-09", "2026-10", "2026-11"]
         for cycle in cycles:
-            (tmp_path / f"scores_{cycle}.parquet").write_bytes(b"x")
-        purges = purger_scores(tmp_path, cycles, conserver=3)
-        assert purges == ["2026-08"]
-        assert sorted(p.stem for p in tmp_path.glob("*.parquet")) == [f"scores_{c}" for c in cycles[1:]]
+            (tmp_path / f"suivi_{cycle}.parquet").write_bytes(b"x")
+        purges = purger_scores(tmp_path, cycles, conserver=2)
+        assert purges == ["2026-08", "2026-09"]
+        assert sorted(p.stem for p in tmp_path.glob("*.parquet")) == [f"suivi_{c}" for c in cycles[2:]]
 
+    def test_purge_ignore_les_autres_fichiers(self, tmp_path):
+        (tmp_path / "liste_csm.parquet").write_bytes(b"x")
+        (tmp_path / "suivi_2026-08.parquet").write_bytes(b"x")
+        assert purger_scores(tmp_path, ["2026-09"], conserver=2) == ["2026-08"]
+        assert (tmp_path / "liste_csm.parquet").exists()
 
 def charger_exporteur():
     spec = importlib.util.spec_from_file_location("export_drift_metrics", RACINE / "scripts" / "export_drift_metrics.py")

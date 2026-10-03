@@ -434,8 +434,8 @@ stages:
       size: 2290
     - path: src/production.py
       hash: md5
-      md5: 8a277ac8d12f45167f9c12182155e3aa
-      size: 9464
+      md5: 807722aa99ed7c4c435c7a8ea1168b39
+      size: 9547
     - path: src/silver.py
       hash: md5
       md5: 2754b0cf2c55f474210fa649c8731ae1
@@ -443,7 +443,7 @@ stages:
     outs:
     - path: data/production/lots_simules_manifest.json
       hash: md5
-      md5: da62d8e6035aa164b31049473374d904
+      md5: 9c757f4cca988da35bac270aeaccc29c
       size: 1511
     - path: data/production/m1_derive/export_crm.csv
       hash: md5
@@ -494,8 +494,8 @@ stages:
       size: 664306
     - path: scripts/scorer_cycle.py
       hash: md5
-      md5: f1f935fc060a529da5954c52ecd268e8
-      size: 4912
+      md5: 151a735e831a2fb2fb5b7453962d56a8
+      size: 6238
     - path: src/drift.py
       hash: md5
       md5: ebb4e5c2cb4a3cdcb42279bb37a89933
@@ -504,14 +504,18 @@ stages:
       hash: md5
       md5: 7d1335d3dc6215bdeb3533e83f730366
       size: 4575
+    - path: src/mesure_impact.py
+      hash: md5
+      md5: d202db22a54125602e2282a05c5ea4a0
+      size: 9471
     - path: src/production.py
       hash: md5
-      md5: 8a277ac8d12f45167f9c12182155e3aa
-      size: 9464
+      md5: 807722aa99ed7c4c435c7a8ea1168b39
+      size: 9547
     - path: src/scoring.py
       hash: md5
-      md5: db6247d75299722fa5ea1012c746a259
-      size: 4463
+      md5: 436623d5635302ac83e91146054afd02
+      size: 5417
     - path: src/silver.py
       hash: md5
       md5: 2754b0cf2c55f474210fa649c8731ae1
@@ -519,8 +523,8 @@ stages:
     outs:
     - path: data/production/journal_scores.jsonl
       hash: md5
-      md5: 81d9251103bdf2bccda8d2d441ad053e
-      size: 1353
+      md5: 7ceef60d402cf25c9dc6fadcd2ea2a5f
+      size: 1939
     - path: data/production/m1_derive/derive.json
       hash: md5
       md5: 4d0c9ada2e5e9606b2e09672ed40a169
@@ -529,6 +533,10 @@ stages:
       hash: md5
       md5: 68751969f0c5d4f003edc72892a549d0
       size: 162191
+    - path: data/production/m1_derive/liste_csm.parquet
+      hash: md5
+      md5: 336de75bcdb3a45b24083749c683f1f9
+      size: 80879
     - path: data/production/m1_stable/derive.json
       hash: md5
       md5: 07e16f26dee0509ef72a4d2fb929180f
@@ -537,8 +545,12 @@ stages:
       hash: md5
       md5: ab5f00939e1d3f35a68b79e853c850a9
       size: 164253
+    - path: data/production/m1_stable/liste_csm.parquet
+      hash: md5
+      md5: 816623885a366fc42537fe93e77e9886
+      size: 80268
     - path: data/production/scores
       hash: md5
-      md5: ad6e9a9ac7c0044058b2ca9dd012706e.dir
-      size: 248046
+      md5: 02375fe2d9582ea9ea53e4666668173d.dir
+      size: 81594
       nfiles: 2

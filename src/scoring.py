@@ -60,27 +60,45 @@ def calibrer_seuil_d9(y_true, score_churn, rappel_cible: float = 0.80) -> float:
     return float(max(seuils_valides)) if seuils_valides else 0.0
 
 
-def assigner_priorites(resultats: pd.DataFrame, seuil_d9: float, capacite_haute: int) -> pd.DataFrame:
+def assigner_priorites(resultats: pd.DataFrame, seuil_d9: float, capacite_haute: int,
+                       filet_d14: bool = True) -> pd.DataFrame:
     """NB06 §2. D9 (signalement par seuil de rappel) + D10 (capacité CSM mensuelle) + D14
     (tri par perte attendue) -> 3 tiers. `resultats` doit contenir `client_id`, `score_churn`,
-    `perte_attendue_eur` (sortie de `scorer_batch`)."""
+    `perte_attendue_eur` (sortie de `scorer_batch`).
+
+    Filet de sécurité D14 (adopté le 2026-10-03) : un compte sous le seuil passe en Moyenne si sa
+    perte attendue dépasse celle du dernier compte Haute du lot (le 150e avec la capacité D10).
+    Le seuil du filet se recalcule donc sur chaque lot scoré. `filet_d14=False` rend la règle
+    d'origine."""
     out = resultats.copy()
     out["signale_D9"] = out["score_churn"] >= seuil_d9
 
     signales = out[out["signale_D9"]].sort_values("perte_attendue_eur", ascending=False)
-    client_ids_haute = set(signales.head(capacite_haute)["client_id"])
+    haute = signales.head(capacite_haute)
+    client_ids_haute = set(haute["client_id"])
     # Rang D14 parmi les signalés (1 = plus forte perte attendue), repris par l'explication de
     # la décision (`src.explain.expliquer_decision`) ; vide pour un compte non signalé.
     out["rang_perte_attendue"] = pd.Series(np.arange(1, len(signales) + 1), index=signales.index).astype("Int64")
 
+    out["filet_D14"] = False
+    if filet_d14 and len(haute):
+        out["filet_D14"] = ~out["signale_D9"] & (out["perte_attendue_eur"] > haute["perte_attendue_eur"].min())
+
     def _priorite(row):
         if not row["signale_D9"]:
-            return "Basse"
+            return "Moyenne" if row["filet_D14"] else "Basse"
         return "Haute" if row["client_id"] in client_ids_haute else "Moyenne"
 
     out["priorite"] = out.apply(_priorite, axis=1)
     out["action_recommandee"] = out["priorite"].map(recommander_action)
     return out
+
+
+def seuil_filet_d14(resultats: pd.DataFrame) -> float | None:
+    """Perte attendue du dernier compte Haute d'un lot (sortie de `assigner_priorites`) : le seuil
+    du filet D14 pour ce lot. None s'il n'y a aucun compte Haute."""
+    haute = resultats.loc[resultats["priorite"] == "Haute", "perte_attendue_eur"]
+    return float(haute.min()) if len(haute) else None
 
 
 def recommander_action(priorite: str) -> str:

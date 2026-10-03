@@ -13,9 +13,9 @@ Les colonnes connues seulement après coup (`sante_compte_fin_periode`, `valeur_
 Le lot simulé repasse ensuite par **la même chaîne** qu'à l'entraînement (`preparer_lot` :
 `load_raw` → `clean_silver` → `construire_features_v2`), puis par le système de décision
 (`scorer_cycle`). Chaque cycle laisse une trace dans un journal (`ajouter_au_journal`) : quel
-modèle a scoré quels comptes, avec quel seuil, sur quel export. Les scores par compte sont
-conservés pour un nombre limité de cycles (`purger_scores`), le temps d'observer l'issue réelle :
-c'est la base de la mesure des comptes sauvés (D12/D13).
+modèle a scoré quels comptes, avec quel seuil, sur quel export. Le fichier de suivi par compte
+(`src.mesure_impact.suivi_du_cycle`) est conservé 2 cycles (`purger_scores`), le temps d'observer
+l'issue réelle : c'est la base de la mesure des comptes sauvés (D12/D13).
 """
 from __future__ import annotations
 
@@ -177,14 +177,15 @@ def ajouter_au_journal(chemin_journal: Path, entree: dict[str, Any]) -> list[dic
     return entrees
 
 
-def purger_scores(dossier_scores: Path, cycles_du_journal: list[str], conserver: int) -> list[str]:
-    """Supprime les fichiers de scores par compte des cycles plus anciens que les `conserver`
-    derniers du journal (limitation de la conservation). Le journal, lui, ne contient que des
-    agrégats et reste complet. Renvoie les cycles purgés."""
+def purger_scores(dossier_scores: Path, cycles_du_journal: list[str], conserver: int,
+                  prefixe: str = "suivi_") -> list[str]:
+    """Supprime les fichiers par compte (`<prefixe><cycle>.parquet`) des cycles plus anciens que
+    les `conserver` derniers du journal (limitation de la conservation). Le journal, lui, ne
+    contient que des agrégats et reste complet. Renvoie les cycles purgés."""
     a_garder = set(cycles_du_journal[-conserver:]) if conserver > 0 else set()
     purges = []
-    for fichier in sorted(Path(dossier_scores).glob("scores_*.parquet")):
-        cycle = fichier.stem.removeprefix("scores_")
+    for fichier in sorted(Path(dossier_scores).glob(f"{prefixe}*.parquet")):
+        cycle = fichier.stem.removeprefix(prefixe)
         if cycle not in a_garder:
             fichier.unlink()
             purges.append(cycle)

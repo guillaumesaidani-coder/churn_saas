@@ -206,6 +206,7 @@ stages:
       - scripts/scorer_cycle.py
       - src/production.py
       - src/scoring.py
+      - src/mesure_impact.py
       - src/features.py
       - src/silver.py
       - src/drift.py
@@ -221,6 +222,8 @@ stages:
       - data/production/scores
       - data/production/m1_stable/features.parquet
       - data/production/m1_derive/features.parquet
+      - data/production/m1_stable/liste_csm.parquet
+      - data/production/m1_derive/liste_csm.parquet
       - data/production/m1_stable/derive.json:
           cache: false
       - data/production/m1_derive/derive.json:

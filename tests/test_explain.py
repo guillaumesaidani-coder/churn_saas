@@ -171,6 +171,14 @@ class TestExplicationDeLaDecision:
         assert textes["A"].startswith("Priorité Moyenne") and "au-delà de la capacité de 1" in textes["A"]
         assert textes["C"] == "Priorité Basse : probabilité de churn 0,100, sous le seuil de signalement D9 (0,5000)."
 
+    def test_compte_rattrape_par_le_filet_d14(self):
+        resultats = pd.DataFrame({"client_id": ["A", "B"], "score_churn": [0.9, 0.2],
+                                  "perte_attendue_eur": [100.0, 5000.0]})
+        ligne = assigner_priorites(resultats, seuil_d9=0.5, capacite_haute=1).set_index("client_id").loc["B"]
+        texte = expliquer_decision(ligne, 0.5, 1, nb_signales=1)
+        assert texte.startswith("Priorité Moyenne (filet de sécurité D14)")
+        assert "sous le seuil D9" in texte and "5 000 €" in texte
+
     def test_expliquer_batch_un_resultat_par_compte(self, modele, reference, donnees):
         X = donnees[0].head(5)
         resultats = pd.DataFrame({"client_id": list("abcde"), "score_churn": modele.predict_proba(X)[:, 1].round(3),

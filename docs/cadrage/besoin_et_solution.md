@@ -1,7 +1,7 @@
 ---
 type: explication
 statut: à jour
-mise_a_jour: 2026-09-29
+mise_a_jour: 2026-10-03
 sources: notebook de certification §1 et §2
 ---
 
@@ -70,15 +70,16 @@ est livrée avec son explication ([Explicabilité](../explicabilite/methode.md))
 ## Limites connues
 
 - Un seul instantané des comptes : pas de validation dans le temps.
-- La recette [D15](decisions/D15.md) n'est que partiellement satisfaite : les comptes de très
-  grande valeur mais de risque modéré échappent à la liste.
-- L'impact métier est **estimé**, pas mesuré : il le sera par le groupe témoin
-  ([D12](decisions/D12.md)).
+- La recette [D15](decisions/D15.md) d'origine n'est pas satisfaite ; ses critères ont été révisés
+  et le filet de sécurité ([D14](decisions/D14.md)) rattrape une partie des comptes de très grande
+  valeur mais de risque modéré. La nouvelle recette se fera au premier cycle réel.
+- L'impact métier est **estimé**, pas mesuré : il le sera par les groupes témoins
+  ([D12](decisions/D12.md)), outillés mais jamais exécutés sur des issues réelles.
 - La date de calcul de `derniere_connexion_jours` reste à confirmer auprès du propriétaire des
   données.
 
 ## Pour aller plus loin
 
 - [Décisions de cadrage D1 à D15](decisions/index.md)
-- [Hypothèses H01 à H05](hypotheses.md)
+- [Hypothèses H01 à H06](hypotheses.md)
 - [Notebook de certification exécuté](../../reports/notebooks/notebook_certifiant_churn_saas.ipynb), §1 et §2

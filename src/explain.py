@@ -264,6 +264,10 @@ def expliquer_decision(ligne: pd.Series, seuil_d9: float, capacite_haute: int, n
     score, seuil = _nombre(ligne["score_churn"], 3), _nombre(seuil_d9, 4)
     if ligne["priorite"] == "Basse":
         return f"Priorité Basse : probabilité de churn {score}, sous le seuil de signalement D9 ({seuil})."
+    if ligne.get("filet_D14", False):
+        perte = _nombre(ligne["perte_attendue_eur"], 0)
+        return (f"Priorité Moyenne (filet de sécurité D14) : probabilité {score}, sous le seuil D9 ({seuil}), "
+                f"mais perte attendue {perte} €, au-dessus de celle du dernier compte en priorité Haute.")
     rang, perte = int(ligne["rang_perte_attendue"]), _nombre(ligne["perte_attendue_eur"], 0)
     signales = "compte signalé" if nb_signales == 1 else "comptes signalés"
     position = f"perte attendue {perte} €, rang {rang} sur {nb_signales} {signales}"

@@ -1,7 +1,7 @@
 ---
 type: référence
 statut: à jour
-mise_a_jour: 2026-09-29
+mise_a_jour: 2026-10-03
 sources: notebook de certification §2.4 et §2.5
 ---
 
@@ -24,9 +24,9 @@ Les décisions **D1 à D7** viennent de l'atelier de cadrage n°1, **D8 à D15**
 | [D9](D09.md) | Seuil de signalement : rappel ≥ 80 % | appliquée |
 | [D10](D10.md) | Capacité de l'équipe Customer Success | appliquée |
 | [D11](D11.md) | Catalogue d'actions | appliquée |
-| [D12](D12.md) | Mesure d'impact par groupe témoin | non implémentée |
-| [D13](D13.md) | Consolidation trimestrielle de l'impact | non implémentée |
-| [D14](D14.md) | Règle de priorité | appliquée |
-| [D15](D15.md) | Critère de recette de la priorisation | partiellement satisfaite |
+| [D12](D12.md) | Mesure d'impact par groupe témoin (révisée le 2026-10-03) | outillée, sans mesure réelle |
+| [D13](D13.md) | Consolidation trimestrielle de l'impact | outillée, sans bilan réel |
+| [D14](D14.md) | Règle de priorité, avec filet de sécurité | appliquée |
+| [D15](D15.md) | Critère de recette de la priorisation (révisé le 2026-10-03) | critères révisés, recette au premier cycle réel |
 
-Voir aussi : [hypothèses H01 à H05](../hypotheses.md) · [besoin et solution](../besoin_et_solution.md)
+Voir aussi : [hypothèses H01 à H06](../hypotheses.md) · [besoin et solution](../besoin_et_solution.md)
