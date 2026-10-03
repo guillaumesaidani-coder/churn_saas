@@ -317,8 +317,8 @@ stages:
       size: 11314
     - path: notebooks/notebook_certifiant_churn_saas.ipynb
       hash: md5
-      md5: ce5b184d767acdd242efec685ca5fdcd
-      size: 337821
+      md5: c8d991e6213f611a6012b6cde8b5fc3f
+      size: 337835
     - path: src/api.py
       hash: md5
       md5: 66d67515d3642e7d18284adb88ac3e89
@@ -431,8 +431,8 @@ stages:
       size: 841
     - path: reports/notebooks/notebook_certifiant_churn_saas.ipynb
       hash: md5
-      md5: 9c8357b213f11c71dc40cf8d9ac9a40f
-      size: 1985730
+      md5: bc186a56f80931cd77f5bd8372354426
+      size: 1985744
   lots_simules:
     cmd: python scripts/simuler_lots_mensuels.py
     deps:
