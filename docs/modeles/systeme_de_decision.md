@@ -137,7 +137,7 @@ partir du premier cycle réel ([D15](../cadrage/decisions/D15.md)).
 - La capacité s'applique au **lot scoré**, donc à chaque requête de l'API : la liste mensuelle passe
   par le scoring batch du portefeuille complet ([`scripts/scorer_cycle.py`](../../scripts/scorer_cycle.py)).
 - Le filtre D9 ignore la valeur (arbitrage ci-dessus).
-- Le filet de sécurité ([D14](../cadrage/decisions/D14.md)) dépend de la taille du lot : 135 comptes ajoutés sur le cycle de test de 1 000 comptes, 38 sur le portefeuille complet de 5 000.
+- Le filet de sécurité ([D14](../cadrage/decisions/D14.md)) dépend de la taille du lot : 135 comptes ajoutés sur le cycle de test de 1 000 comptes, 38 sur le cycle simulé de 5 000 comptes du mois suivant, 47 sur le portefeuille observé.
 - Seuil et capacité sont figés : ils doivent être revus à chaque ré-entraînement
   ([runbook](../exploitation/runbook.md)).
 
