@@ -14,15 +14,24 @@ Customer Success à prioriser leurs actions de rétention.
 | Versioning DVC (DagsHub, compte gratuit requis pour naviguer) | https://dagshub.com/guillaume.saidani/churn_saas |
 | Runs d'entraînement (MLflow sur DagsHub) | https://dagshub.com/guillaume.saidani/churn_saas.mlflow |
 
-## Résultats du modèle v2.1 (notebook de certification, jeu de test de 1 000 comptes)
+## Résultats du modèle v2.1 (notebook de certification v2.3)
+
+La décision : chaque mois, l'équipe Customer Success appelle **150 comptes sur 5 000** (3 %),
+choisis par probabilité de churn × valeur estimée.
 
 | | Valeur |
 |---|---|
 | Modèle churn | Régression logistique, 20 variables (Gold v2, version v2.1 : retards de paiement impossibles neutralisés) |
-| PR-AUC / ROC-AUC (test) | 0,748 / 0,882 (baseline métier : 0,593 / 0,791) |
+| Classement par risque : PR-AUC / ROC-AUC (test) | 0,748 / 0,882 (règle métier D8 : 0,593 / 0,791) ; gain +0,154, IC 95 % de +0,108 à +0,202 |
 | Seuil D9 (calculé hors pli) | 0,283 : rappel 82,5 %, précision 63,1 % |
-| 150 priorités Hautes | 102 comptes réellement partis (hasard : 42), 82 % de la perte réelle captée |
-| CLV | Gradient boosting sur log(CLV) : R² log 0,89, erreur relative médiane 42 % |
+| Perte réelle captée par les appels, à l'échelle de la production | 47 % hors pli (IC 37 à 56 %), 59 % sur le test ; maximum possible (oracle) 74 à 76 % |
+| Précision des appels (3 %, hors pli) | 69 % (règle métier : 40 %) |
+| Seuil de rentabilité d'un cycle (coûts complets, hypothèse H07) | 0,05 à 0,15 % de la valeur couverte par les appels |
+| CLV | Gradient boosting sur log(CLV) : R² log 0,89, erreur relative médiane 42 % ; c'est elle qui ordonne la liste d'appels |
+
+Sur la perte captée, les familles de modèles et la règle métier font jeu égal ; le modèle apporte
+la précision des appels, des probabilités calibrées et l'explication de chaque priorité. Détail :
+[système de décision](docs/modeles/systeme_de_decision.md).
 
 ## Explicabilité et base de connaissance
 
@@ -97,9 +106,12 @@ Image publiée par la CI à chaque push sur `main` (déploiement continu) :
 
 ```bash
 docker pull ghcr.io/guillaumesaidani-coder/churn_saas:latest     # ou :<12 premiers caractères du commit>
-docker run -d -p 127.0.0.1:8011:8000 -e API_KEY=une-cle-locale -e MODEL_DIR=/app/data/model_v2 \
-  ghcr.io/guillaumesaidani-coder/churn_saas:latest
+docker run -d -p 127.0.0.1:8011:8000 -e API_KEY=une-cle-locale \
+  ghcr.io/guillaumesaidani-coder/churn_saas:latest      # l'image fixe MODEL_DIR=/app/data/model_v2
 ```
+
+L'API applique la capacité de 150 comptes à chaque requête : la liste mensuelle se produit avec
+`python scripts/scorer_cycle.py --cycle <cycle> --export <export CRM>` ([runbook](docs/exploitation/runbook.md)).
 
 ## Données personnelles
 

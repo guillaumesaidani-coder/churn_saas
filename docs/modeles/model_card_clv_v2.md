@@ -2,7 +2,7 @@
 type: référence
 statut: à jour (modèle en service)
 mise_a_jour: 2026-10-03
-sources: data/model_v2/metrics_clv.json, model_manifest.json ; notebook §9.7 et §12.2
+sources: data/model_v2/metrics_clv.json, model_manifest.json ; notebook §9.7, §9.8, §12.2 et §12.3.1
 ---
 
 [← Documentation](../index.md)
@@ -36,6 +36,10 @@ neutralisés en valeur manquante) et le jeu de test relu une seconde fois, de fa
 
 - **Prévu** : **ordonner** les comptes signalés par enjeu économique, via la perte attendue =
   probabilité de churn × CLV estimée ([D14](../cadrage/decisions/D14.md)).
+- **C'est ce modèle qui ordonne la liste** (notebook §9.8) : parmi les comptes signalés, la variance
+  du log de la CLV estimée vaut 24 fois celle du log de la probabilité, et 84 % de la liste d'appels
+  est celle qu'on obtiendrait en triant par CLV seule. La définition de la CLV pèse donc autant sur
+  la décision que le modèle de churn.
 - **Hors périmètre** : prévoir un chiffre d'affaires au euro près ; toute décision individuelle
   fondée sur la seule CLV estimée.
 
@@ -81,8 +85,15 @@ comptes par enjeu.
 - **Non expliquée** : les explications par compte portent sur la probabilité de churn, pas sur la
   CLV. Expliquer ce modèle non linéaire demanderait SHAP (`TreeExplainer`)
   ([explicabilité](../explicabilite/methode.md)).
-- Un compte de très grande valeur mais de risque modéré n'entre jamais dans la liste : c'est une
-  conséquence de la règle [D14](../cadrage/decisions/D14.md), pas du modèle CLV.
+- Un compte de très grande valeur mais de risque modéré n'entre pas dans la liste d'appels : c'est
+  une conséquence du filtre [D9](../cadrage/decisions/D09.md), pas du modèle CLV ; le filet de
+  sécurité de [D14](../cadrage/decisions/D14.md) lui adresse un email.
+- **Définition de la cible à confirmer.** Exprimée en mois de revenu, la CLV médiane vaut 12,3 mois
+  pour les comptes de 1 à 3 mois d'ancienneté, 16,4 de 4 à 12 mois, 21,8 de 13 à 24 mois et 29,5 de
+  25 à 36 mois (notebook §12.3.1). Elle croît avec l'ancienneté plus vite que le revenu : elle inclut
+  probablement du **revenu déjà encaissé**, alors que la décision a besoin de la valeur future
+  perdue. Question posée au propriétaire de la donnée ; d'ici là, le retour sur investissement est
+  présenté en seuil de rentabilité, robuste à une valeur dix fois plus faible.
 
 ## Traçabilité
 

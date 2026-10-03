@@ -33,6 +33,8 @@ COPY knowledge ./knowledge
 # Retour à la v1 : reconstruire l'image depuis un commit antérieur (git checkout + dvc checkout).
 COPY data/model_v2 ./data/model_v2
 COPY data/gold ./data/gold
+# Le défaut du code (src/api.py) désigne le modèle v1, refusé par /ready : l'image sert la v2.
+ENV MODEL_DIR=/app/data/model_v2
 
 RUN mkdir -p /app && chown -R appuser:appgroup /app
 USER appuser

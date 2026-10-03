@@ -2,7 +2,7 @@
 type: explication
 statut: à jour
 mise_a_jour: 2026-10-03
-sources: notebook de certification §1 et §2
+sources: notebook de certification §1, §2, §9.8 et §12.3.1
 ---
 
 [← Documentation](../index.md)
@@ -24,8 +24,26 @@ concentrer leurs actions de rétention **avant l'échéance**. Leur capacité es
 
 La solution est un **outil d'aide à la décision** : elle hiérarchise les comptes et recommande une
 action, elle ne remplace jamais le jugement d'un CSM par une exécution automatique
-([D3](decisions/D03.md)). C'est une contrainte de l'énoncé et une condition de conformité (RGPD,
-article 22 ; voir [RGPD et éthique](../donnees/rgpd_et_ethique.md)).
+([D3](decisions/D03.md)). C'est une contrainte de l'énoncé et une condition d'adoption par les CSM.
+Les comptes sont des entreprises : un appel de rétention n'engage pas l'article 22 du RGPD, dont
+l'esprit est néanmoins respecté (voir [RGPD et éthique](../donnees/rgpd_et_ethique.md)).
+
+## De la finalité aux exigences
+
+Chaque mois, l'équipe CS appelle **150 comptes sur 5 000** (3 %), choisis par probabilité de churn
+× valeur estimée, et envoie un email aux autres comptes signalés. Ce que l'on exige des données, des
+modèles et de leur évaluation en découle (notebook §2.7) :
+
+| La décision… | … exige | Où c'est traité |
+|---|---|---|
+| est prise chaque mois, avant l'échéance ([H06](hypotheses.md)) | des variables connues à la date du scoring | notebook §6.2, §6.4 |
+| classe les comptes par probabilité × valeur ([D14](decisions/D14.md)) | des probabilités calibrées | notebook §9.4 |
+| classe les comptes par probabilité × valeur | une valeur en jeu estimée pour chaque compte, et bien définie | notebook §9.7, §12.2, §12.3.1 |
+| appelle 150 comptes sur 5 000, soit 3 % ([D10](decisions/D10.md)) | une évaluation à cette échelle | notebook §9.8, §12.3.1, §12.4 |
+| cherche à préserver le plus de valeur possible | une règle de priorité cohérente avec la valeur, un retour sur investissement chiffré | notebook §9.8, §12.3.1 |
+| doit pouvoir être contestée par le CSM ([D3](decisions/D03.md)) | une explication de chaque priorité | notebook §9.6, §10.2.1 |
+
+La PR-AUC juge le classement par risque ; la **perte captée** par les appels juge la décision.
 
 ## Traduction en problème de données
 
@@ -57,15 +75,23 @@ ne se rencontrent que dans le système de décision. Les modèles disent **ce qu
 passer** ; le système de décision dit **quoi faire, pour qui, dans quel ordre**. Chaque priorité
 est livrée avec son explication ([Explicabilité](../explicabilite/methode.md)).
 
-## Résultats clés (modèle v2.1, jeu de test de 1 000 comptes, lu une seconde fois pour la v2.1)
+## Résultats clés (modèle v2.1)
 
 | Indicateur | Valeur |
 |---|---|
-| PR-AUC du modèle churn / baseline métier | 0,748 / 0,593 : critère [D8](decisions/D08.md) respecté, marge faible (+0,154 pour +0,15 exigé) |
-| Rappel et précision au seuil D9 (0,2832) | 82,5 % et 63,1 % |
-| Comptes réellement partis parmi les 150 priorités Hautes | 102 (42 attendus au hasard) |
-| Part de la perte réelle captée par les 150 priorités Hautes | 82 % |
+| Classement par risque : PR-AUC du modèle churn / règle métier D8 (test) | 0,748 / 0,593 : critère [D8](decisions/D08.md) respecté, marge faible (+0,154 pour +0,15 exigé ; IC 95 % de +0,108 à +0,202) |
+| Rappel et précision au seuil D9 (0,2832, test) | 82,5 % et 63,1 % |
+| **Perte réelle captée à l'échelle de la production** (150 appels sur 5 000, soit 3 %) | **47 %** hors pli (IC 37 à 56 %) ; **59 %** sur le test avec 30 appels sur 1 000 ; maximum possible (oracle) 74 à 76 % |
+| Précision des appels à 3 % (hors pli) : modèle / règle métier | 69 % / 40 % |
+| Perte captée par 150 appels sur les 1 000 comptes du test (15 %) | 82 % (102 comptes partis parmi les appelés, 42 au hasard) |
+| Seuil de rentabilité d'un cycle de production (coûts complets, [H07](hypotheses.md)) | **0,05 à 0,15 %** de la valeur couverte par les appels |
 | CLV : erreur relative médiane / corrélation de rang avec la valeur réelle | 42 % / 0,94 |
+
+Le chiffre de 82 % vaut pour une capacité cinq fois plus large que la production ; à l'échelle
+réelle, les appels couvrent environ la moitié de la perte. Sur la perte captée, le modèle de churn,
+la forêt, le boosting et la règle métier calibrée font jeu égal : c'est la valeur estimée qui
+ordonne la liste. Le modèle apporte la précision des appels, des probabilités calibrées et
+l'explication ([système de décision](../modeles/systeme_de_decision.md)).
 
 ## Limites connues
 
@@ -75,11 +101,16 @@ est livrée avec son explication ([Explicabilité](../explicabilite/methode.md))
   valeur mais de risque modéré. La nouvelle recette se fera au premier cycle réel.
 - L'impact métier est **estimé**, pas mesuré : il le sera par les groupes témoins
   ([D12](decisions/D12.md)), outillés mais jamais exécutés sur des issues réelles.
-- La date de calcul de `derniere_connexion_jours` reste à confirmer auprès du propriétaire des
-  données.
+- Le filtre [D9](decisions/D09.md) ignore la valeur : sans lui, les appels couvriraient environ 55 %
+  de la perte au lieu de 47 %, pour 6 points de précision en moins. Arbitrage soumis à la direction
+  CS.
+- La recette D15 (b') (≥ 75 %) est inatteignable à 3 % : elle doit être réexprimée en part de
+  l'oracle avant le premier cycle réel.
+- La date de calcul de `derniere_connexion_jours` et la définition de la CLV (qui inclut
+  probablement du revenu déjà encaissé) restent à confirmer auprès du propriétaire des données.
 
 ## Pour aller plus loin
 
 - [Décisions de cadrage D1 à D16](decisions/index.md)
-- [Hypothèses H01 à H06](hypotheses.md)
-- [Notebook de certification exécuté](../../reports/notebooks/notebook_certifiant_churn_saas.ipynb), §1 et §2
+- [Hypothèses H01 à H07](hypotheses.md)
+- [Notebook de certification exécuté](../../reports/notebooks/notebook_certifiant_churn_saas.ipynb), §1, §2, §9.8 et §12.3.1

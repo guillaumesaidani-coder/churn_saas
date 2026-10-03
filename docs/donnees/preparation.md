@@ -1,7 +1,7 @@
 ---
 type: explication
 statut: à jour
-mise_a_jour: 2026-09-29
+mise_a_jour: 2026-10-03
 sources: notebook §6 et §7 ; src/silver.py, src/features.py, src/gold.py ; gold_fiche_identite_v2.md
 ---
 
@@ -27,7 +27,7 @@ données vues à l'entraînement et celles reçues en production.
 
 | Colonne(s) | Manquants | Traitement | Justification |
 |---|---|---|---|
-| `revenu_mensuel_recurrent_eur` | — | Recalculé : sièges × prix catalogue du plan | Valeur reconstituable exactement |
+| `revenu_mensuel_recurrent_eur` | 3 % | **Approché** : sièges × prix catalogue du plan | Approximation sans remise : le revenu réel vaut 0,6 à 1,5 fois le prix catalogue (notebook §6.5) |
 | `taux_adoption_pct` | 5 % | **Recalculé** : 100 × actifs / sièges | Définition même de la variable |
 | `secteur`, `pays` | quelques % | Modalité explicite « Inconnu » | Ne pas inventer une catégorie ; l'absence reste visible |
 | `heures_usage_30j`, `nb_integrations`, `delai_reponse_support_h`, `csat`, `retards_paiement_12m` | 4 à 10 % | **Médiane apprise sur le seul jeu d'entraînement**, dans le pipeline du modèle | Robuste aux valeurs extrêmes ; aucune information du test utilisée |
@@ -60,7 +60,7 @@ du support est renseigné pour 1 177 comptes sans ticket (23,5 %) ; la CLV est p
 |---|---|---|
 | Identifiant | `client_id` | Aucune valeur prédictive légitime |
 | Redondante | `date_souscription` | Information portée par `anciennete_mois` |
-| Conformité | `commentaire_csm` | Texte libre, risque de données personnelles ([D7](../cadrage/decisions/D07.md)) |
+| Conformité | `commentaire_csm` | Minimisation : 13 phrases types sans apport (ablation 0,780 contre 0,783) ; un texte libre peut contenir des noms en production ([D7](../cadrage/decisions/D07.md)) |
 | **Fuite de données** | `sante_compte_fin_periode` | Calculée en fin de période, donc indisponible au scoring : AUC univariée de **0,999** |
 | Cible secondaire | `valeur_vie_client_eur` | Interdite comme variable du churn (énoncé §3.2) |
 | Leurres | `jour_souscription`, `pays`, `code_datacenter`, `couleur_theme_interface`, `groupe_experimentation` | Aucun effet mesurable sur le churn (test statistique, notebook §6) |
@@ -74,9 +74,10 @@ montre que la garder ne dégrade rien (notebook §8.4).
 
 80 % / 20 % stratifié sur `churn`, graine 42 : 4 000 comptes d'entraînement et 1 000 de test,
 28,0 % de churn dans chacun. Le découpage est **identique à celui de la v1**, ce qui permet de
-comparer les deux versions compte par compte. Le jeu de test ne sert qu'à l'évaluation finale ; il
-a été lu une seconde fois, de façon assumée, pour mesurer la révision v2.1 (notebook §9.3,
-[protocole](../modeles/protocole_experimental.md)).
+comparer les deux versions compte par compte. **Aucun choix de variable, de modèle,
+d'hyperparamètre ni de seuil n'utilise le test** : il mesure le modèle final, puis sert à des
+analyses descriptives. Il a été lu une seconde fois, de façon assumée, pour mesurer la révision
+v2.1 (notebook §9.3, [protocole](../modeles/protocole_experimental.md)).
 
 ## Ce qui change par rapport au Gold v1
 

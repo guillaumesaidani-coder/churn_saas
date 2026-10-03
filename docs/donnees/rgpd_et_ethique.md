@@ -2,7 +2,7 @@
 type: explication
 statut: à jour
 mise_a_jour: 2026-10-03
-sources: notebook §3.2, §4 (dont §4.5 et §4.6) et §12.5 ; data/rgpd/rgpd_gate_manifest.json
+sources: notebook §3.2, §4 (dont §4.1, §4.5 et §4.6), §8.4, §9.8 et §12.5 ; data/rgpd/rgpd_gate_manifest.json
 ---
 
 [← Documentation](../index.md)
@@ -27,6 +27,13 @@ Une **pseudonymisation** de `client_id` est disponible mais **non appliquée par
 (`client_id` n'est pas nominatif). La clé et la table de correspondance ne sont **jamais
 publiées** : exclues de Git et du cache DVC (voir [`.gitignore`](../../.gitignore)).
 
+## Champ d'application
+
+Les comptes sont des **entreprises (personnes morales)** : leurs données ne sont pas, en elles-mêmes,
+des données personnelles. Le RGPD ne s'applique qu'à la marge (entrepreneurs individuels parmi les
+TPE, noms éventuels dans les commentaires des CSM). Ses principes sont appliqués **par précaution**
+(notebook §4.1).
+
 ## Application des principes du RGPD
 
 | Principe | Application dans le projet |
@@ -34,7 +41,7 @@ publiées** : exclues de Git et du cache DVC (voir [`.gitignore`](../../.gitigno
 | **Base légale** (art. 6) | Intérêt légitime de l'éditeur à assurer la continuité de la relation contractuelle B2B ([D6](../cadrage/decisions/D06.md)) |
 | **Finalité** (art. 5.1.b) | Priorisation des actions de rétention uniquement ; tout autre usage (évaluation d'un CSM, scoring commercial) exigerait une nouvelle analyse |
 | **Minimisation** (art. 5.1.c) | Données agrégées au compte ([D1](../cadrage/decisions/D01.md)) ; texte libre exclu ([D7](../cadrage/decisions/D07.md)) ; export CRM limité à 5 colonnes ; suivi de mesure limité à l'identifiant, la priorité et le groupe D12 |
-| **Décision automatisée** (art. 22) | Score et recommandation, **jamais d'action exécutée** ([D3](../cadrage/decisions/D03.md)) : vérifié par un test automatique |
+| **Décision automatisée** (art. 22) | L'article 22 vise une décision fondée exclusivement sur un traitement automatisé et produisant des effets juridiques ou significatifs pour une personne physique : un appel de rétention à une entreprise n'en est pas une. Son esprit est respecté : score et recommandation, **jamais d'action exécutée** ([D3](../cadrage/decisions/D03.md)), vérifié par un test automatique |
 | **Registre de traitement** (art. 30) | Texte proposé (finalité, base légale, données, conservation, destinataires : équipes CS), rédigé à titre d'exercice ([H04](../cadrage/hypotheses.md)). Conservation : écrasés à chaque cycle dans le texte initial. Amendement proposé le 3 octobre, à faire valider par le DPO : un **suivi par compte** (identifiant, priorité, signalé ou non, filet, groupe D12, bande autour du seuil ; ni probabilité ni variables) est conservé **2 cycles**, soit l'horizon de la cible (1 mois, [H06](../cadrage/hypotheses.md)) plus le cycle du rapprochement, puis purgé automatiquement ; seuls des agrégats restent au journal. Nouvelle finalité à inscrire : **mesure d'impact** par tirage aléatoire de groupes témoins ([D12](../cadrage/decisions/D12.md)) |
 
 Restent à faire côté client, selon le manifeste RGPD : documenter formellement base légale et
@@ -54,13 +61,15 @@ finalité, rédiger le registre, vérifier le contrat de sous-traitance en cas d
 | Dilemme | Arbitrage proposé | À valider par |
 |---|---|---|
 | Aider les clients en difficulté, ou ne pas solliciter inutilement des comptes fidèles | Le rappel prime ([D9](../cadrage/decisions/D09.md)) : action bienveillante et réversible, volume borné par la capacité CS ([D10](../cadrage/decisions/D10.md)) | Direction CS |
+| Valeur préservée ou sollicitations inutiles : le filtre D9 écarte des appels les comptes précieux mais peu à risque | Filtre conservé (option (a)) : 47 % de la perte captée et 69 % de précision, contre 55 % et 63 % sans filtre (notebook §9.8) | Direction CS |
 | Valeur ou égalité de traitement : à risque égal, un petit compte reçoit un email plutôt qu'un appel ([D14](../cadrage/decisions/D14.md)) | Priorité à la valeur, assumée ; aucun compte signalé n'est ignoré ([D11](../cadrage/decisions/D11.md)) | Direction CS |
 | Anticiper ou surveiller : exploiter les données d'usage peut être perçu comme une surveillance | Données agrégées par compte, finalité unique, information des clients à prévoir | DPO, juristes |
 | Un seuil unique ou un seuil par segment | Seuil unique, sans traitement différencié ; surveillance des segments signalés par l'audit | Direction CS, DPO |
 
 ## L'explication au service de l'intervention humaine
 
-L'article 22 exige qu'un humain puisse réellement intervenir. Chaque priorité est donc livrée avec
+Un appel de rétention n'engage pas l'article 22 ; son esprit, qu'un humain puisse réellement
+intervenir, est néanmoins appliqué. Chaque priorité est donc livrée avec
 ses raisons (facteurs de hausse et de baisse du risque, règle appliquée) et ses avertissements
 (valeurs imputées, hors plage, inconnues). Un CSM peut ainsi **contester** une priorité au lieu de
 la valider par principe. Voir [lire une explication](../explicabilite/lire_une_explication.md).
@@ -78,7 +87,9 @@ C'est défendable aussi du point de vue du client : l'action associée (un appel
 
 ## Variables écartées pour des raisons éthiques ou de conformité
 
-- `commentaire_csm` : texte libre, risque de données personnelles ([D7](../cadrage/decisions/D07.md)).
+- `commentaire_csm` : dans ce jeu, 13 phrases types, sans donnée personnelle et sans apport au
+  modèle (ablation : 0,780 contre 0,783). Exclu par minimisation : en production, un texte libre
+  peut contenir des noms ([D7](../cadrage/decisions/D07.md)).
 - `pays` : sans pouvoir prédictif **et** susceptible d'introduire un traitement différencié selon
   le pays ; l'exclure supprime ce risque sans coût de performance.
 - `client_id` : identifiant, sans valeur prédictive légitime.

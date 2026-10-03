@@ -56,7 +56,7 @@ Lancer un domaine : `python -m pytest tests/test_explain.py -v`.
 | Jeux d'entraînement et de test disjoints | ✅ |
 | Seuil D9 calculé sans le test (hors pli) | ✅ |
 | Critère D8 respecté sur le test | ✅ |
-| Actions conformes à D3 (article 22) | ✅ |
+| Actions conformes à D3 (aucune action exécutée) | ✅ |
 | Modèle conforme à la base de connaissance (aucun contrôle bloquant) | ✅ |
 | Explication exacte (décomposition du score) | ✅ |
 | Artefacts présents (modèles, manifestes, métriques, export, référence d'explication) | ✅ |

@@ -30,4 +30,4 @@ Les décisions **D1 à D7** viennent de l'atelier de cadrage n°1, **D8 à D15**
 | [D15](D15.md) | Critère de recette de la priorisation (révisé le 2026-10-03) | critères révisés, recette au premier cycle réel |
 | [D16](D16.md) | Revue trimestrielle des indicateurs | décidée et outillée, aucune revue réelle |
 
-Voir aussi : [hypothèses H01 à H06](../hypotheses.md) · [besoin et solution](../besoin_et_solution.md)
+Voir aussi : [hypothèses H01 à H07](../hypotheses.md) · [besoin et solution](../besoin_et_solution.md)

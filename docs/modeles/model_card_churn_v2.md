@@ -2,7 +2,7 @@
 type: référence
 statut: à jour (modèle en service)
 mise_a_jour: 2026-10-03
-sources: data/model_v2/model_manifest.json, metrics.json, scoring_manifest.json ; notebook §8, §9, §12
+sources: data/model_v2/model_manifest.json, metrics.json, scoring_manifest.json ; notebook §8, §9 (dont §9.8), §12 (dont §12.3.1)
 ---
 
 [← Documentation](../index.md)
@@ -60,10 +60,14 @@ pour la mesurer (notebook §6.5 et §9.3).
 | **Régression logistique** | **0,783 ± 0,020** | **0,886** |
 | Forêt aléatoire | 0,764 ± 0,022 | 0,876 |
 | Gradient boosting | 0,755 ± 0,021 | 0,867 |
+| Forêt aléatoire réglée (recherche sur grille) | 0,770 | — |
+| Gradient boosting réglé (recherche sur grille) | 0,774 | — |
+| Règle métier + satisfaction (CSAT) | 0,674 | — |
 
 La règle de sélection était fixée à l'avance ([protocole](protocole_experimental.md)). La
 régularisation retenue (`C = 0,03`, PR-AUC CV 0,785) vient d'une recherche sur grille en
-validation croisée.
+validation croisée. Ablations sans apport : `commentaire_csm` (0,780), logarithme des variables
+de taille (0,769), splines (0,781), contre 0,783 pour la v2.1.
 
 ## Performance sur le jeu de test
 
@@ -71,7 +75,7 @@ validation croisée.
 |---|---|---|
 | PR-AUC | **0,748** | 0,593 |
 | ROC-AUC | **0,882** | 0,791 |
-| Gain de PR-AUC | **+0,154** (critère D8 : +0,15, respecté, marge faible) | — |
+| Gain de PR-AUC | **+0,154** (critère D8 : +0,15, respecté, marge faible) ; IC 95 % de +0,108 à +0,202, 41 % des tirages sous +0,15 | — |
 
 | Point de fonctionnement | Rappel | Précision | Comptes signalés |
 |---|---|---|---|
@@ -89,9 +93,17 @@ croisée ne confirme pas. Une recalibration n'apporte rien : Brier de 0,1229 ave
 en isotonique, contre 0,1230 sans. Les probabilités brutes de la régression logistique sont
 conservées ; l'ECE est suivie à chaque évaluation (`src/evaluation.py`), sans seuil.
 
-**Valeur métier** (cycle simulé de 1 000 comptes) : les 150 priorités Hautes contiennent
-**102 comptes qui allaient réellement partir** (42 attendus au hasard) et captent **82 %** de la
-perte réelle (98 % au mieux).
+**Ce que mesure la PR-AUC** : la qualité du classement par risque. La décision, elle, se juge
+sur la perte captée par les appels ([système de décision](systeme_de_decision.md)).
+
+**Valeur métier.** À l'échelle de la production (150 appels sur 5 000, soit 3 %), les appels
+captent **47 %** de la perte réelle hors pli (IC 37 à 56 % ; oracle 76 %) et **59 %** sur le test
+avec 30 appels sur 1 000 (IC 46 à 70 % ; oracle 74 %). Sur ce critère, forêt, boosting et règle
+métier calibrée font jeu égal (47 %, 46 %, 48 %) : c'est la CLV estimée qui ordonne la liste. Ce que
+le modèle apporte : la **précision des appels** (69 % des appelés partent, contre 40 % avec la
+règle), des **probabilités calibrées**, exigées par le calcul p × CLV, et l'explication. Sur le
+cycle de test avec 150 appels sur 1 000 (15 %), les priorités Hautes contiennent 102 comptes partis
+(42 au hasard) et captent 82 % de la perte réelle.
 
 ## Facteurs appris
 
@@ -133,6 +145,9 @@ surveillance ; plan Business, secteur Commerce et PME restent des points de surv
   en v3.
 - **Date de calcul de `derniere_connexion_jours`** à confirmer : c'est l'une des deux variables
   les plus influentes (coefficient +0,775, juste derrière l'ancienneté).
+- **Le filtre D9 ignore la valeur** : sans lui, les appels captent 55 % de la perte au lieu de
+  47 %, pour 6 points de précision en moins. Arbitrage soumis à la direction CS
+  ([D9](../cadrage/decisions/D09.md)).
 - Seuil et capacité **figés** : une dérive du taux de churn réel rendrait le seuil progressivement
   inadapté ([supervision](../exploitation/supervision.md)).
 
