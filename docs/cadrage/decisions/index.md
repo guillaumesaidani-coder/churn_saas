@@ -7,9 +7,9 @@ sources: notebook de certification §2.4 et §2.5
 
 [← Documentation](../../index.md)
 
-# Décisions de cadrage D1 à D15
+# Décisions de cadrage D1 à D16
 
-Les décisions **D1 à D7** viennent de l'atelier de cadrage n°1, **D8 à D15** du point de contact métier n°3. Exercice mené seul : ce sont des choix justifiés par le candidat, pas des validations d'un commanditaire réel. Les valeurs chiffrées (seuil, capacité, actions) ne sont écrites qu'à un endroit, [`scoring_manifest.json`](../../../data/model_v2/scoring_manifest.json), que lisent le notebook et l'API.
+Les décisions **D1 à D7** viennent de l'atelier de cadrage n°1, **D8 à D15** du point de contact métier n°3, **D16** d'un arbitrage du 2 octobre. Exercice mené seul : ce sont des choix justifiés par le candidat, pas des validations d'un commanditaire réel. Les valeurs chiffrées (seuil, capacité, actions) ne sont écrites qu'à un endroit, [`scoring_manifest.json`](../../../data/model_v2/scoring_manifest.json), que lisent le notebook et l'API.
 
 | Décision | Objet | Statut |
 |---|---|---|
@@ -28,5 +28,6 @@ Les décisions **D1 à D7** viennent de l'atelier de cadrage n°1, **D8 à D15**
 | [D13](D13.md) | Consolidation trimestrielle de l'impact | outillée, sans bilan réel |
 | [D14](D14.md) | Règle de priorité, avec filet de sécurité | appliquée |
 | [D15](D15.md) | Critère de recette de la priorisation (révisé le 2026-10-03) | critères révisés, recette au premier cycle réel |
+| [D16](D16.md) | Revue trimestrielle des indicateurs | décidée et outillée, aucune revue réelle |
 
 Voir aussi : [hypothèses H01 à H06](../hypotheses.md) · [besoin et solution](../besoin_et_solution.md)

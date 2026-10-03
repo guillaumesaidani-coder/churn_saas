@@ -14,7 +14,9 @@ Le cycle se déroule en trois temps :
 1. au scoring (`tirer_groupes_d12`, `suivi_du_cycle`) : chaque compte reçoit un groupe ; le fichier
    de suivi ne garde que ce qu'il faut pour la mesure (pas de probabilité, pas de variables) ;
 2. au cycle suivant, une fois l'échéance passée (`rapprocher_issues`) : le suivi est rapproché de
-   l'issue réelle ; seuls des agrégats sont écrits au journal des scores ;
+   l'issue réelle ; seuls des agrégats sont écrits au journal des scores : churn par groupe et
+   écarts, rappel réel (déclencheur de ré-entraînement), recette D15 (b') et (c') si la valeur
+   réelle des comptes est fournie, écarts au protocole s'ils sont notés ;
 3. chaque trimestre (D13, `consolider`) : les agrégats des cycles sont additionnés.
 """
 from __future__ import annotations
@@ -28,12 +30,15 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from src.evaluation import RAPPEL_REEL_MIN
 from src.production import lire_journal
 from src.scoring import recommander_action
 
 PART_TEMOIN_HAUTE = 0.20     # option B
 PART_TEMOIN_MOYENNE = 0.10   # option D
 BANDE_SEUIL = 0.05           # option C : écart maximal au seuil D9, en probabilité
+SEUIL_RECETTE_B = 0.75       # D15 (b') : part de la perte réelle captée par la priorité Haute
+SEUIL_RECETTE_C = 0.85       # D15 (c') : part des partis à forte perte couverts (Haute ou Moyenne)
 
 ACTION_TEMOIN_MOYENNE = "Pas d'email ce cycle (groupe témoin D12) ; surveillance passive"
 
@@ -141,10 +146,51 @@ def _agreger(comptes: dict[str, dict], issues_connues: int, churn_total: int, ch
     }
 
 
+def _recette_d15(connus: pd.DataFrame) -> dict[str, Any] | None:
+    """Critères (b') et (c') de D15, si les issues donnent la valeur réelle des comptes."""
+    if "valeur_vie_client_eur" not in connus:
+        return None
+    perte = connus["churn"] * connus["valeur_vie_client_eur"].fillna(0)
+    partis = connus[connus["churn"] == 1]
+    seuil = float((partis["valeur_vie_client_eur"].fillna(0)).quantile(0.75)) if len(partis) else 0.0
+    forte = partis[partis["valeur_vie_client_eur"].fillna(0) >= seuil]
+    recette = {
+        "perte_reelle_totale_eur": round(float(perte.sum()), 0),
+        "perte_reelle_haute_eur": round(float(perte[connus["priorite"] == "Haute"].sum()), 0),
+        "partis_forte_perte": int(len(forte)),
+        "forte_perte_couverts": int(forte["priorite"].isin(["Haute", "Moyenne"]).sum()),
+        "seuil_forte_perte_eur": round(seuil, 0),
+    }
+    return _completer_recette(recette)
+
+
+def _completer_recette(recette: dict[str, Any]) -> dict[str, Any]:
+    b = recette["perte_reelle_haute_eur"] / recette["perte_reelle_totale_eur"] if recette["perte_reelle_totale_eur"] else None
+    c = recette["forte_perte_couverts"] / recette["partis_forte_perte"] if recette["partis_forte_perte"] else None
+    recette["b_part_perte_captee_haute"] = None if b is None else round(b, 4)
+    recette["c_part_forte_perte_couverte"] = None if c is None else round(c, 4)
+    recette["b_respecte"] = None if b is None else b >= SEUIL_RECETTE_B
+    recette["c_respecte"] = None if c is None else c >= SEUIL_RECETTE_C
+    return recette
+
+
+def _ecarts_protocole(connus: pd.DataFrame) -> dict[str, Any] | None:
+    """Comptes dont l'action réelle s'est écartée du protocole (ex. un témoin appelé). La mesure
+    garde les groupes tels que tirés (intention de traiter) : ce décompte en dit la fiabilité."""
+    if "ecart_protocole" not in connus:
+        return None
+    ecarts = connus["ecart_protocole"].fillna(0).astype(int) == 1
+    par_groupe = {nom: int((ecarts & condition(connus)).sum()) for nom, condition in _SOUS_GROUPES.items()}
+    return {"total": int(ecarts.sum()), "par_groupe": par_groupe}
+
+
 def rapprocher_issues(suivi: pd.DataFrame, issues: pd.DataFrame) -> dict[str, Any]:
-    """Suivi d'un cycle + issues réelles (`client_id`, `churn` en 0/1) -> agrégats, sans aucune
-    donnée par compte. Un compte sans issue connue est compté à part et exclu des taux."""
-    lien = suivi.merge(issues[["client_id", "churn"]], on="client_id", how="left")
+    """Suivi d'un cycle + issues réelles -> agrégats, sans aucune donnée par compte. Colonnes
+    des issues : `client_id`, `churn` (0/1) ; facultatives : `valeur_vie_client_eur` (valeur
+    réelle, pour la recette D15) et `ecart_protocole` (0/1, action réelle différente du protocole
+    D12). Un compte sans issue connue est compté à part et exclu des taux."""
+    colonnes = [c for c in ("client_id", "churn", "valeur_vie_client_eur", "ecart_protocole") if c in issues]
+    lien = suivi.merge(issues[colonnes], on="client_id", how="left")
     connus = lien[lien["churn"].notna()].copy()
     connus["churn"] = connus["churn"].astype(int)
     comptes = {}
@@ -154,11 +200,17 @@ def rapprocher_issues(suivi: pd.DataFrame, issues: pd.DataFrame) -> dict[str, An
     agregats = _agreger(comptes, int(len(connus)), int(connus["churn"].sum()),
                         int(connus.loc[connus["signale_D9"], "churn"].sum()))
     agregats["comptes_sans_issue"] = int(lien["churn"].isna().sum())
+    agregats["recette_D15"] = _recette_d15(connus)
+    agregats["ecarts_protocole"] = _ecarts_protocole(connus)
+    rappel = agregats["rappel_reel"]
+    agregats["declencheur_rappel_reel"] = {"actif": rappel is not None and rappel < RAPPEL_REEL_MIN,
+                                           "seuil": RAPPEL_REEL_MIN}
     return agregats
 
 
 def consolider(agregats_par_cycle: list[dict[str, Any]]) -> dict[str, Any]:
-    """Bilan D13 : additionne les effectifs de plusieurs rapprochements et recalcule taux et écarts."""
+    """Bilan D13 : additionne les effectifs de plusieurs rapprochements et recalcule taux, écarts
+    et recette D15 (si tous les cycles l'ont)."""
     comptes = {nom: {"comptes": 0, "churn": 0} for nom in _SOUS_GROUPES}
     issues_connues = churn_total = churn_signales = 0
     for agregats in agregats_par_cycle:
@@ -170,6 +222,12 @@ def consolider(agregats_par_cycle: list[dict[str, Any]]) -> dict[str, Any]:
         churn_signales += agregats["churn_signales_D9"]
     consolide = _agreger(comptes, issues_connues, churn_total, churn_signales)
     consolide["cycles"] = len(agregats_par_cycle)
+    recettes = [a.get("recette_D15") for a in agregats_par_cycle]
+    consolide["recette_D15"] = None if not recettes or None in recettes else _completer_recette({
+        cle: sum(r[cle] for r in recettes)
+        for cle in ("perte_reelle_totale_eur", "perte_reelle_haute_eur", "partis_forte_perte", "forte_perte_couverts")})
+    ecarts = [a.get("ecarts_protocole") for a in agregats_par_cycle]
+    consolide["ecarts_protocole"] = None if not ecarts or None in ecarts else {"total": sum(e["total"] for e in ecarts)}
     return consolide
 
 

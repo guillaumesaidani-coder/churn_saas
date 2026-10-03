@@ -468,6 +468,14 @@ stages:
       hash: md5
       md5: 87bf854eb19f70016661397341845d24
       size: 200436
+    - path: data/model_v2/explication_reference.json
+      hash: md5
+      md5: 1f15afafa31ce8269f035f3b44893496
+      size: 5804
+    - path: data/model_v2/metrics.json
+      hash: md5
+      md5: e6768678bc0dc5fe9765cb33fa79b3b6
+      size: 435
     - path: data/model_v2/model.joblib
       hash: md5
       md5: 4ab0ed181cab6c9df936ac05ca4d12fa
@@ -494,20 +502,28 @@ stages:
       size: 664306
     - path: scripts/scorer_cycle.py
       hash: md5
-      md5: 151a735e831a2fb2fb5b7453962d56a8
-      size: 6238
+      md5: ad2e31b21b59993bb952e77cf28b0d35
+      size: 7246
     - path: src/drift.py
       hash: md5
       md5: ebb4e5c2cb4a3cdcb42279bb37a89933
       size: 2830
+    - path: src/evaluation.py
+      hash: md5
+      md5: 3278ca672e48b7283675cfac100c8c58
+      size: 7973
+    - path: src/explain.py
+      hash: md5
+      md5: 207035af2a9f2dee8a9ad85abf416672
+      size: 21593
     - path: src/features.py
       hash: md5
       md5: 7d1335d3dc6215bdeb3533e83f730366
       size: 4575
     - path: src/mesure_impact.py
       hash: md5
-      md5: d202db22a54125602e2282a05c5ea4a0
-      size: 9471
+      md5: 784997ae1c4d7875ddb352ec517869b3
+      size: 13194
     - path: src/production.py
       hash: md5
       md5: 807722aa99ed7c4c435c7a8ea1168b39
@@ -523,8 +539,8 @@ stages:
     outs:
     - path: data/production/journal_scores.jsonl
       hash: md5
-      md5: 7ceef60d402cf25c9dc6fadcd2ea2a5f
-      size: 1939
+      md5: 6a2b5697754c1256449b3b89a7f69a1e
+      size: 2776
     - path: data/production/m1_derive/derive.json
       hash: md5
       md5: 4d0c9ada2e5e9606b2e09672ed40a169

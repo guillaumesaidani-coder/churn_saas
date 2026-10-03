@@ -1,7 +1,7 @@
 ---
 type: index
 statut: à jour
-mise_a_jour: 2026-09-29
+mise_a_jour: 2026-10-03
 ---
 
 # Documentation — prédiction du churn SaaS
@@ -28,7 +28,7 @@ affirmation à son code ou à son artefact.
 
 ### Cadrage
 - [Besoin et solution](cadrage/besoin_et_solution.md) : contexte, trois briques, résultats clés, limites
-- [Décisions D1 à D15](cadrage/decisions/index.md) : une note par décision, avec son statut
+- [Décisions D1 à D16](cadrage/decisions/index.md) : une note par décision, avec son statut
 - [Hypothèses H01 à H06](cadrage/hypotheses.md)
 
 ### Données

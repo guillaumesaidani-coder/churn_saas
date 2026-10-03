@@ -80,6 +80,6 @@ est livrée avec son explication ([Explicabilité](../explicabilite/methode.md))
 
 ## Pour aller plus loin
 
-- [Décisions de cadrage D1 à D15](decisions/index.md)
+- [Décisions de cadrage D1 à D16](decisions/index.md)
 - [Hypothèses H01 à H06](hypotheses.md)
 - [Notebook de certification exécuté](../../reports/notebooks/notebook_certifiant_churn_saas.ipynb), §1 et §2

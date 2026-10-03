@@ -141,6 +141,39 @@ class TestRapprochement:
         largeur = lambda e: e["ic95"][1] - e["ic95"][0]  # noqa: E731
         assert largeur(bilan["ecarts"]["B_gain_appel_sur_email"]) < largeur(agregats["ecarts"]["B_gain_appel_sur_email"])
 
+    def test_sans_colonnes_facultatives(self):
+        suivi = suivi_fabrique()
+        agregats = rapprocher_issues(suivi, issues_fabriquees(suivi))
+        assert agregats["recette_D15"] is None and agregats["ecarts_protocole"] is None
+        assert agregats["declencheur_rappel_reel"] == {"actif": False, "seuil": 0.75}   # rappel 0,95
+
+    def test_recette_d15_et_ecarts_au_protocole(self):
+        suivi = suivi_fabrique()
+        issues = issues_fabriquees(suivi)
+        # Valeur réelle : 1 000 € par compte, 100 000 € pour les Haute ; un témoin Haute appelé quand même.
+        issues["valeur_vie_client_eur"] = np.where(suivi["priorite"].iloc[:-1] == "Haute", 100_000.0, 1_000.0)
+        issues["ecart_protocole"] = 0
+        issues.loc[10, "ecart_protocole"] = 1
+        agregats = rapprocher_issues(suivi, issues)
+        r = agregats["recette_D15"]
+        # Partis : 8 Haute (800 000 €) et 11 autres (11 000 €) -> (b') = 800 / 811
+        assert r["perte_reelle_haute_eur"] == 800_000 and r["perte_reelle_totale_eur"] == 811_000
+        assert r["b_part_perte_captee_haute"] == round(800 / 811, 4) and r["b_respecte"]
+        # Forte perte (>= 3e quartile des partis, 100 000 €) : les 8 partis Haute, tous couverts
+        assert (r["partis_forte_perte"], r["forte_perte_couverts"], r["c_respecte"]) == (8, 8, True)
+        assert agregats["ecarts_protocole"] == {"total": 1, "par_groupe": {
+            "haute_traite": 0, "haute_temoin": 1, "renfort": 0, "moyenne_traite": 0, "moyenne_temoin": 0,
+            "seuil_dessus": 0, "seuil_dessous": 0}}
+        bilan = consolider([agregats, agregats])
+        assert bilan["recette_D15"]["b_part_perte_captee_haute"] == r["b_part_perte_captee_haute"]
+        assert bilan["ecarts_protocole"] == {"total": 2}
+
+    def test_declencheur_rappel_reel(self):
+        suivi = suivi_fabrique()
+        suivi["signale_D9"] = False            # aucun départ signalé : rappel réel nul
+        agregats = rapprocher_issues(suivi, issues_fabriquees(suivi))
+        assert agregats["rappel_reel"] == 0.0 and agregats["declencheur_rappel_reel"]["actif"]
+
     def test_journal_complete_sans_changer_l_ordre(self, tmp_path):
         journal = tmp_path / "journal_scores.jsonl"
         for cycle in ["2026-11", "2026-12"]:

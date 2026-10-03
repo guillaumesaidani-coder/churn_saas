@@ -3,6 +3,8 @@ name: CI
 # À chaque push / pull request :
 #   1. tests unitaires (données synthétiques, aucun secret requis) ;
 #   2. récupération des données/modèles versionnés par DVC depuis DagsHub (`dvc pull`),
+#      évaluation du modèle en service sur le jeu de test (porte de qualité : D8, D9,
+#      calibration, base de connaissance, reproduction de metrics.json ; rapport en artefact),
 #      build de l'image API et test de fumée /ready (modèles v2 chargés).
 #      Étape 2 ignorée tant que le secret DAGSHUB_TOKEN n'est pas configuré.
 
@@ -40,6 +42,7 @@ jobs:
         if: env.DAGSHUB_TOKEN != ''
         with:
           python-version: "3.13"
+          cache: pip
       - name: dvc pull (données + modèles depuis DagsHub)
         if: env.DAGSHUB_TOKEN != ''
         run: |
@@ -47,6 +50,18 @@ jobs:
           dvc remote modify origin --local access_key_id "$DAGSHUB_TOKEN"
           dvc remote modify origin --local secret_access_key "$DAGSHUB_TOKEN"
           dvc pull
+      - name: Évaluation du modèle en service (porte de qualité)
+        if: env.DAGSHUB_TOKEN != ''
+        run: |
+          pip install -r requirements.txt
+          python scripts/evaluer_modele.py --sortie reports/evaluation_modele.json
+      - name: Rapport d'évaluation
+        if: always() && env.DAGSHUB_TOKEN != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-modele
+          path: reports/evaluation_modele.json
+          if-no-files-found: warn
       - name: Build image API + test de fumée
         if: env.DAGSHUB_TOKEN != ''
         run: |

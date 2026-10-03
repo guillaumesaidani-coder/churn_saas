@@ -207,6 +207,8 @@ stages:
       - src/production.py
       - src/scoring.py
       - src/mesure_impact.py
+      - src/evaluation.py
+      - src/explain.py
       - src/features.py
       - src/silver.py
       - src/drift.py
@@ -217,6 +219,8 @@ stages:
       - data/model_v2/model_clv.joblib
       - data/model_v2/scoring_manifest.json
       - data/model_v2/model_manifest.json
+      - data/model_v2/explication_reference.json
+      - data/model_v2/metrics.json
       - data/gold/clients_churn_gold_v2.parquet
     outs:
       - data/production/scores

@@ -52,5 +52,5 @@ statistique n'a été fait. C'est la confirmation du formateur qui fonde H06.
 - **H06** : avec une échéance annuelle, l'horizon de la cible pourrait atteindre 12 mois ; la
   conservation des scores par compte et le protocole du groupe témoin seraient à revoir.
 
-Voir aussi : [décisions D1 à D15](decisions/index.md) ·
+Voir aussi : [décisions D1 à D16](decisions/index.md) ·
 [notebook de certification](../../reports/notebooks/notebook_certifiant_churn_saas.ipynb), §9.5 et §12.3

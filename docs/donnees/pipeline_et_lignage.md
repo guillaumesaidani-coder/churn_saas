@@ -90,7 +90,7 @@ Notebook §7.11 : chaque état de la donnée, de l'export brut aux scores.
 | Export brut (CSV fournis) | Versionné par DVC, sur DagsHub (stockage objet compatible S3) | Toutes les versions | Équipe data |
 | Portique RGPD | Manifeste JSON ; pseudonymisation hors Git et hors DVC | Clé conservée en local uniquement | Équipe data, DPO |
 | Bronze, Silver, Gold v2 | Parquet versionné par DVC ; manifestes et empreintes dans Git | Toutes les versions | Équipe data |
-| Modèles et règle de décision | joblib et manifestes, runs MLflow | Version en service et précédentes | Équipe data |
+| Modèles et règle de décision | joblib et manifestes, runs MLflow ; journal des décisions de ré-entraînement (`data/reentrainement/journal_decisions.jsonl`, Git) | Version en service et précédentes ; journal complet | Équipe data |
 | Scores du cycle | Liste de 5 colonnes vers le CRM (`liste_csm.parquet`) ; suivi de mesure par compte dans `data/production/scores/suivi_<cycle>.parquet` (sans probabilité ni variables) | Suivi : 2 derniers cycles, le temps d'observer l'issue et de la rapprocher ([D12](../cadrage/decisions/D12.md), proposition à valider par le DPO) ; journal des cycles et agrégats de mesure sans donnée par compte | Équipes CS, équipe data |
 
 - **Stockage** : le Parquet en stockage objet suffit à 5 000 comptes traités par lots mensuels ;

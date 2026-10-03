@@ -32,6 +32,8 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.drift import drift_table  # noqa: E402
+from src.evaluation import declencheurs_cycle, top_importance  # noqa: E402
+from src.explain import contributions, parts_explication  # noqa: E402
 from src.features import NUMERIQUES_V2  # noqa: E402
 from src.production import (  # noqa: E402
     ajouter_au_journal, entree_journal, preparer_lot, purger_scores, scorer_cycle,
@@ -65,14 +67,22 @@ def main() -> None:
 
     catalogue = pd.read_csv(args.catalogue, dtype=str, keep_default_na=False, encoding="utf-8-sig")
     X, client_ids = preparer_lot(args.export, catalogue)
-    resultats = scorer_cycle(X, client_ids, joblib.load(chemin_churn), joblib.load(chemin_clv),
-                             seuil_d9, capacite_d10)
+    modele_churn = joblib.load(chemin_churn)
+    resultats = scorer_cycle(X, client_ids, modele_churn, joblib.load(chemin_clv), seuil_d9, capacite_d10)
     graine = graine_du_cycle(args.cycle)
     resultats = tirer_groupes_d12(resultats, graine)
 
     gold = pd.read_parquet(args.gold)
     derive = drift_table(gold[gold["split"] == "train"], X, NUMERIQUES_V2).set_index("feature")
     en_alerte = derive.index[derive["psi"] > PSI_SEUIL_ALERTE].tolist()
+
+    # Déclencheurs de ré-entraînement évaluables au scoring (runbook §3) : dérive d'une variable du
+    # top 5 d'importance sur ce cycle, volume de signalés comparé à celui du test.
+    reference = read_manifest(args.model_dir / "explication_reference.json")
+    importantes = top_importance(parts_explication(contributions(modele_churn, X, reference)))
+    part_reference = read_manifest(args.model_dir / "metrics.json")["part_signales_seuil_D9"]
+    declencheurs = declencheurs_cycle(derive["psi"], importantes, float(resultats["signale_D9"].mean()),
+                                      part_reference)
 
     dossier_cycle = args.export.parent
     X.assign(client_id=client_ids.values).to_parquet(dossier_cycle / "features.parquet", index=False)
@@ -96,6 +106,8 @@ def main() -> None:
         "filet_D14": {"comptes": int(resultats["filet_D14"].sum()),
                       "seuil_perte_attendue_eur": None if filet is None else round(filet, 0)},
         "protocole_D12": {"graine": graine, "effectifs": resume_groupes(resultats)},
+        "top5_importance": importantes,
+        "declencheurs": declencheurs,
     })
     journal = ajouter_au_journal(args.sortie / "journal_scores.jsonl", entree)
     purges = purger_scores(dossier_scores, [e["cycle"] for e in journal], args.conserver)
@@ -106,6 +118,8 @@ def main() -> None:
     print(f"Filet D14 : {entree['filet_D14']['comptes']} comptes ; groupes D12 : {entree['protocole_D12']['effectifs']}")
     print(f"Dérive : PSI max {entree['psi_max']:.3f} ; variables en alerte (PSI > {PSI_SEUIL_ALERTE}) : "
           f"{en_alerte or 'aucune'}")
+    actifs = [d["declencheur"] for d in declencheurs if d["actif"]]
+    print(f"Top 5 d'importance : {importantes} ; déclencheurs actifs : {actifs or 'aucun'}")
     if purges:
         print(f"Suivi par compte purgé (plus de {args.conserver} cycles) : {purges}")
 

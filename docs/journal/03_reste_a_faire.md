@@ -56,4 +56,4 @@ Sans cela, le job `docker` de la CI échoue au `dvc pull`.
 
 ---
 
-Précédent : [2.28_arbitrages_h06_d12_d14_d15](actions/2.28_arbitrages_h06_d12_d14_d15.md) · Suivant : [04_livrable_final](04_livrable_final.md)
+Précédent : [2.29_lot2_reentrainement](actions/2.29_lot2_reentrainement.md) · Suivant : [04_livrable_final](04_livrable_final.md)
