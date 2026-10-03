@@ -68,7 +68,7 @@ knowledge/            base de connaissance du domaine (explications et contrôle
 tests/                tests unitaires (pytest)
 dvc.yaml / dvc.lock   pipeline reproductible RGPD → Bronze → Silver → Gold → modèles → scoring
 Dockerfile, compose.yaml   API de scoring, exporteur de dérive, Prometheus, Grafana, pipeline
-.github/workflows/ci.yml   CI : tests, puis dvc pull, build Docker et test de fumée
+.github/workflows/ci.yml   CI : lint et tests, puis dvc pull, évaluation du modèle, build Docker, test de fumée, publication sur ghcr.io
 ```
 
 ## Reproduire
@@ -88,8 +88,17 @@ mlflow ui --backend-store-uri sqlite:///data/model_v2/mlflow.db   # runs v2 trac
 Avec Docker :
 
 ```bash
-docker compose up -d                                   # API :8011, Grafana :3011, Prometheus :9092
+echo "API_KEY=une-cle-locale" >> .env                  # pas de clé par défaut
+docker compose up -d                                   # API :8011, Grafana :3011, Prometheus :9092 (127.0.0.1)
 docker compose --profile pipeline run --rm pipeline    # dvc repro dans un conteneur
+```
+
+Image publiée par la CI à chaque push sur `main` (déploiement continu) :
+
+```bash
+docker pull ghcr.io/guillaumesaidani-coder/churn_saas:latest     # ou :<12 premiers caractères du commit>
+docker run -d -p 127.0.0.1:8011:8000 -e API_KEY=une-cle-locale -e MODEL_DIR=/app/data/model_v2 \
+  ghcr.io/guillaumesaidani-coder/churn_saas:latest
 ```
 
 ## Données personnelles

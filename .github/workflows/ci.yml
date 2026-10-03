@@ -1,11 +1,13 @@
 name: CI
 
 # À chaque push / pull request :
-#   1. tests unitaires (données synthétiques, aucun secret requis) ;
+#   1. lint (ruff) et tests unitaires (données synthétiques, aucun secret requis) ;
 #   2. récupération des données/modèles versionnés par DVC depuis DagsHub (`dvc pull`),
 #      évaluation du modèle en service sur le jeu de test (porte de qualité : D8, D9,
 #      calibration, base de connaissance, reproduction de metrics.json ; rapport en artefact),
-#      build de l'image API et test de fumée /ready (modèles v2 chargés).
+#      build de l'image API et test de fumée /ready (modèles v2 chargés) ;
+#   3. sur un push sur main uniquement, si tout est vert : publication de l'image testée sur
+#      GitHub Container Registry, taggée par commit et `latest` (déploiement continu).
 #      Étape 2 ignorée tant que le secret DAGSHUB_TOKEN n'est pas configuré.
 
 on:
@@ -24,6 +26,8 @@ jobs:
           python-version: "3.13"
           cache: pip
       - run: pip install -r requirements-dev.txt
+      - name: Lint (ruff)
+        run: python -m ruff check .
       - run: python -m pytest -q
         env:
           MLFLOW_DISABLE_AGENT_HINT: "1"
@@ -31,6 +35,9 @@ jobs:
   docker:
     needs: tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write   # publication sur ghcr.io avec le GITHUB_TOKEN du run
     env:
       DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
     steps:
@@ -73,3 +80,13 @@ jobs:
           done
           docker logs api
           exit 1
+      - name: Publication de l'image sur GHCR (push sur main)
+        if: env.DAGSHUB_TOKEN != '' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          IMAGE="ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')"
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          for TAG in "${GITHUB_SHA::12}" latest; do
+            docker tag churn-api:ci "$IMAGE:$TAG"
+            docker push "$IMAGE:$TAG"
+          done
+          echo "Image publiée : $IMAGE:${GITHUB_SHA::12}" >> "$GITHUB_STEP_SUMMARY"

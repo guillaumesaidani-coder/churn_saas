@@ -4,12 +4,10 @@ Données utilisées : uniquement des DataFrames synthétiques minimaux -- jamais
 Bronze réel -- pour isoler chaque règle de nettoyage (dédoublonnage, dates, nombres,
 catégorielles, jointure, valeurs manquantes) de la donnée métier réelle.
 """
-import numpy as np
 import pandas as pd
 import pytest
 
 from src.silver import (
-    NUMERIC_COLUMNS,
     clean_silver,
     drop_strict_duplicates,
     normalize_secteur,

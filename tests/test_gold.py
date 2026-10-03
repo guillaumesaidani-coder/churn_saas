@@ -135,7 +135,6 @@ class TestIdentifyLeurres:
     def test_categorielle_parfaitement_independante_est_signalee(self):
         # Construction déterministe (pas de random) : indépendance exacte entre groupe_neutre
         # et churn -- doit être détectée comme leurre quel que soit le tirage aléatoire.
-        n = 100
         clients = pd.DataFrame({
             "churn": [0] * 50 + [1] * 50,
             "groupe_neutre": ["A", "B"] * 50,

@@ -16,7 +16,7 @@ from fastapi.testclient import TestClient
 import src.api as api_module
 from src.api import app, load_artifacts
 
-API_KEY = "dev-local-key"
+API_KEY = "cle-de-test"
 
 
 class FakeModelChurn:
@@ -30,6 +30,12 @@ class FakeModelChurn:
 class FakeModelCLV:
     def predict(self, X):
         return np.log1p(X["signal"].to_numpy(dtype=float) * 1000)
+
+
+@pytest.fixture(autouse=True)
+def cle_api(monkeypatch):
+    """Le service est fermé sans API_KEY : chaque test la définit, sauf s'il la retire."""
+    monkeypatch.setenv("API_KEY", API_KEY)
 
 
 @pytest.fixture
@@ -246,3 +252,77 @@ class TestGardeFouBaseDeConnaissance:
 
         assert response.status_code == 503
         assert "sante_compte_fin_periode" in response.json()["detail"]
+
+
+class TestValidationDesEntrees:
+    """Lot 3 (A3.2) : variable inconnue, type faux ou valeur impossible -> 422, avant tout calcul."""
+
+    @pytest.fixture(autouse=True)
+    def colonnes(self, client, monkeypatch):   # après le chargement des artefacts (fixture client)
+        monkeypatch.setattr(api_module, "_feature_columns", ["signal", "csat", "plan"])
+        api_module._rate_limit_state.clear()
+
+    def _post(self, client, features):
+        return client.post("/score-batch", json={"clients": [{"client_id": "CLI-1", "features": features}]},
+                           headers=_headers())
+
+    def test_variable_inconnue_422(self, client):
+        response = self._post(client, {"signal": 0.5, "couleur_theme_interface": "sombre"})
+        assert response.status_code == 422
+        assert "variable inconnue « couleur_theme_interface »" in response.json()["detail"][0]
+
+    @pytest.mark.parametrize("features, motif", [
+        ({"signal": 0.5, "csat": 7}, "hors des bornes physiques [1 ; 5]"),
+        ({"signal": 0.5, "csat": "4"}, "nombre attendu"),
+        ({"signal": 0.5, "plan": 3}, "texte attendu"),
+    ])
+    def test_valeur_refusee_422(self, client, features, motif):
+        response = self._post(client, features)
+        assert response.status_code == 422 and motif in response.json()["detail"][0]
+
+    def test_valeur_manquante_et_modalite_inconnue_acceptees(self, client):
+        assert self._post(client, {"signal": 0.5, "csat": None, "plan": "Premium"}).status_code == 200
+
+    def test_identifiant_vide_422(self, client):
+        response = client.post("/score-batch", json={"clients": [{"client_id": "", "features": {"signal": 0.5}}]},
+                               headers=_headers())
+        assert response.status_code == 422
+
+
+class TestSecurite:
+    """Lot 3 (A3.4) : sans API_KEY, le service reste fermé ; pas de clé par défaut."""
+
+    def test_sans_api_key_service_ferme(self, client, monkeypatch):
+        monkeypatch.delenv("API_KEY")
+        assert client.get("/ready").status_code == 503
+        response = client.post("/score-batch", json={"clients": [{"client_id": "CLI-1", "features": {"signal": 0.5}}]},
+                               headers={"X-API-Key": "dev-local-key"})
+        assert response.status_code == 503 and "API_KEY non configurée" in response.json()["detail"]
+
+    def test_health_reste_ouvert_sans_api_key(self, client, monkeypatch):
+        monkeypatch.delenv("API_KEY")
+        assert client.get("/health").status_code == 200
+
+
+class TestEmpreinteCertifiee:
+    """Lot 3 (A3.3) : /ready refuse un modèle dont l'empreinte diffère de celle certifiée."""
+
+    def _manifeste(self, artifacts_dir, empreintes):
+        (artifacts_dir / "model_manifest.json").write_text(
+            json.dumps({"features": ["signal"], "empreintes_sha256": empreintes}), encoding="utf-8")
+        load_artifacts(artifacts_dir)
+
+    def test_empreintes_conformes(self, artifacts_dir, client):
+        from src.versioning import sha256_of
+        self._manifeste(artifacts_dir, {n: sha256_of(artifacts_dir / n) for n in ("model.joblib", "model_clv.joblib")})
+        response = client.get("/ready")
+        assert response.status_code == 200 and response.json()["empreintes_verifiees"] is True
+
+    def test_modele_remplace_503(self, artifacts_dir, client):
+        self._manifeste(artifacts_dir, {"model.joblib": "0" * 64})
+        response = client.get("/ready")
+        assert response.status_code == 503 and "model.joblib" in response.json()["detail"]
+
+    def test_manifeste_sans_empreintes_signale_non_verifie(self, client):
+        response = client.get("/ready")
+        assert response.status_code == 200 and response.json()["empreintes_verifiees"] is False

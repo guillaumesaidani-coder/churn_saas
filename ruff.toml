@@ -1,0 +1,6 @@
+# Lint du code Python (CI, job tests) : règles par défaut de ruff (erreurs de syntaxe, noms
+# indéfinis, imports et variables inutilisés...). Les notebooks ne sont pas lintés : ils sont
+# exécutés par le pipeline DVC et relus à la main.
+line-length = 130
+target-version = "py313"
+extend-exclude = ["notebooks", "reports", "data", "Livrables"]

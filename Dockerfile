@@ -16,6 +16,8 @@ CMD ["python", "-m", "dvc", "repro"]
 
 FROM python:3.13-slim AS runtime
 WORKDIR /app
+# Relie l'image publiée sur ghcr.io au dépôt GitHub (page du paquet, visibilité).
+LABEL org.opencontainers.image.source="https://github.com/guillaumesaidani-coder/churn_saas"       org.opencontainers.image.description="API de scoring churn SaaS (modèle v2) et exporteur de dérive"
 
 RUN groupadd --system appgroup \
     && useradd --system --uid 10001 --gid appgroup --no-create-home appuser

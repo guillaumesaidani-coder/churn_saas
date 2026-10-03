@@ -56,6 +56,7 @@ affirmation à son code ou à son artefact.
 - [Guide de démarrage](exploitation/guide_de_demarrage.md)
 - [Runbook d'exploitation](exploitation/runbook.md)
 - [Supervision et mesure de l'impact](exploitation/supervision.md)
+- [Sécurité : menaces et parades (STRIDE)](exploitation/securite.md)
 
 ### Qualité
 - [Cahier de tests](qualite/cahier_de_tests.md)

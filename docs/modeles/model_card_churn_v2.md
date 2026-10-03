@@ -1,7 +1,7 @@
 ---
 type: référence
 statut: à jour (modèle en service)
-mise_a_jour: 2026-09-29
+mise_a_jour: 2026-10-03
 sources: data/model_v2/model_manifest.json, metrics.json, scoring_manifest.json ; notebook §8, §9, §12
 ---
 
@@ -81,6 +81,13 @@ validation croisée.
 **Calibration** : probabilité moyenne prédite 0,276 pour un taux réel de 0,280 ; score de Brier
 0,123 contre 0,202 pour la référence. Les probabilités sont fiables, ce qui légitime le calcul de
 la perte attendue en euros.
+
+**Faut-il recalibrer ?** (lot 3, 3 octobre) Non. Erreur de calibration moyenne par déciles (ECE) :
+4,5 points sur le test, 1,3 point en validation croisée sur l'entraînement. L'écart le plus fort
+porte sur un décile du test (30 % prédits, 44 % observés, sur 100 comptes), ce que la validation
+croisée ne confirme pas. Une recalibration n'apporte rien : Brier de 0,1229 avec Platt et 0,1238
+en isotonique, contre 0,1230 sans. Les probabilités brutes de la régression logistique sont
+conservées ; l'ECE est suivie à chaque évaluation (`src/evaluation.py`), sans seuil.
 
 **Valeur métier** (cycle simulé de 1 000 comptes) : les 150 priorités Hautes contiennent
 **102 comptes qui allaient réellement partir** (42 attendus au hasard) et captent **82 %** de la

@@ -4,10 +4,13 @@ services:
       context: .
       target: runtime
     environment:
-      API_KEY: dev-local-key
+      # Pas de clé par défaut : sans API_KEY (variable d'environnement ou fichier .env, non
+      # versionné), Compose refuse de démarrer, et l'API seule resterait fermée (503).
+      API_KEY: ${API_KEY:?Définir API_KEY, par exemple dans le fichier .env}
       MODEL_DIR: /app/data/model_v2   # modèle v2 (notebook de certification)
+    # Ports publiés sur la boucle locale seulement : rien n'est exposé au réseau du poste.
     ports:
-      - "8011:8000"
+      - "127.0.0.1:8011:8000"
     # HEALTHCHECK déjà défini dans le Dockerfile (GET /health).
 
   drift-exporter:
@@ -36,7 +39,7 @@ services:
     volumes:
       - ./data/production:/app/data/production:ro
     ports:
-      - "9111:9110"
+      - "127.0.0.1:9111:9110"
 
   prometheus:
     image: prom/prometheus:v3.1.0
@@ -50,7 +53,7 @@ services:
       drift-exporter:
         condition: service_started
     ports:
-      - "9092:9090"
+      - "127.0.0.1:9092:9090"
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/ready"]
       interval: 5s
@@ -63,7 +66,7 @@ services:
       prometheus:
         condition: service_healthy
     ports:
-      - "3011:3000"
+      - "127.0.0.1:3011:3000"
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro

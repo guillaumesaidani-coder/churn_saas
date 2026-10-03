@@ -40,6 +40,16 @@ def score_regle_metier(X: pd.DataFrame, mediane_integrations: float) -> pd.Serie
             + X["derniere_connexion_jours"] / 200)
 
 
+def erreur_calibration(y: pd.Series, proba: np.ndarray, groupes: int = 10) -> tuple[float, float]:
+    """Écart entre probabilité moyenne prédite et taux observé, par déciles de probabilité :
+    moyenne pondérée (ECE) et écart maximal. Suivi, sans seuil : sur 100 comptes par décile,
+    un écart de 10 points peut venir du hasard."""
+    d = pd.DataFrame({"y": np.asarray(y), "p": proba, "q": pd.qcut(proba, groupes, labels=False, duplicates="drop")})
+    par_groupe = d.groupby("q").agg(y=("y", "mean"), p=("p", "mean"), n=("y", "size"))
+    ecarts = (par_groupe["y"] - par_groupe["p"]).abs()
+    return float((ecarts * par_groupe["n"]).sum() / par_groupe["n"].sum()), float(ecarts.max())
+
+
 def metriques_classification(y: pd.Series, proba: np.ndarray, score_regle: pd.Series, seuil_d9: float,
                              taux_reference: float) -> dict[str, Any]:
     """Métriques de test du notebook (§9.3) et calibration (§9.4). `taux_reference` est le taux de
@@ -58,6 +68,7 @@ def metriques_classification(y: pd.Series, proba: np.ndarray, score_regle: pd.Se
         "probabilite_moyenne": float(np.mean(proba)),
         "taux_churn_observe": float(np.mean(y)),
     }
+    m["ece"], m["ecart_calibration_max_decile"] = erreur_calibration(y, proba)
     m["gain_pr_auc_vs_D8"] = m["pr_auc"] - m["pr_auc_baseline_metier_D8"]
     return {k: (round(float(v), 4) if isinstance(v, (float, np.floating)) else v) for k, v in m.items()}
 

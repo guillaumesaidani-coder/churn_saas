@@ -15,9 +15,19 @@ Explicabilité (`src/explain.py`) : `/score-batch?explain=true` ajoute à chaque
 facteurs qui augmentent et diminuent son risque, la trace de la règle de décision et les
 avertissements sur ses valeurs d'entrée. Garde-fou : `/ready` répond 503 si le modèle chargé
 contient une variable que la base de connaissance exclut (fuite, cible, leurre...).
+
+Robustesse et sécurité (lot 3) :
+- entrées validées (`src/validation.py`) : variable inconnue, type faux ou valeur physiquement
+  impossible -> 422, avant tout calcul ;
+- `/ready` répond 503 si l'empreinte SHA-256 d'un modèle chargé diffère de celle écrite par le
+  notebook de certification (`model_manifest.json`, champ `empreintes_sha256`) : on ne sert pas
+  un modèle autre que celui qui a été évalué ;
+- sans variable d'environnement `API_KEY`, le service reste fermé (503 sur `/ready` et
+  `/score-batch`) au lieu d'accepter une clé par défaut ; comparaison de la clé en temps constant.
 """
 from __future__ import annotations
 
+import hmac
 import json
 import logging
 import os
@@ -33,12 +43,14 @@ from fastapi import Depends, FastAPI, HTTPException, Request, Response, Security
 from fastapi.responses import JSONResponse
 from fastapi.security import APIKeyHeader
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from src.explain import (CHEMIN_BASE_DEFAUT, NOM_FICHIER_REFERENCE, charger_base_connaissance,
                          controler_exclusions, expliquer_batch)
 from src.features import neutraliser_incoherences
 from src.scoring import assigner_priorites, scorer_batch
+from src.validation import valider_entrees
+from src.versioning import sha256_of
 
 app = FastAPI(title="Churn SaaS -- API de scoring")
 logger = logging.getLogger("churn_saas.api")
@@ -60,6 +72,8 @@ _capacite_haute: int = 0
 _reference_explication: dict | None = None
 _base_connaissance: dict | None = None
 _anomalies_bloquantes: list[dict] = []
+_empreintes_non_conformes: list[str] = []   # modèles dont l'empreinte diffère de la certifiée
+_empreintes_verifiees = False
 
 # IP -> horodatages des appels dans la fenêtre courante. En mémoire, par process : suffisant
 # pour une seule instance, pas pour un déploiement multi-instance.
@@ -87,6 +101,7 @@ def load_artifacts(model_dir: Path | None = None, knowledge_path: Path | None = 
     absents -- c'est `/ready` (ou `/score-batch?explain=true`) qui traduit ça en 503."""
     global _model_churn, _model_clv, _feature_columns, _seuil_d9, _capacite_haute
     global _reference_explication, _base_connaissance, _anomalies_bloquantes
+    global _empreintes_non_conformes, _empreintes_verifiees
 
     model_dir = Path(model_dir) if model_dir else MODEL_DIR
     churn_path = model_dir / "model.joblib"
@@ -97,11 +112,20 @@ def load_artifacts(model_dir: Path | None = None, knowledge_path: Path | None = 
     _model_churn = joblib.load(churn_path) if churn_path.exists() else None
     _model_clv = joblib.load(clv_path) if clv_path.exists() else None
 
+    manifeste_modele = {}
     if model_manifest_path.exists():
         with open(model_manifest_path, "r", encoding="utf-8") as f:
-            _feature_columns = json.load(f)["features"]
-    else:
-        _feature_columns = []
+            manifeste_modele = json.load(f)
+    _feature_columns = manifeste_modele.get("features", [])
+
+    # Empreintes certifiées : écrites par le notebook de certification à côté des modèles qu'il
+    # a évalués. Absentes d'un manifeste plus ancien : vérification impossible, signalée par /ready.
+    certifiees = manifeste_modele.get("empreintes_sha256", {})
+    _empreintes_verifiees = bool(certifiees)
+    _empreintes_non_conformes = [
+        nom for nom, attendue in certifiees.items()
+        if not (model_dir / nom).exists() or sha256_of(model_dir / nom) != attendue
+    ]
 
     if manifest_path.exists():
         with open(manifest_path, "r", encoding="utf-8") as f:
@@ -167,9 +191,15 @@ async def add_request_id(request: Request, call_next):
     return response
 
 
+def _cle_configuree() -> str | None:
+    return os.getenv("API_KEY") or None
+
+
 def require_api_key(api_key: str = Security(_api_key_header)) -> str:
-    expected = os.getenv("API_KEY", "dev-local-key")
-    if api_key != expected:
+    attendue = _cle_configuree()
+    if attendue is None:
+        raise HTTPException(status_code=503, detail="Service fermé : API_KEY non configurée")
+    if api_key is None or not hmac.compare_digest(api_key.encode("utf-8"), attendue.encode("utf-8")):
         raise HTTPException(status_code=401, detail="Clé API manquante ou invalide")
     return api_key
 
@@ -191,7 +221,7 @@ def rate_limit_dependency(request: Request) -> None:
 
 
 class ClientFeatures(BaseModel):
-    client_id: str
+    client_id: str = Field(min_length=1, max_length=64)
     features: dict[str, float | str | None]
 
 
@@ -244,7 +274,10 @@ def health():
 
 @app.get("/ready")
 def ready():
-    """Le service peut vraiment scorer : les deux modèles et la règle D9/D10 sont chargés."""
+    """Le service peut vraiment scorer : les deux modèles et la règle D9/D10 sont chargés, ce
+    sont ceux qui ont été certifiés, et une clé API est configurée."""
+    if _cle_configuree() is None:
+        raise HTTPException(status_code=503, detail="Service fermé : API_KEY non configurée")
     if _model_churn is None or _model_clv is None:
         raise HTTPException(status_code=503, detail="Modèles non chargés")
     if not _feature_columns:
@@ -252,7 +285,10 @@ def ready():
     if _anomalies_bloquantes:
         variables = ", ".join(a["variable"] for a in _anomalies_bloquantes)
         raise HTTPException(status_code=503, detail=f"Modèle non conforme à la base de connaissance : {variables}")
-    return {"status": "ready"}
+    if _empreintes_non_conformes:
+        raise HTTPException(status_code=503, detail="Empreinte différente du modèle certifié : "
+                                                    + ", ".join(_empreintes_non_conformes))
+    return {"status": "ready", "empreintes_verifiees": _empreintes_verifiees}
 
 
 @app.post(
@@ -270,6 +306,9 @@ def score_batch(payload: ScoreBatchRequest, explain: bool = False):
 
     if not payload.clients:
         raise HTTPException(status_code=422, detail="clients ne peut pas être vide")
+    erreurs = valider_entrees([(c.client_id, c.features) for c in payload.clients], _feature_columns)
+    if erreurs:
+        raise HTTPException(status_code=422, detail=erreurs)
 
     client_ids = pd.Series([c.client_id for c in payload.clients])
     X = pd.DataFrame([c.features for c in payload.clients]).reindex(columns=_feature_columns)

@@ -5,7 +5,8 @@ Recalcule les métriques de test du modèle livré (`data/model_v2/model.joblib`
 `scoring_manifest.json`) et vérifie :
 - les critères qu'il doit tenir (D8, rappel au seuil D9, calibration, aucun contrôle bloquant de
   la base de connaissance) ;
-- qu'il redonne les métriques publiées dans `metrics.json` (artefact cohérent avec le notebook).
+- qu'il redonne les métriques publiées dans `metrics.json` (artefact cohérent avec le notebook) ;
+- que ses fichiers ont l'empreinte certifiée par le notebook (`model_manifest.json`), si elle y est.
 
 Sort avec le code 1 si un critère n'est pas tenu : la CI échoue et l'image n'est pas construite.
 Avec `--sortie`, écrit le rapport complet en JSON.
@@ -25,6 +26,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.evaluation import criteres_reproduction  # noqa: E402
+from src.versioning import sha256_of  # noqa: E402
 from src.explain import charger_base_connaissance  # noqa: E402
 from src.reentrainement import decouper, evaluer  # noqa: E402
 from src.versioning import read_manifest  # noqa: E402
@@ -47,6 +49,11 @@ def main() -> None:
     rapport = evaluer(modele, seuil, X_train, y_train, X_test, y_test,
                       charger_base_connaissance(args.base), reference)
     rapport["criteres"] += criteres_reproduction(rapport["metriques"], publiees)
+    # Empreintes certifiées par le notebook (absentes d'un manifeste antérieur au lot 3)
+    certifiees = read_manifest(args.model_dir / "model_manifest.json").get("empreintes_sha256", {})
+    for nom, attendue in certifiees.items():
+        rapport["criteres"].append({"critere": f"Empreinte de {nom} = empreinte certifiée", "valeur": sha256_of(args.model_dir / nom)[:12],
+                                    "seuil": attendue[:12], "respecte": sha256_of(args.model_dir / nom) == attendue})
     rapport["modele"] = (args.model_dir / "model.joblib").as_posix()
     rapport["tous_respectes"] = all(c["respecte"] for c in rapport["criteres"])
 
