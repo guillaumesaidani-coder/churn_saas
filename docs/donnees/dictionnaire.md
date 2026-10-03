@@ -1,7 +1,7 @@
 ---
 type: référence
 statut: à jour
-mise_a_jour: 2026-09-29
+mise_a_jour: 2026-10-03
 sources: énoncé §2.1 ; knowledge/base_connaissance.yaml ; notebook §6 et §7.6
 ---
 
@@ -73,6 +73,31 @@ Chacune ne prend qu'une valeur par plan : elle répète l'information de `plan` 
 > (PR-AUC en validation croisée de 0,785 avec eux, 0,784 sans ; signe instable pour le taux
 > d'utilisation ; le taux de retard est stable mais fonction exacte des retards et de l'ancienneté) :
 > leur retrait est recommandé pour la v3 ([contrôles](../explicabilite/controles.md)).
+
+## Features et cible de chaque modèle
+
+Le Gold v2 compte 25 colonnes : 20 features, 2 cibles et 3 colonnes qui n'entrent dans aucun
+modèle. Les deux modèles lisent **les mêmes 20 features** (liste exacte : `FEATURES_V2`,
+`src/features.py`) ; seule la préparation des numériques diffère.
+
+| Features | Modèle de churn | Modèle de CLV |
+|---|---|---|
+| **3 catégorielles** : `secteur` (8 modalités : Commerce, Tech, Finance, Industrie, Éducation, Santé, Public, Inconnu), `taille_entreprise` (4 : TPE, PME, ETI, GE), `plan` (4 : Starter, Pro, Business, Enterprise) | One-hot, modalité inconnue ignorée | Idem |
+| **17 numériques** : `anciennete_mois`, `sieges_souscrits`, `utilisateurs_actifs`, `taux_adoption_pct`, `connexions_30j`, `heures_usage_30j`, `fonctionnalites_total`, `fonctionnalites_utilisees`, `nb_integrations`, `derniere_connexion_jours`, `tickets_support_90j`, `delai_reponse_support_h`, `csat`, `retards_paiement_12m`, `revenu_mensuel_recurrent_eur`, `taux_utilisation_fonctionnalites`, `taux_retard_paiement_par_mois` | Médiane du train puis standardisation | Médiane du train, sans standardisation |
+
+| | Modèle de churn | Modèle de CLV |
+|---|---|---|
+| Cible | `churn` | `valeur_vie_client_eur` |
+| Type de problème | Classification binaire | Régression |
+| Classes de la cible | **0** = reste client, **1** = résilie à l'échéance | Aucune : montant continu (300 à 2 000 000 €), appris en `log(1 + CLV)` |
+| Répartition — train (4 000) | 2 880 × 0, 1 120 × 1 (28,0 %) | Médiane 11 086,5 € |
+| Répartition — test (1 000) | 720 × 0, 280 × 1 (28,0 %) | Médiane 11 601,5 € |
+| Déséquilibre | Classes non pondérées ([protocole](../modeles/protocole_experimental.md)) ; mesure par la PR-AUC | Distribution très étirée, d'où le log |
+
+Colonnes du Gold qui n'entrent dans aucun modèle : `client_id` (identifiant), `split`
+(train / test, graine 42, stratifié sur `churn`), `sante_compte_fin_periode` (fuite, conservée
+pour traçabilité). Chaque cible est absente de l'autre modèle : la CLV ne doit pas servir à
+prédire le churn (énoncé §3.2), et le churn n'entre pas dans la CLV.
 
 ## Sens attendu
 

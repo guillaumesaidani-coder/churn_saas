@@ -2,7 +2,7 @@
 type: référence
 statut: à jour
 mise_a_jour: 2026-10-03
-sources: document de cadrage de l'atelier n°1 (non publié) pour H01 à H04 ; notebook §12.3 pour H05 ; énoncé du cas d'usage et réponse du formateur (2026-10-03) pour H06 ; notebook §2.6
+sources: document de cadrage de l'atelier n°1 (non publié) pour H01 à H04 ; notebook §12.3 pour H05 ; énoncé du cas d'usage et réponse du formateur (2026-10-03) pour H06 ; notebook §2.6 et §6.2
 ---
 
 [← Documentation](../index.md)
@@ -29,7 +29,7 @@ comme un fait mesuré.
 les données, pas une hypothèse ; elle sert de coût d'un faux négatif dans l'analyse de coût
 (§9.5).
 
-## Indice dans les données pour H06 ; notebook §2.6
+## Indice dans les données pour H06 ; notebook §2.6 et §6.2
 
 Taux de churn selon l'ancienneté (table Silver, 5 000 comptes) :
 
@@ -42,6 +42,11 @@ Le churn baisse régulièrement avec l'ancienneté, sans pic aux dates anniversa
 dates. Les données vont donc plutôt dans le sens d'une échéance mensuelle, mais ce n'est pas une
 preuve : le jeu est synthétique et a pu être généré sans modéliser les contrats ; aucun test
 statistique n'a été fait. C'est la confirmation du formateur qui fonde H06.
+
+H06 permet en retour de lire l'ancienneté d'un compte qui résilie comme sa durée de vie au départ,
+à un mois près : 7,1 mois en moyenne (médiane 6), contre 12,3 mois pour les comptes qui restent ;
+52 % de churn entre 1 et 3 mois. Ce n'est pas une durée de vie moyenne des clients (un seul
+instantané, comptes actifs non résiliés) : détail et limites au notebook §6.2.
 
 ## Robustesse
 

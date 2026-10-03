@@ -1,7 +1,7 @@
 ---
 type: référence
 statut: à jour (modèle en service)
-mise_a_jour: 2026-09-29
+mise_a_jour: 2026-10-03
 sources: data/model_v2/metrics_clv.json, model_manifest.json ; notebook §9.7 et §12.2
 ---
 
@@ -20,7 +20,7 @@ Fiche d'identité du modèle de régression servi par l'API (brique 2 de la
 | Type | **Gradient boosting** (`HistGradientBoostingRegressor`, `learning_rate = 0,05`, `max_iter = 400`) |
 | Cible | `valeur_vie_client_eur`, apprise en `log(1 + CLV)` ; prédiction retransformée en euros (bornée à 0) |
 | Préparation (dans le pipeline) | One-hot des 3 catégorielles ; médiane des 17 numériques (pas de standardisation) |
-| Entrées | Les 20 mêmes variables que le modèle de churn ; `churn` et `sante_compte_fin_periode` en sont absentes |
+| Entrées | Les 20 mêmes variables que le modèle de churn ; `churn` et `sante_compte_fin_periode` en sont absentes ([features et cible de chaque modèle](../donnees/dictionnaire.md#features-et-cible-de-chaque-modèle)) |
 | Artefact | `data/model_v2/model_clv.joblib` : 1,47 Mo, versionné par DVC (hors Git, récupéré par `dvc pull`) |
 | Graine | 42 |
 

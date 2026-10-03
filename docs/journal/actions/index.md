@@ -43,6 +43,7 @@ certification.
 - [2.29 Lot 2 : déclencheurs, challenger contre modèle en service, évaluation en CI, revue trimestrielle (2026-10-03)](2.29_lot2_reentrainement.md)
 - [2.30 Lot 3 : robustesse, sécurité et déploiement continu (2026-10-03)](2.30_lot3_robustesse_deploiement.md)
 - [2.31 Lot 4 : notebook mis à jour, rejeu officiel, un défaut de l'API corrigé (2026-10-03)](2.31_lot4_notebook_rejeu.md)
+- [2.32 Ancienneté au départ, features et classes de chaque modèle ; rejeu (2026-10-03)](2.32_anciennete_et_features_par_modele.md)
 
 ---
 

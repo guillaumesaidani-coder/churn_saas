@@ -19,7 +19,7 @@ Fiche d'identité du modèle de classification servi par l'API (brique 1 de la
 |---|---|
 | Type | **Régression logistique** régularisée (L2), `C = 0,03`, `max_iter = 3000`, sans pondération des classes |
 | Préparation (dans le pipeline) | One-hot des 3 catégorielles (modalité inconnue ignorée) ; médiane puis standardisation des 17 numériques |
-| Entrées | 20 variables du Gold v2 ([dictionnaire](../donnees/dictionnaire.md)) |
+| Entrées | 20 variables du Gold v2 et cible `churn` à 2 classes ([features et cible de chaque modèle](../donnees/dictionnaire.md#features-et-cible-de-chaque-modèle)) |
 | Sortie | Probabilité de churn à l'échéance ([D2](../cadrage/decisions/D02.md)) |
 | Artefact | `data/model_v2/model.joblib` : pipeline complet, versionné par DVC (hors Git, récupéré par `dvc pull`) |
 | Graine | 42 |
