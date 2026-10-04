@@ -111,16 +111,16 @@ par le système de décision : la même entrée donne toujours la même liste pr
 ## Éco-conception (notebook §8.6)
 
 Mesure avec CodeCarbon (hors ligne, mix électrique français), lors du rejeu officiel du notebook
-v2.3 (3 octobre 2026) :
+v2.3 (4 octobre 2026) :
 
 | Modèle | PR-AUC (CV) | Énergie de la sélection (mWh) | Scoring de 1 000 comptes (ms) | Taille du modèle |
 |---|---|---|---|---|
-| Régression logistique (retenue) | 0,783 | 3,05 | 5,2 | 4,8 Ko |
-| Forêt aléatoire | 0,764 | 52,2 (**17 fois plus**) | 63,6 | 28,7 Mo |
-| Gradient boosting | 0,755 | 84,0 (**28 fois plus**) | 9,7 | 1,1 Mo |
+| Régression logistique (retenue) | 0,783 | 3,00 | 4,9 | 4,8 Ko |
+| Forêt aléatoire | 0,764 | 49,9 (**17 fois plus**) | 88,0 | 28,7 Mo |
+| Gradient boosting | 0,755 | 82,1 (**27 fois plus**) | 11,8 | 1,1 Mo |
 
-Ces valeurs varient d'une exécution à l'autre (le rejeu du 1er octobre donnait 18 et 28 fois, une
-exécution à blanc du 3 octobre 17 et 26 fois) ; l'ordre de grandeur est stable : les familles à
+Ces valeurs varient d'une exécution à l'autre (18 et 28 fois au rejeu du 1er octobre, 17 et 26 fois
+à l'exécution à blanc du 3 octobre, 17 et 28 fois au premier rejeu officiel du même jour) ; l'ordre de grandeur est stable : les familles à
 base d'arbres consomment **plus de dix fois** l'énergie du modèle retenu (notebook §8.6).
 
 Le modèle retenu est aussi le plus sobre. Les valeurs absolues sont infimes et estimées : à
