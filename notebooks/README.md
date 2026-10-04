@@ -1,7 +1,7 @@
 # Notebooks
 
 **Le livrable est [`notebook_certifiant_churn_saas.ipynb`](notebook_certifiant_churn_saas.ipynb)**
-(version 2.2). Il couvre seul le plan imposé (§0 à §15) et les compétences C1 à C9. Sa version
+(version 2.3). Il couvre seul le plan imposé (§0 à §15). Sa version
 exécutée, avec toutes les sorties, est dans
 [`reports/notebooks/`](../reports/notebooks/notebook_certifiant_churn_saas.ipynb).
 
