@@ -317,8 +317,8 @@ stages:
       size: 11314
     - path: notebooks/notebook_certifiant_churn_saas.ipynb
       hash: md5
-      md5: 1790555d9035e8992181376bf16dff16
-      size: 390932
+      md5: 75211a9cd3d54a8b79460e840b6106ed
+      size: 391867
     - path: src/api.py
       hash: md5
       md5: 66d67515d3642e7d18284adb88ac3e89
@@ -386,11 +386,11 @@ stages:
       size: 200436
     - path: data/gold/gold_fiche_identite_v2.md
       hash: md5
-      md5: b44bb497cf9951f0c4dc99f278789084
+      md5: 9fed47514ce75bcc1cc0f41d7ca11396
       size: 2885
     - path: data/gold/gold_v2_manifest.json
       hash: md5
-      md5: 5761deec59f9a6644ddf58006f711ce6
+      md5: 161f21048a507f9919d284ec7761b42e
       size: 2146
     - path: data/model_v2/explication_reference.json
       hash: md5
@@ -398,8 +398,8 @@ stages:
       size: 5804
     - path: data/model_v2/figures
       hash: md5
-      md5: cfa6381f4041d4b726da38cb53ac2b41.dir
-      size: 1267143
+      md5: 190787d4ed88225852b27c84996b4d62.dir
+      size: 1340676
       nfiles: 19
     - path: data/model_v2/metrics.json
       hash: md5
@@ -419,7 +419,7 @@ stages:
       size: 1467186
     - path: data/model_v2/model_manifest.json
       hash: md5
-      md5: 9e36458d1e8aba8fe838dc702b950b8f
+      md5: e801928e27078e555d55e497cb12ee25
       size: 2332
     - path: data/model_v2/scoring_exemple_cycle.parquet
       hash: md5
@@ -431,8 +431,8 @@ stages:
       size: 841
     - path: reports/notebooks/notebook_certifiant_churn_saas.ipynb
       hash: md5
-      md5: b2f9a04e7eb80df332b5dc11aa927dc0
-      size: 2075973
+      md5: 44d6eaa8570d8a4f66c254a5b401279a
+      size: 2154320
   lots_simules:
     cmd: python scripts/simuler_lots_mensuels.py
     deps:
@@ -506,7 +506,7 @@ stages:
       size: 1467186
     - path: data/model_v2/model_manifest.json
       hash: md5
-      md5: 9e36458d1e8aba8fe838dc702b950b8f
+      md5: e801928e27078e555d55e497cb12ee25
       size: 2332
     - path: data/model_v2/scoring_manifest.json
       hash: md5
@@ -559,7 +559,7 @@ stages:
     outs:
     - path: data/production/journal_scores.jsonl
       hash: md5
-      md5: 04a872fe8b2befa23e73f8160888f022
+      md5: 3f823c53cb1287c2fc2b4aafaf1136eb
       size: 2776
     - path: data/production/m1_derive/derive.json
       hash: md5
