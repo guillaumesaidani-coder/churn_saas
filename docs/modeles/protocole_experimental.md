@@ -115,12 +115,13 @@ v2.3 (4 octobre 2026) :
 
 | Modèle | PR-AUC (CV) | Énergie de la sélection (mWh) | Scoring de 1 000 comptes (ms) | Taille du modèle |
 |---|---|---|---|---|
-| Régression logistique (retenue) | 0,783 | 3,00 | 4,9 | 4,8 Ko |
-| Forêt aléatoire | 0,764 | 49,9 (**17 fois plus**) | 88,0 | 28,7 Mo |
-| Gradient boosting | 0,755 | 82,1 (**27 fois plus**) | 11,8 | 1,1 Mo |
+| Régression logistique (retenue) | 0,783 | 2,97 | 5,2 | 4,8 Ko |
+| Forêt aléatoire | 0,764 | 54,4 (**18 fois plus**) | 64,5 | 28,7 Mo |
+| Gradient boosting | 0,755 | 82,2 (**28 fois plus**) | 9,9 | 1,1 Mo |
 
 Ces valeurs varient d'une exécution à l'autre (18 et 28 fois au rejeu du 1er octobre, 17 et 26 fois
-à l'exécution à blanc du 3 octobre, 17 et 28 fois au premier rejeu officiel du même jour) ; l'ordre de grandeur est stable : les familles à
+à l'exécution à blanc du 3 octobre, 17 et 28 fois au premier rejeu officiel du même jour, 17 et 27
+fois au deuxième, le 4 octobre) ; l'ordre de grandeur est stable : les familles à
 base d'arbres consomment **plus de dix fois** l'énergie du modèle retenu (notebook §8.6).
 
 Le modèle retenu est aussi le plus sobre. Les valeurs absolues sont infimes et estimées : à
