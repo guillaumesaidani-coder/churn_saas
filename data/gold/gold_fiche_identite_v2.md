@@ -1,6 +1,6 @@
 # Fiche d'identité — Gold dataset v2
 
-Produit par `notebooks/notebook_certifiant_churn_saas.ipynb` (commit `1789677`).
+Produit par `notebooks/notebook_certifiant_churn_saas.ipynb` (commit `d9b92dc`).
 Fichier : `data/gold/clients_churn_gold_v2.parquet` — SHA-256 `0dcb0bbd659c6479569accc19cde05629fe20acfbfdc43e3194d3af9abd1f865`.
 
 ## Changements par rapport à la v1
